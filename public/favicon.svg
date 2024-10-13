@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background Circle -->
+  <circle cx="50" cy="50" r="50" fill="#2E3A59"/>
+  
+  <!-- Oscillating Wave -->
+  <path d="M 10 60 Q 20 20, 30 60 T 50 60 T 70 60 T 90 60" 
+        stroke="#F4D35E" stroke-width="6" fill="transparent"/>
+
+  <!-- Text or Symbol -->
+  <text x="50%" y="90%" text-anchor="middle" fill="#F4D35E" font-size="14" font-family="Arial" dy=".3em">O</text>
+</svg>

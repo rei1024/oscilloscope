@@ -1,0 +1,28 @@
+{
+  "name": "oscilloscope",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "repository": {
+    "url": "https://github.com/rei1024/oscilloscope"
+  },
+  "homepage": "https://rei1024.github.io/oscilloscope/",
+  "keywords": [
+    "game of life",
+    "cgol"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && node prebuild.js && vite build",
+    "postinstall": "node prebuild.js",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@ca-ts/algo": "npm:@jsr/ca-ts__algo@^0.2.0",
+    "@ca-ts/rle": "npm:@jsr/ca-ts__rle@^0.8.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.1"
+  },
+  "dependencies": {}
+}
