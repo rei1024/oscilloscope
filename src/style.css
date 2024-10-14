@@ -10,3 +10,20 @@ canvas {
 body {
   font-family: system-ui;
 }
+
+main,
+header {
+  width: 900px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  main,
+  header {
+    width: auto;
+  }
+}
