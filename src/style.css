@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 canvas {
@@ -17,13 +18,51 @@ header {
   margin: auto;
 }
 
-h1 {
-  text-align: center;
-}
-
 @media (max-width: 900px) {
   main,
   header {
     width: auto;
   }
+}
+
+h1 {
+  text-align: center;
+}
+
+main {
+  display: grid;
+  align-items: stretch;
+  margin: auto;
+  padding-inline: 8px;
+  row-gap: 8px;
+}
+
+.m-1 {
+  margin: 2px;
+}
+
+.m-2 {
+  margin: 4px;
+}
+
+.m-3 {
+  margin: 8px;
+}
+
+button {
+  font-size: 1.2rem;
+  padding-block: 8px;
+}
+
+table {
+  font-variant-numeric: tabular-nums;
+}
+
+table th,
+table td {
+  padding: 4px;
+}
+
+table th {
+  text-align: right;
 }
