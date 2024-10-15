@@ -45,7 +45,8 @@ onmessage = (e) => {
   try {
     const result = analyzeOscillator(
       rle.cells.filter((x) => x.state === 1).map((x) => x.position),
-      rule.transition
+      rule.transition,
+      { maxGeneration: 100_000 }
     );
     post({ kind: "response-analyzed", data: result });
   } catch (error) {

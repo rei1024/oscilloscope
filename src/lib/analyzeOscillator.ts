@@ -52,13 +52,14 @@ export type AnalyzeResult = {
 
 export function analyzeOscillator(
   cells: { x: number; y: number }[],
-  transition: { birth: number[]; survive: number[] }
+  transition: { birth: number[]; survive: number[] },
+  { maxGeneration }: { maxGeneration: number }
 ): AnalyzeResult {
   let bufferSize = 32;
   for (let i = 0; i < 5; i++) {
     try {
       const world = new WorldWithHistory({ cells, bufferSize, transition });
-      world.run({ forceStop: () => world.getGen() >= 100_000 });
+      world.run({ forceStop: () => world.getGen() >= maxGeneration });
 
       const period = world.getGen();
       const populations = world.histories.map((h) => h.bitGrid.getPopulation());
