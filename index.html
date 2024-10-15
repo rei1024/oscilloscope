@@ -33,6 +33,53 @@
     <header>
       <h1>Oscilloscope</h1>
     </header>
-    <main></main>
+    <main>
+      <textarea
+        id="input"
+        rows="8"
+        placeholder="x = 3, y = 1, rule = B3/S23
+3o!"
+      ></textarea>
+      <button id="analyze">Analyze</button>
+      <div id="message"></div>
+      <div>
+        <table id="output-table" style="display: none">
+          <tr>
+            <th>Period</th>
+            <td id="output-period">32</td>
+          </tr>
+          <tr>
+            <th>Population</th>
+            <td>
+              min = <span id="output-cells-min"></span>, max =
+              <span id="output-cells-max"></span>, avg =
+              <span id="output-cells-avg"></span>, median =
+              <span id="output-cells-median"></span>
+            </td>
+          </tr>
+          <tr>
+            <th>Bounding Box</th>
+            <td>
+              <span id="output-width"></span> x
+              <span id="output-height"></span> = <span id="output-area"></span>
+            </td>
+          </tr>
+          <tr>
+            <th>Stator / Rotor</th>
+            <td>
+              Stator = <span id="output-stator"></span>, Rotor =
+              <span id="output-rotor"></span>
+            </td>
+          </tr>
+          <tr>
+            <th>Volatility</th>
+            <td><span id="output-volatility"></span></td>
+          </tr>
+        </table>
+      </div>
+    </main>
+    <footer class="m-3" style="margin-top: 40px">
+      <a href="https://github.com/rei1024/oscilloscope">Source Code</a>
+    </footer>
   </body>
 </html>
