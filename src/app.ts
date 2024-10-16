@@ -1,5 +1,5 @@
 import { BitGrid } from "@ca-ts/algo/bit";
-import { AnalyzeResult } from "./lib/analyzeOscillator";
+import type { AnalyzeResult } from "./lib/analyzeOscillator";
 const cellSize = 10;
 export class App {
   histories: BitGrid[] | null = null;

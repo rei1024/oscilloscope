@@ -1,4 +1,4 @@
-import { analyzeOscillator, AnalyzeResult } from "./lib/analyzeOscillator";
+import { analyzeOscillator, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { parseRule } from "@ca-ts/rule";
 
