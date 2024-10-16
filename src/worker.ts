@@ -1,4 +1,4 @@
-import { analyzeOscillator, AnalyzeResult } from "./lib/analyzeOscillator";
+import { analyzeOscillator, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { parseRule } from "@ca-ts/rule";
 
@@ -17,30 +17,31 @@ export type WorkerResponseMessage =
       message: string;
     };
 
-onmessage = (e) => {
-  const data = e.data as WorkerRequestMessage;
-  function post(res: WorkerResponseMessage) {
-    postMessage(res);
-  }
+function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
   let rle;
   let rule;
+  if (data.rle.trim() === "") {
+    return {
+      kind: "response-error",
+      message: "RLE is empty",
+    };
+  }
   try {
     rle = parseRLE(data.rle);
     rule = parseRule(rle.ruleString);
   } catch (error) {
-    post({
+    console.error(error);
+    return {
       kind: "response-error",
       message: "Unsupported rule or rle error",
-    });
-    return;
+    };
   }
 
   if (rule.type !== "outer-totalistic") {
-    post({
+    return {
       kind: "response-error",
       message: "Unsupported rule",
-    });
-    return;
+    };
   }
   try {
     const result = analyzeOscillator(
@@ -48,11 +49,20 @@ onmessage = (e) => {
       rule.transition,
       { maxGeneration: 100_000 }
     );
-    post({ kind: "response-analyzed", data: result });
+    return { kind: "response-analyzed", data: result };
   } catch (error) {
-    post({
+    console.error(error);
+    return {
       kind: "response-error",
       message: "Analyzation Error",
-    });
+    };
   }
+}
+
+onmessage = (e) => {
+  const data = e.data as WorkerRequestMessage;
+  function post(res: WorkerResponseMessage) {
+    postMessage(res);
+  }
+  post(handleRequest(data));
 };
