@@ -47,6 +47,8 @@ export type AnalyzeResult = {
     height: number | null;
     minX: number;
     minY: number;
+    or: Uint32Array;
+    and: Uint32Array;
   };
 };
 
@@ -88,6 +90,8 @@ export function analyzeOscillator(
           height: world.histories[0]?.bitGrid.getHeight() ?? null,
           minX: boundingBox.minX,
           minY: boundingBox.minY,
+          or: or.asInternalUint32Array(),
+          and: or.asInternalUint32Array(),
         },
       };
     } catch (error) {

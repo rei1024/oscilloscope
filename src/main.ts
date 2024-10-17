@@ -34,10 +34,6 @@ worker.addEventListener("message", (e) => {
     const data = message.data;
     setTable(data);
     app.setup(data);
-    const ctx = $canvas.getContext("2d");
-    if (ctx == null) {
-      throw new Error("canvas");
-    }
   }
 });
 
