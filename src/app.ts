@@ -1,14 +1,11 @@
 import { BitGrid } from "@ca-ts/algo/bit";
-import type { AnalyzeResult } from "./lib/analyzeOscillator";
-import { periodMap, periodMapUnique } from "./lib/periodMap";
+import { bitGridFromData, type AnalyzeResult } from "./lib/analyzeOscillator";
 const cellSize = 10;
 const safeArea = 1;
 
 export class App {
   private data: AnalyzeResult | null = null;
   private histories: BitGrid[] | null = null;
-  private periodMap: number[][] | null = null;
-  private periods: number[] | null = null;
   private ctx: CanvasRenderingContext2D;
   private gen = 0;
   constructor(private $canvas: HTMLCanvasElement) {
@@ -37,22 +34,13 @@ export class App {
     const dx = this.data.bitGridData.minX;
     const dy = this.data.bitGridData.minY;
 
-    const colors = [
-      "#fca5a5",
-      "#fed7aa",
-      "#fde68a",
-      "#d9f99d",
-      "#6ee7b7",
-      "#a5f3fc",
-      "#bae6fd",
-    ];
-    // console.log(this.periods);
-    const periodNum = this.periods?.length ?? 1;
-    for (const [y, row] of this.periodMap?.entries() ?? []) {
+    const periodNum = this.data.periodMap.periodList.length;
+    for (const [y, row] of this.data.periodMap.data.entries()) {
       for (const [x, p] of row.entries()) {
         if (p >= 1) {
           ctx.beginPath();
-          const index = this.periods?.findIndex((t) => t === p) ?? 0;
+          const index =
+            this.data.periodMap.periodList?.findIndex((t) => t === p) ?? 0;
           ctx.fillStyle = `oklch(70% 0.2 ${(index * 360) / periodNum})`;
           ctx.rect(
             (x - dx + safeArea) * cellSize,
@@ -92,14 +80,8 @@ export class App {
       $canvas.style.height = "400px";
     }
 
-    const width32 = Math.ceil((bitGridData.width ?? 0) / 32);
-    const height = bitGridData.height ?? 0;
     this.data = data;
-    this.histories = bitGridData.histories.map(
-      (h) => new BitGrid(width32, height, h)
-    );
+    this.histories = data.histories.map((h) => bitGridFromData(h));
     this.gen = 0;
-    this.periodMap = periodMap(data);
-    this.periods = periodMapUnique(this.periodMap);
   }
 }

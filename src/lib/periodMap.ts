@@ -1,12 +1,18 @@
-import { BitGrid } from "@ca-ts/algo/bit";
-import type { AnalyzeResult } from "./analyzeOscillator";
+import type { BitGrid } from "@ca-ts/algo/bit";
+import { bitGridFromData, type AnalyzeResult } from "./analyzeOscillator";
 import { findPeriod } from "./findPeriod";
 
-export function periodMap(data: AnalyzeResult) {
-  const height = data.bitGridData.height ?? 0;
-  const width = data.bitGridData.width ?? 0;
-  const width32 = Math.ceil((data.bitGridData.width ?? 0) / 32);
-
+export function periodMap({
+  width,
+  height,
+  or,
+  histories,
+}: {
+  width: number;
+  height: number;
+  or: BitGrid;
+  histories: BitGrid[];
+}) {
   const array = Array(height)
     .fill(0)
     .map(() => 0)
@@ -15,21 +21,6 @@ export function periodMap(data: AnalyzeResult) {
         .fill(0)
         .map(() => 0)
     );
-
-  const or = new BitGrid(width32, height, data.bitGridData.or);
-
-  const transposed: (0 | 1)[][][] = Array(height)
-    .fill(0)
-    .map(() => 0)
-    .map(() =>
-      Array(width)
-        .fill(0)
-        .map(() => [])
-    );
-
-  const histories = data.bitGridData.histories.map(
-    (h) => new BitGrid(width32, height, h)
-  );
 
   const historiesArray = histories.map((h) => h.getArray());
 

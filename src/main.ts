@@ -1,5 +1,4 @@
 import "./style.css";
-import { BitGrid } from "@ca-ts/algo/bit";
 import type { WorkerRequestMessage, WorkerResponseMessage } from "./worker";
 import MyWorker from "./worker?worker";
 import {
