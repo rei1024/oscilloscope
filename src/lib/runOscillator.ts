@@ -8,11 +8,6 @@ export type RunOscillatorConfig = {
 
 export type RunOscillatorResult = {
   world: WorldWithHistory;
-  data: {
-    histories: Uint32Array[];
-    width: number | null;
-    height: number | null;
-  };
 };
 
 export function runOscillator(
@@ -26,13 +21,6 @@ export function runOscillator(
       world.run({ forceStop: () => world.getGen() >= maxGeneration });
       return {
         world,
-        data: {
-          histories: world.histories.map((a) =>
-            a.bitGrid.asInternalUint32Array()
-          ),
-          width: world.histories[0]?.bitGrid.getWidth() ?? null,
-          height: world.histories[0]?.bitGrid.getHeight() ?? null,
-        },
       };
     } catch (error) {
       if (error instanceof WorldSizeError) {

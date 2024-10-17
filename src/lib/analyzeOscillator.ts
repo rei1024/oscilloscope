@@ -82,8 +82,7 @@ export function bitGridFromData(bitGridData: BitGridData): BitGrid {
 export function analyzeOscillator(
   runConfig: RunOscillatorConfig
 ): AnalyzeResult {
-  const runOscillatorResult = runOscillator(runConfig);
-  const world = runOscillatorResult.world;
+  const { world } = runOscillator(runConfig);
 
   const period = world.getGen();
   const populations = world.histories.map((h) => h.bitGrid.getPopulation());
