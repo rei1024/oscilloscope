@@ -1,6 +1,6 @@
 import { BitGrid } from "@ca-ts/algo/bit";
 import type { AnalyzeResult } from "./lib/analyzeOscillator";
-import { periodMap, periodMapUnique } from "./lib/periodmap";
+import { periodMap, periodMapUnique } from "./lib/periodMap";
 const cellSize = 10;
 const safeArea = 1;
 
@@ -47,19 +47,13 @@ export class App {
       "#bae6fd",
     ];
     // console.log(this.periods);
+    const periodNum = this.periods?.length ?? 1;
     for (const [y, row] of this.periodMap?.entries() ?? []) {
       for (const [x, p] of row.entries()) {
-        // ctx.beginPath();
-        // ctx.fillText(
-        //   p.toString(),
-        //   (x - dx + safeArea) * cellSize,
-        //   (y - dy + safeArea) * cellSize,
-        //   3
-        // );
-        // ctx.fill();
-        if (p >= 2) {
+        if (p >= 1) {
           ctx.beginPath();
-          ctx.fillStyle = colors[this.periods?.findIndex((t) => t === p)];
+          const index = this.periods?.findIndex((t) => t === p) ?? 0;
+          ctx.fillStyle = `oklch(70% 0.2 ${(index * 360) / periodNum})`;
           ctx.rect(
             (x - dx + safeArea) * cellSize,
             (y - dy + safeArea) * cellSize,
