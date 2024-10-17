@@ -6,6 +6,7 @@
 
 canvas {
   outline: none;
+  margin: auto;
 }
 
 body {
@@ -14,11 +15,11 @@ body {
 
 main,
 header {
-  width: 900px;
+  width: 800px;
   margin: auto;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 800px) {
   main,
   header {
     width: auto;

@@ -44,11 +44,11 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     };
   }
   try {
-    const result = analyzeOscillator(
-      rle.cells.filter((x) => x.state === 1).map((x) => x.position),
-      rule.transition,
-      { maxGeneration: 100_000 }
-    );
+    const result = analyzeOscillator({
+      cells: rle.cells.filter((x) => x.state === 1).map((x) => x.position),
+      transition: rule.transition,
+      maxGeneration: 100_000,
+    });
     return { kind: "response-analyzed", data: result };
   } catch (error) {
     console.error(error);
