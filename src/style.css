@@ -63,8 +63,8 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
-table th,
-table td {
+#output-table th,
+#output-table td {
   padding: 4px;
 }
 

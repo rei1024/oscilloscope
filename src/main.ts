@@ -13,7 +13,6 @@ import {
 import { setTable } from "./ui/table";
 
 import { App } from "./app";
-import { setPeriodColorTable } from "./ui/periodColorTable";
 import { getMousePositionInElement } from "./ui/getMousePositionInElement";
 
 const worker = new MyWorker();
@@ -47,6 +46,11 @@ $analyzeButton.addEventListener("click", () => {
 
 $animFrequency.addEventListener("input", () => {
   app.updateFrequency();
+});
+
+$canvas.addEventListener("mousemove", (e) => {
+  const position = getMousePositionInElement($canvas, e);
+  app.renderPeriodTableHighlight(position);
 });
 
 const examples = [

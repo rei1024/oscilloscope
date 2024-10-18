@@ -139,4 +139,38 @@ export class App {
   updateFrequency() {
     this.valve.frequency = frequencyList[Number($animFrequency.value)];
   }
+
+  renderPeriodTableHighlight(pixelPosition: { x: number; y: number }) {
+    if (!this.data?.periodMap) {
+      return;
+    }
+    const dx = this.data.bitGridData.minX;
+    const dy = this.data.bitGridData.minY;
+    const x =
+      -safeArea +
+      dx +
+      Math.floor(
+        (pixelPosition.x / this.$canvas.clientWidth) *
+          (this.data.boundingBox.sizeX + safeArea * 2)
+      );
+    const y =
+      -safeArea +
+      dy +
+      Math.floor(
+        (pixelPosition.y / this.$canvas.clientHeight) *
+          (this.data.boundingBox.sizeY + safeArea * 2)
+      );
+
+    const period = this.data.periodMap.data[y][x];
+    const index = this.data.periodMap.periodList
+      .filter((x) => x !== 0)
+      .findIndex((x) => x === period);
+    console.log(x, y, index, this.periodRows);
+    for (const row of this.periodRows) {
+      row.style.backgroundColor = "";
+    }
+    if (index !== -1) {
+      this.periodRows[index].style.backgroundColor = "#0000FF22";
+    }
+  }
 }
