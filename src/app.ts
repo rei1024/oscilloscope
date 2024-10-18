@@ -1,6 +1,9 @@
 import { BitGrid } from "@ca-ts/algo/bit";
 import { bitGridFromData, type AnalyzeResult } from "./lib/analyzeOscillator";
+
 const cellSize = 10;
+const innerCellSize = 6;
+
 const safeArea = 1;
 
 export class App {
@@ -29,7 +32,12 @@ export class App {
     }
 
     const ctx = this.ctx;
-    ctx.reset && ctx.reset();
+    if (ctx.reset) {
+      ctx.reset();
+    } else {
+      ctx.resetTransform();
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
 
     const dx = this.data.bitGridData.minX;
     const dy = this.data.bitGridData.minY;
@@ -41,7 +49,7 @@ export class App {
           ctx.beginPath();
           const index =
             this.data.periodMap.periodList?.findIndex((t) => t === p) ?? 0;
-          ctx.fillStyle = `oklch(70% 0.2 ${(index * 360) / periodNum})`;
+          ctx.fillStyle = `oklch(100% 0.3 ${(index * 360) / periodNum})`;
           ctx.rect(
             (x - dx + safeArea) * cellSize,
             (y - dy + safeArea) * cellSize,
@@ -57,10 +65,10 @@ export class App {
     ctx.fillStyle = "black";
     this.histories[this.gen].forEachAlive((x, y) => {
       ctx.rect(
-        (x - dx + safeArea) * cellSize,
-        (y - dy + safeArea) * cellSize,
-        cellSize,
-        cellSize
+        (x - dx + safeArea) * cellSize + (cellSize - innerCellSize) / 2,
+        (y - dy + safeArea) * cellSize + (cellSize - innerCellSize) / 2,
+        innerCellSize,
+        innerCellSize
       );
     });
     ctx.fill();
@@ -69,7 +77,6 @@ export class App {
 
   setup(data: AnalyzeResult) {
     const $canvas = this.$canvas;
-    const bitGridData = data.bitGridData;
     $canvas.width = (data.boundingBox.sizeX + safeArea * 2) * cellSize;
     $canvas.height = (data.boundingBox.sizeY + safeArea * 2) * cellSize;
     if ($canvas.width / 2 > $canvas.height) {
