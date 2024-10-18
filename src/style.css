@@ -59,11 +59,15 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
 table th,
 table td {
   padding: 4px;
 }
 
-table th {
+#output-table th {
   text-align: right;
 }

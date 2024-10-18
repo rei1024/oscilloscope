@@ -3,6 +3,7 @@ import type { WorkerRequestMessage, WorkerResponseMessage } from "./worker";
 import MyWorker from "./worker?worker";
 import {
   $analyzeButton,
+  $animFrequency,
   $canvas,
   $exampleOscillators,
   $input,
@@ -12,6 +13,8 @@ import {
 import { setTable } from "./ui/table";
 
 import { App } from "./app";
+import { setPeriodColorTable } from "./ui/periodColorTable";
+import { getMousePositionInElement } from "./ui/getMousePositionInElement";
 
 const worker = new MyWorker();
 
@@ -42,8 +45,12 @@ $analyzeButton.addEventListener("click", () => {
   post({ kind: "request-analyze", rle: $input.value });
 });
 
+$animFrequency.addEventListener("input", () => {
+  app.updateFrequency();
+});
+
 const examples = [
-  { name: "P156 Hans Leo hassler", src: "p156hansleohassler.rle" },
+  { name: "P96 Hans Leo hassler", src: "p96hansleohassler.rle" },
   {
     name: "Figure eight on pentadecathlon",
     src: "cisfigureeightonpentadecathlon.rle",
