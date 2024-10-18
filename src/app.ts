@@ -2,6 +2,7 @@ import { BitGrid } from "@ca-ts/algo/bit";
 import { bitGridFromData, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { Valve } from "./ui/valve";
 import { $animFrequency, $animFrequencyLabel } from "./bind";
+import { setPeriodColorTable } from "./ui/periodColorTable";
 
 const cellSize = 10;
 const innerCellSize = 6;
@@ -9,13 +10,15 @@ const innerCellSize = 6;
 const safeArea = 1;
 
 const frequencyList = [
-  5, 6, 7, 8, 9, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300,
-  400, 500,
+  2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200,
+  300, 400, 500,
 ];
 
 export function periodToColor(periodList: number[], period: number) {
   const index = periodList.findIndex((t) => t === period) ?? 0;
-  return `oklch(100% 0.3 ${(index * 360) / periodList.length})`;
+  // 80% 0.1
+  return `oklch(95% 0.35 ${(index * 360) / periodList.length})`;
+  // return `lch(70% 70 ${(index * 360) / periodList.length})`;
 }
 
 export class App {
@@ -24,8 +27,9 @@ export class App {
   private ctx: CanvasRenderingContext2D;
   private gen = 0;
   private valve: Valve;
+  private periodRows: HTMLTableRowElement[] = [];
   constructor(private $canvas: HTMLCanvasElement) {
-    const ctx = this.$canvas.getContext("2d");
+    const ctx = this.$canvas.getContext("2d", { colorSpace: "display-p3" });
     if (ctx == null) {
       throw Error("Context");
     }
@@ -119,14 +123,17 @@ export class App {
 
     $animFrequency.min = (0).toString();
     $animFrequency.max = (frequencyList.length - 1).toString();
-    $animFrequency.value =
+    $animFrequency.value = (
       data.histories.length <= 3
-        ? "0"
+        ? frequencyList.filter((x) => x <= 3).length - 1
         : data.histories.length <= 10
-        ? "4"
-        : "7";
+        ? frequencyList.filter((x) => x <= 10).length - 1
+        : "10"
+    ).toString();
 
     this.updateFrequency();
+
+    this.periodRows = setPeriodColorTable(data);
   }
 
   updateFrequency() {

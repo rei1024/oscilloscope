@@ -14,6 +14,7 @@ import { setTable } from "./ui/table";
 
 import { App } from "./app";
 import { setPeriodColorTable } from "./ui/periodColorTable";
+import { getMousePositionInElement } from "./ui/getMousePositionInElement";
 
 const worker = new MyWorker();
 
@@ -35,7 +36,6 @@ worker.addEventListener("message", (e) => {
     $outputTable.style.display = "block";
     const data = message.data;
     setTable(data);
-    setPeriodColorTable(data);
     app.setup(data);
   }
 });
@@ -50,7 +50,7 @@ $animFrequency.addEventListener("input", () => {
 });
 
 const examples = [
-  { name: "P156 Hans Leo hassler", src: "p156hansleohassler.rle" },
+  { name: "P96 Hans Leo hassler", src: "p96hansleohassler.rle" },
   {
     name: "Figure eight on pentadecathlon",
     src: "cisfigureeightonpentadecathlon.rle",
