@@ -50,3 +50,7 @@ export const $analyzeButton = document.querySelector(
 ) as HTMLButtonElement;
 
 export const $canvas = document.querySelector("#canvas") as HTMLCanvasElement;
+
+export const $exampleOscillators = document.querySelector(
+  "#example-oscillators"
+) as HTMLSelectElement;

@@ -1,5 +1,4 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
-import { bitGridFromData, type AnalyzeResult } from "./analyzeOscillator";
 import { findPeriod } from "./findPeriod";
 
 export function periodMap({

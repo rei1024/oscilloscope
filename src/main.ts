@@ -4,6 +4,7 @@ import MyWorker from "./worker?worker";
 import {
   $analyzeButton,
   $canvas,
+  $exampleOscillators,
   $input,
   $message,
   $outputTable,
@@ -39,4 +40,38 @@ worker.addEventListener("message", (e) => {
 $analyzeButton.addEventListener("click", () => {
   $analyzeButton.disabled = true;
   post({ kind: "request-analyze", rle: $input.value });
+});
+
+const examples = [
+  { name: "P156 Hans Leo hassler", src: "p156hansleohassler.rle" },
+  {
+    name: "Figure eight on pentadecathlon",
+    src: "cisfigureeightonpentadecathlon.rle",
+  },
+  { name: "Kok's galaxy", src: "koksgalaxy.rle" },
+];
+
+for (const example of examples) {
+  const option = document.createElement("option");
+  option.textContent = example.name;
+  option.value = example.src;
+  $exampleOscillators.append(option);
+}
+
+$exampleOscillators.addEventListener("change", async () => {
+  if ($exampleOscillators.value === "") {
+    return;
+  }
+  const response = await fetch(
+    "/oscilloscope/data/" + $exampleOscillators.value
+  );
+  if (!response.ok) {
+    throw new Error("fetch error");
+  }
+  const text = await response.text();
+  $input.value = text;
+});
+
+$input.addEventListener("input", () => {
+  $exampleOscillators.value = "";
 });
