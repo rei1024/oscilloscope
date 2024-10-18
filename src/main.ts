@@ -3,6 +3,7 @@ import type { WorkerRequestMessage, WorkerResponseMessage } from "./worker";
 import MyWorker from "./worker?worker";
 import {
   $analyzeButton,
+  $animFrequency,
   $canvas,
   $exampleOscillators,
   $input,
@@ -12,6 +13,7 @@ import {
 import { setTable } from "./ui/table";
 
 import { App } from "./app";
+import { setPeriodColorTable } from "./ui/periodColorTable";
 
 const worker = new MyWorker();
 
@@ -33,6 +35,7 @@ worker.addEventListener("message", (e) => {
     $outputTable.style.display = "block";
     const data = message.data;
     setTable(data);
+    setPeriodColorTable(data);
     app.setup(data);
   }
 });
@@ -40,6 +43,10 @@ worker.addEventListener("message", (e) => {
 $analyzeButton.addEventListener("click", () => {
   $analyzeButton.disabled = true;
   post({ kind: "request-analyze", rle: $input.value });
+});
+
+$animFrequency.addEventListener("input", () => {
+  app.updateFrequency();
 });
 
 const examples = [

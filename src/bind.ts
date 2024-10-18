@@ -49,8 +49,20 @@ export const $analyzeButton = document.querySelector(
   "#analyze"
 ) as HTMLButtonElement;
 
-export const $canvas = document.querySelector("#canvas") as HTMLCanvasElement;
-
 export const $exampleOscillators = document.querySelector(
   "#example-oscillators"
 ) as HTMLSelectElement;
+
+export const $canvas = document.querySelector("#canvas") as HTMLCanvasElement;
+
+export const $animFrequency = document.querySelector(
+  "#anim-frequency"
+) as HTMLInputElement;
+
+export const $animFrequencyLabel = document.querySelector(
+  "#anim-frequency-label"
+) as HTMLInputElement;
+
+export const $periodColorTable = document.querySelector(
+  "#period-coolor-table"
+) as HTMLTableElement;
