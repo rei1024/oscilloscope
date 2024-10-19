@@ -10,6 +10,10 @@ export const $showAnimationCheckbox = document.querySelector(
   "#show-animation-checkbox"
 ) as HTMLInputElement;
 
+export const $showGridCheckbox = document.querySelector(
+  "#show-grid-checkbox"
+) as HTMLInputElement;
+
 export const $dataBox = document.querySelector("#data-box") as HTMLElement;
 
 export const $outputTable = document.querySelector(

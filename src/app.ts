@@ -9,6 +9,7 @@ import {
   $hoverInfo,
   $mapBox,
   $showAnimationCheckbox,
+  $showGridCheckbox,
 } from "./bind";
 import { setColorTable } from "./ui/colorTable";
 
@@ -79,6 +80,8 @@ export class App {
       ctx.resetTransform();
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // Map
     const dx = this.data.bitGridData.minX;
@@ -103,32 +106,63 @@ export class App {
     }
     ctx.fill();
 
-    if (!$showAnimationCheckbox.checked) {
+    if ($showAnimationCheckbox.checked) {
+      $animFrequency.style.display = "";
+      $animFrequencyLabel.style.display = "";
+      // Alive Cells
+      ctx.beginPath();
+      ctx.fillStyle = "black";
+      const innerBorder = (cellSize - innerCellSize) / 2;
+      this.histories[this.gen].forEachAlive((x, y) => {
+        ctx.rect(
+          (x - dx + safeArea) * cellSize + innerBorder,
+          (y - dy + safeArea) * cellSize + innerBorder,
+          innerCellSize,
+          innerCellSize
+        );
+      });
+      ctx.fill();
+
+      $generation.textContent =
+        "generation = " +
+        this.gen
+          .toString()
+          .padStart(this.histories.length.toString().length, " ") +
+        "/" +
+        this.histories.length;
+    } else {
+      $animFrequency.style.display = "none";
+      $animFrequencyLabel.style.display = "none";
       $generation.textContent = "";
-      return;
     }
 
-    // Alive Cells
-    ctx.beginPath();
-    ctx.fillStyle = "black";
-    const innerBorder = (cellSize - innerCellSize) / 2;
-    this.histories[this.gen].forEachAlive((x, y) => {
-      ctx.rect(
-        (x - dx + safeArea) * cellSize + innerBorder,
-        (y - dy + safeArea) * cellSize + innerBorder,
-        innerCellSize,
-        innerCellSize
-      );
-    });
-    ctx.fill();
+    // Grid
+    if ($showGridCheckbox.checked) {
+      for (let y = 0; y < this.data.boundingBox.sizeY + safeArea * 2; y++) {
+        for (let x = 0; x < this.data.boundingBox.sizeX + safeArea * 2; x++) {
+          ctx.beginPath();
+          const posX = x * cellSize;
+          const posY = y * cellSize;
+          // ボーダーの線の太さ（例えば2px）
+          const borderWidth = 1;
+          ctx.strokeStyle = "#bbbbbb"; // ボーダーの色
+          ctx.strokeRect(
+            posX + borderWidth / 2,
+            posY + borderWidth / 2,
+            cellSize - borderWidth,
+            cellSize - borderWidth
+          );
 
-    $generation.textContent =
-      "generation = " +
-      this.gen
-        .toString()
-        .padStart(this.histories.length.toString().length, " ") +
-      "/" +
-      this.histories.length;
+          // ctx.rect(
+          //   (x + safeArea) * cellSize,
+          //   (y + safeArea) * cellSize,
+          //   cellSize,
+          //   cellSize
+          // );
+          ctx.fill();
+        }
+      }
+    }
   }
 
   setup(data: AnalyzeResult) {
@@ -231,7 +265,7 @@ export class App {
         " = " +
         pointData.cellData;
     } else {
-      $hoverInfo.textContent = "";
+      $hoverInfo.textContent = " "; // 崩れないように
     }
   }
 
