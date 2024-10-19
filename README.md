@@ -1,6 +1,6 @@
 # Oscilloscope
 
-Oscilloscope is oscillator analyzer for cellular automata.
+Oscilloscope is an oscillator analyzer for cellular automata.
 
 ![Period map of p96 Hans Leo hassler](public/p96_image.png)
 
