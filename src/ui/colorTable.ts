@@ -2,7 +2,7 @@ import { dataToColor as dataToColor } from "../app";
 import { $colorTable } from "../bind";
 
 export function setColorTable(
-  map: { data: number[][]; list: number[] },
+  map: { data: number[][]; list: number[]; countMap: Map<number, number> },
   type: "period" | "frequency"
 ) {
   const rows: HTMLTableRowElement[] = [];
@@ -21,7 +21,10 @@ export function setColorTable(
     const thType = document.createElement("th");
     thType.textContent = type === "period" ? "Period" : "Frequency";
 
-    trHead.append(thColor, thType);
+    const thCount = document.createElement("th");
+    thCount.textContent = "Count";
+
+    trHead.append(thColor, thType, thCount);
     $colorTable.append(trHead);
   }
 
@@ -39,7 +42,11 @@ export function setColorTable(
     $detail.textContent = item.toString();
     $detail.style.textAlign = "right";
 
-    row.append($color, $detail);
+    const $count = document.createElement("td");
+    $count.textContent = map.countMap.get(item)?.toString() ?? "-";
+    $count.style.textAlign = "right";
+
+    row.append($color, $detail, $count);
     $colorTable.append(row);
     rows.push(row);
   }

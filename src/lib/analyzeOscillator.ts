@@ -82,6 +82,7 @@ export type AnalyzeResult = {
      */
     data: number[][];
     list: number[];
+    countMap: Map<number, number>;
   };
   /**
    * [Frequency map](https://conwaylife.com/wiki/Map#Frequency_map)
@@ -89,6 +90,7 @@ export type AnalyzeResult = {
   frequencyMap: {
     data: number[][];
     list: number[];
+    countMap: Map<number, number>;
   };
 };
 

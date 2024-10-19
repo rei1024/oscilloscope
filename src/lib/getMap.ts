@@ -12,8 +12,16 @@ export function getMap({
   or: BitGrid;
   histories: BitGrid[];
 }): {
-  periodMap: { data: number[][]; list: number[] };
-  frequencyMap: { data: number[][]; list: number[] };
+  periodMap: {
+    data: number[][];
+    list: number[];
+    countMap: Map<number, number>;
+  };
+  frequencyMap: {
+    data: number[][];
+    list: number[];
+    countMap: Map<number, number>;
+  };
 } {
   const periodArray = Array(height)
     .fill(0)
@@ -51,15 +59,36 @@ export function getMap({
     periodMap: {
       data: periodArray,
       list: mapUnique(periodArray),
+      countMap: getCountMap(periodArray),
     },
     frequencyMap: {
       data: frequencyArray,
       list: mapUnique(frequencyArray),
+      countMap: getCountMap(frequencyArray),
     },
   };
 }
 
-function mapUnique(periodMap: number[][]): number[] {
-  const set = new Set(periodMap.flat());
+function mapUnique(map: number[][]): number[] {
+  const set = new Set(map.flat());
   return [...set].sort((a, b) => a - b);
+}
+
+function getCountMap(map: number[][]): Map<number, number> {
+  const countMap = new Map<number, number>();
+  for (const row of map) {
+    for (const x of row) {
+      if (x === 0) {
+        continue;
+      }
+      const currentCount = countMap.get(x);
+      if (currentCount !== undefined) {
+        countMap.set(x, currentCount + 1);
+      } else {
+        countMap.set(x, 1);
+      }
+    }
+  }
+
+  return countMap;
 }
