@@ -1,7 +1,13 @@
 import { BitGrid } from "@ca-ts/algo/bit";
 import { bitGridFromData, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { Valve } from "./ui/valve";
-import { $animFrequency, $animFrequencyLabel } from "./bind";
+import {
+  $animFrequency,
+  $animFrequencyLabel,
+  $dataBox,
+  $generation,
+  $mapBox,
+} from "./bind";
 import { setPeriodColorTable } from "./ui/periodColorTable";
 
 const cellSize = 10;
@@ -17,8 +23,9 @@ const frequencyList = [
 export function periodToColor(periodList: number[], period: number) {
   const index = periodList.findIndex((t) => t === period) ?? 0;
   // 80% 0.1
-  return `oklch(95% 0.35 ${(index * 360) / periodList.length})`;
+  return `oklch(92% 0.35 ${(index * 360) / periodList.length})`;
   // return `lch(70% 70 ${(index * 360) / periodList.length})`;
+  // return `hsl(${(index * 360) / periodList.length} 100% 70%)`;
 }
 
 export class App {
@@ -102,9 +109,19 @@ export class App {
 
     $animFrequencyLabel.textContent =
       this.valve.frequency.toLocaleString() + "Hz";
+    $generation.textContent =
+      "generation = " +
+      this.gen
+        .toString()
+        .padStart(this.histories.length.toString().length, " ") +
+      "/" +
+      this.histories.length;
   }
 
   setup(data: AnalyzeResult) {
+    $mapBox.style.display = "";
+    $dataBox.style.display = "";
+
     const $canvas = this.$canvas;
     $canvas.width = (data.boundingBox.sizeX + safeArea * 2) * cellSize;
     $canvas.height = (data.boundingBox.sizeY + safeArea * 2) * cellSize;
