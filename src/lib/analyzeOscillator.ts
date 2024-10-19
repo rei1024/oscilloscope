@@ -36,17 +36,33 @@ type BitGridData = {
 export type AnalyzeResult = {
   period: number;
   population: {
+    /** Maximum population */
     max: number;
+    /** Minimum population */
     min: number;
+    /** Average population */
     avg: string;
+    /** Median of population */
     median: number;
   };
+  /**
+   * Bounding box
+   */
   boundingBox: {
     sizeX: number;
     sizeY: number;
   };
+  /**
+   * Number of stators
+   */
   stator: number;
+  /**
+   * Number of rotors
+   */
   rotor: number;
+  /**
+   * Oscillator valatility
+   */
   volatility: string;
   histories: BitGridData[];
   bitGridData: {
@@ -57,7 +73,13 @@ export type AnalyzeResult = {
     or: BitGridData;
     and: BitGridData;
   };
+  /**
+   * [Period Map](https://conwaylife.com/wiki/Map#Period_map)
+   */
   periodMap: {
+    /**
+     * Period of each cells
+     */
     data: number[][];
     periodList: number[];
   };

@@ -14,16 +14,22 @@ body {
 }
 
 main,
-header {
+header,
+footer {
   width: 800px;
   margin: auto;
 }
 
 @media (max-width: 800px) {
   main,
-  header {
+  header,
+  footer {
     width: auto;
   }
+}
+
+footer {
+  margin-top: 40px;
 }
 
 h1 {
@@ -44,10 +50,6 @@ main {
 
 .m-2 {
   margin: 4px;
-}
-
-.m-3 {
-  margin: 8px;
 }
 
 button {
