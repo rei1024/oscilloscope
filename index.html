@@ -32,6 +32,17 @@
   <body>
     <header>
       <h1>Oscilloscope</h1>
+      <div style="text-align: center; margin-bottom: 2px">
+        <small style="text-align: center; margin: auto"
+          ><a
+            href="https://conwaylife.com/wiki/Oscillator"
+            target="_blank"
+            rel="noopener"
+            >Oscillator</a
+          >
+          analyzer</small
+        >
+      </div>
     </header>
     <main>
       <div class="box">
@@ -59,6 +70,28 @@
       <div class="box" id="message" style="display: none"></div>
       <div id="map-box" class="box" style="display: none">
         <h2>Map</h2>
+        <div>
+          <label for="map-period-select" style="user-select: none">
+            <input
+              id="map-period-select"
+              value="period"
+              name="map-type-select"
+              type="radio"
+              checked
+            />
+            Period
+          </label>
+
+          <label for="map-frequency-select" style="user-select: none">
+            <input
+              id="map-frequency-select"
+              value="frequency"
+              name="map-type-select"
+              type="radio"
+            />
+            Frequency
+          </label>
+        </div>
         <canvas id="canvas"></canvas>
         <div>
           <input
@@ -74,8 +107,12 @@
           <pre
             style="display: inline"
           ><span id="generation" class="tabular-nums"></span></pre>
+          <pre style="display: inline" id="hover-info"><span></span></pre>
         </div>
-        <table id="period-coolor-table" style="margin-right: auto"></table>
+        <details open>
+          <summary style="user-select: none; cursor: pointer">Colors</summary>
+          <table id="color-table" style="margin-right: auto"></table>
+        </details>
       </div>
 
       <div id="data-box" class="box" style="display: none">
@@ -83,7 +120,7 @@
         <table id="output-table" style="display: none">
           <tr>
             <th>Period</th>
-            <td id="output-period">32</td>
+            <td id="output-period"></td>
           </tr>
           <tr>
             <th>Population</th>
@@ -116,23 +153,25 @@
       </div>
     </main>
     <footer>
-      <h2>Reference</h2>
-      <ul>
-        <li>
-          <a href="https://github.com/rei1024/oscilloscope"
-            >Source Code | GitHub</a
-          >
-        </li>
-        <li>
-          <a href="https://conwaylife.com/wiki/Map">Map | LifeWiki</a>
-        </li>
-        <li>
-          <a
-            href="https://conwaylife.com/wiki/Comparison_of_oscillator_analysis_tools"
-            >Comparison of oscillator analysis tools | LifeWiki</a
-          >
-        </li>
-      </ul>
+      <section>
+        <h2>Reference</h2>
+        <ul>
+          <li>
+            <a href="https://github.com/rei1024/oscilloscope"
+              >Source Code | GitHub</a
+            >
+          </li>
+          <li>
+            <a href="https://conwaylife.com/wiki/Map">Map | LifeWiki</a>
+          </li>
+          <li>
+            <a
+              href="https://conwaylife.com/wiki/Comparison_of_oscillator_analysis_tools"
+              >Comparison of oscillator analysis tools | LifeWiki</a
+            >
+          </li>
+        </ul>
+      </section>
     </footer>
   </body>
 </html>

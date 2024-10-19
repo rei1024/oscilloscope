@@ -1,6 +1,11 @@
 export const $message = document.querySelector("#message") as HTMLElement;
 
 export const $mapBox = document.querySelector("#map-box") as HTMLElement;
+
+export const $mapTypeSelect = [
+  ...document.querySelectorAll('[name="map-type-select"]'),
+] as HTMLInputElement[];
+
 export const $dataBox = document.querySelector("#data-box") as HTMLElement;
 
 export const $outputTable = document.querySelector(
@@ -59,6 +64,8 @@ export const $exampleOscillators = document.querySelector(
 
 export const $canvas = document.querySelector("#canvas") as HTMLCanvasElement;
 
+export const $hoverInfo = document.querySelector("#hover-info") as HTMLElement;
+
 export const $animFrequency = document.querySelector(
   "#anim-frequency"
 ) as HTMLInputElement;
@@ -69,6 +76,6 @@ export const $animFrequencyLabel = document.querySelector(
 
 export const $generation = document.querySelector("#generation") as HTMLElement;
 
-export const $periodColorTable = document.querySelector(
-  "#period-coolor-table"
+export const $colorTable = document.querySelector(
+  "#color-table"
 ) as HTMLTableElement;

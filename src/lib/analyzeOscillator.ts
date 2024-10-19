@@ -2,7 +2,7 @@ import { average, max, median, min } from "./collection";
 import { rectToSize } from "./rect";
 import { BitGrid } from "@ca-ts/algo/bit";
 import { runOscillator, type RunOscillatorConfig } from "./runOscillator";
-import { periodMap, periodMapUnique } from "./periodMap";
+import { getMap } from "./getMap";
 
 function getOrAndGrid(histories: BitGrid[]) {
   if (histories.length === 0) {
@@ -74,14 +74,21 @@ export type AnalyzeResult = {
     and: BitGridData;
   };
   /**
-   * [Period Map](https://conwaylife.com/wiki/Map#Period_map)
+   * [Period map](https://conwaylife.com/wiki/Map#Period_map)
    */
   periodMap: {
     /**
      * Period of each cells
      */
     data: number[][];
-    periodList: number[];
+    list: number[];
+  };
+  /**
+   * [Frequency map](https://conwaylife.com/wiki/Map#Frequency_map)
+   */
+  frequencyMap: {
+    data: number[][];
+    list: number[];
   };
 };
 
@@ -117,7 +124,7 @@ export function analyzeOscillator(
   const width = world.histories[0]?.bitGrid.getWidth() ?? 0;
   const height = world.histories[0]?.bitGrid.getHeight() ?? 0;
 
-  const periodMapData = periodMap({
+  const { periodMap, frequencyMap } = getMap({
     width,
     height,
     or,
@@ -145,9 +152,7 @@ export function analyzeOscillator(
       minX: boundingBox.minX,
       minY: boundingBox.minY,
     },
-    periodMap: {
-      data: periodMapData,
-      periodList: periodMapUnique(periodMapData),
-    },
+    periodMap,
+    frequencyMap,
   };
 }
