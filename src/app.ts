@@ -8,6 +8,7 @@ import {
   $generation,
   $hoverInfo,
   $mapBox,
+  $showAnimationCheckbox,
 } from "./bind";
 import { setColorTable } from "./ui/colorTable";
 
@@ -64,6 +65,9 @@ export class App {
   }
 
   render() {
+    $animFrequencyLabel.textContent =
+      this.valve.frequency.toLocaleString() + "Hz";
+
     if (this.histories == null || this.data == null) {
       return;
     }
@@ -76,6 +80,7 @@ export class App {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
 
+    // Map
     const dx = this.data.bitGridData.minX;
     const dy = this.data.bitGridData.minY;
 
@@ -97,6 +102,13 @@ export class App {
       }
     }
     ctx.fill();
+
+    if (!$showAnimationCheckbox.checked) {
+      $generation.textContent = "";
+      return;
+    }
+
+    // Alive Cells
     ctx.beginPath();
     ctx.fillStyle = "black";
     const innerBorder = (cellSize - innerCellSize) / 2;
@@ -110,8 +122,6 @@ export class App {
     });
     ctx.fill();
 
-    $animFrequencyLabel.textContent =
-      this.valve.frequency.toLocaleString() + "Hz";
     $generation.textContent =
       "generation = " +
       this.gen
@@ -150,6 +160,8 @@ export class App {
         ? frequencyList.filter((x) => x <= 10).length - 1
         : "10"
     ).toString();
+    $animFrequencyLabel.textContent =
+      this.valve.frequency.toLocaleString() + "Hz";
 
     this.updateFrequency();
 

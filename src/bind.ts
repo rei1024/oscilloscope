@@ -6,6 +6,10 @@ export const $mapTypeSelect = [
   ...document.querySelectorAll('[name="map-type-select"]'),
 ] as HTMLInputElement[];
 
+export const $showAnimationCheckbox = document.querySelector(
+  "#show-animation-checkbox"
+) as HTMLInputElement;
+
 export const $dataBox = document.querySelector("#data-box") as HTMLElement;
 
 export const $outputTable = document.querySelector(
