@@ -6,9 +6,10 @@ import {
   $animFrequencyLabel,
   $dataBox,
   $generation,
+  $hoverInfo,
   $mapBox,
 } from "./bind";
-import { setPeriodColorTable } from "./ui/periodColorTable";
+import { setColorTable } from "./ui/colorTable";
 
 const cellSize = 10;
 const innerCellSize = 6;
@@ -20,12 +21,12 @@ const frequencyList = [
   300, 400, 500,
 ];
 
-export function periodToColor(periodList: number[], period: number) {
-  const index = periodList.findIndex((t) => t === period) ?? 0;
+export function dataToColor(list: number[], data: number) {
+  const index = list.findIndex((t) => t === data) ?? 0;
   // 80% 0.1
-  return `oklch(92% 0.35 ${(index * 360) / periodList.length})`;
-  // return `lch(70% 70 ${(index * 360) / periodList.length})`;
-  // return `hsl(${(index * 360) / periodList.length} 100% 70%)`;
+  return `oklch(92% 0.35 ${(index * 360) / list.length})`;
+  // return `lch(70% 70 ${(index * 360) / list.length})`;
+  // return `hsl(${(index * 360) / list.length} 100% 70%)`;
 }
 
 export class App {
@@ -34,7 +35,8 @@ export class App {
   private ctx: CanvasRenderingContext2D;
   private gen = 0;
   private valve: Valve;
-  private periodRows: HTMLTableRowElement[] = [];
+  private colorTableRows: HTMLTableRowElement[] = [];
+  private mapType: "period" | "frequency" = "period";
   constructor(private $canvas: HTMLCanvasElement) {
     const ctx = this.$canvas.getContext("2d", { colorSpace: "display-p3" });
     if (ctx == null) {
@@ -77,12 +79,13 @@ export class App {
     const dx = this.data.bitGridData.minX;
     const dy = this.data.bitGridData.minY;
 
-    const periodList = this.data.periodMap.periodList;
-    for (const [y, row] of this.data.periodMap.data.entries()) {
+    const mapData = this.getMapData();
+    const list = mapData.list;
+    for (const [y, row] of mapData.data.entries()) {
       for (const [x, p] of row.entries()) {
         if (p >= 1) {
           ctx.beginPath();
-          ctx.fillStyle = periodToColor(periodList, p);
+          ctx.fillStyle = dataToColor(list, p);
           ctx.rect(
             (x - dx + safeArea) * cellSize,
             (y - dy + safeArea) * cellSize,
@@ -150,16 +153,28 @@ export class App {
 
     this.updateFrequency();
 
-    this.periodRows = setPeriodColorTable(data);
+    this.colorTableRows = setColorTable(this.getMapData(), this.mapType);
+  }
+
+  private getMapData() {
+    if (this.data == null) {
+      throw null;
+    }
+    return this.mapType === "frequency"
+      ? this.data.frequencyMap
+      : this.data.periodMap;
   }
 
   updateFrequency() {
     this.valve.frequency = frequencyList[Number($animFrequency.value)];
   }
 
-  renderPeriodTableHighlight(pixelPosition: { x: number; y: number }) {
-    if (!this.data?.periodMap) {
-      return;
+  private getMapIndexAt(pixelPosition: {
+    x: number;
+    y: number;
+  }): { cellData: number; index: number } | undefined {
+    if (!this.data) {
+      return undefined;
     }
     const dx = this.data.bitGridData.minX;
     const dy = this.data.bitGridData.minY;
@@ -178,16 +193,38 @@ export class App {
           (this.data.boundingBox.sizeY + safeArea * 2)
       );
 
-    const period = this.data.periodMap.data[y][x];
-    const index = this.data.periodMap.periodList
+    const mapData = this.getMapData();
+    const cellData = mapData.data[y][x];
+    const index = mapData.list
       .filter((x) => x !== 0)
-      .findIndex((x) => x === period);
-    console.log(x, y, index, this.periodRows);
-    for (const row of this.periodRows) {
+      .findIndex((x) => x === cellData);
+    if (index === -1) {
+      return undefined;
+    }
+    return { cellData, index };
+  }
+
+  renderColorTableHighlight(pixelPosition: { x: number; y: number }) {
+    for (const row of this.colorTableRows) {
       row.style.backgroundColor = "";
     }
-    if (index !== -1) {
-      this.periodRows[index].style.backgroundColor = "#0000FF22";
+
+    const pointData = this.getMapIndexAt(pixelPosition);
+    if (pointData !== undefined) {
+      this.colorTableRows[pointData.index].style.backgroundColor = "#0000FF22";
+
+      $hoverInfo.textContent =
+        "  " +
+        (this.mapType === "period" ? "period" : "frequency") +
+        " = " +
+        pointData.cellData;
+    } else {
+      $hoverInfo.textContent = "";
     }
+  }
+
+  updateMapType(mapType: "period" | "frequency") {
+    this.mapType = mapType;
+    this.colorTableRows = setColorTable(this.getMapData(), this.mapType);
   }
 }

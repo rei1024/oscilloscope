@@ -7,6 +7,7 @@ import {
   $canvas,
   $exampleOscillators,
   $input,
+  $mapTypeSelect,
   $message,
   $outputTable,
 } from "./bind";
@@ -65,8 +66,17 @@ $animFrequency.addEventListener("input", () => {
 
 $canvas.addEventListener("mousemove", (e) => {
   const position = getMousePositionInElement($canvas, e);
-  app.renderPeriodTableHighlight(position);
+  app.renderColorTableHighlight(position);
 });
+
+for (const $radio of $mapTypeSelect) {
+  $radio.addEventListener("input", (e) => {
+    (e.target as HTMLInputElement).value;
+    app.updateMapType(
+      (e.target as HTMLInputElement).value as "period" | "frequency"
+    );
+  });
+}
 
 const examples = [
   { name: "P96 Hans Leo hassler", src: "p96hansleohassler.rle" },
