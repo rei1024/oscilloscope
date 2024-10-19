@@ -15,6 +15,8 @@ import { setColorTable } from "./ui/colorTable";
 
 const cellSize = 10;
 const innerCellSize = 6;
+const innerCellOffset = (cellSize - innerCellSize) / 2;
+const gridWidth = 1;
 
 const safeArea = 1;
 
@@ -39,6 +41,7 @@ export class App {
   private valve: Valve;
   private colorTableRows: HTMLTableRowElement[] = [];
   private mapType: "period" | "frequency" = "period";
+
   constructor(private $canvas: HTMLCanvasElement) {
     const ctx = this.$canvas.getContext("2d", { colorSpace: "display-p3" });
     if (ctx == null) {
@@ -80,6 +83,8 @@ export class App {
       ctx.resetTransform();
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
+
+    // Background
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -112,11 +117,10 @@ export class App {
       // Alive Cells
       ctx.beginPath();
       ctx.fillStyle = "black";
-      const innerBorder = (cellSize - innerCellSize) / 2;
       this.histories[this.gen].forEachAlive((x, y) => {
         ctx.rect(
-          (x - dx + safeArea) * cellSize + innerBorder,
-          (y - dy + safeArea) * cellSize + innerBorder,
+          (x - dx + safeArea) * cellSize + innerCellOffset,
+          (y - dy + safeArea) * cellSize + innerCellOffset,
           innerCellSize,
           innerCellSize
         );
@@ -137,31 +141,24 @@ export class App {
     }
 
     // Grid
+    const yMax = this.data.boundingBox.sizeY + safeArea * 2;
+    const xMax = this.data.boundingBox.sizeX + safeArea * 2;
     if ($showGridCheckbox.checked) {
-      for (let y = 0; y < this.data.boundingBox.sizeY + safeArea * 2; y++) {
-        for (let x = 0; x < this.data.boundingBox.sizeX + safeArea * 2; x++) {
-          ctx.beginPath();
+      ctx.beginPath();
+      for (let y = 0; y < yMax; y++) {
+        const posY = y * cellSize;
+        for (let x = 0; x < xMax; x++) {
           const posX = x * cellSize;
-          const posY = y * cellSize;
-          // ボーダーの線の太さ（例えば2px）
-          const borderWidth = 1;
-          ctx.strokeStyle = "#bbbbbb"; // ボーダーの色
+          ctx.strokeStyle = "#dddddd";
           ctx.strokeRect(
-            posX + borderWidth / 2,
-            posY + borderWidth / 2,
-            cellSize - borderWidth,
-            cellSize - borderWidth
+            posX + gridWidth / 2,
+            posY + gridWidth / 2,
+            cellSize - gridWidth,
+            cellSize - gridWidth
           );
-
-          // ctx.rect(
-          //   (x + safeArea) * cellSize,
-          //   (y + safeArea) * cellSize,
-          //   cellSize,
-          //   cellSize
-          // );
-          ctx.fill();
         }
       }
+      ctx.fill();
     }
   }
 

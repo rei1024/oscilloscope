@@ -1,9 +1,5 @@
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
 import {
-  $analyzeButton,
-  $canvas,
-  $input,
-  $message,
   $outputArea,
   $outputCellsAvg,
   $outputCellsMax,
@@ -16,7 +12,8 @@ import {
   $outputVolatility,
   $outputWidth,
 } from "../bind";
-export function setTable(data: AnalyzeResult) {
+
+export function setDataTable(data: AnalyzeResult) {
   $outputPeriod.textContent = data.period.toString();
 
   $outputCellsMin.textContent = data.population.min.toString();

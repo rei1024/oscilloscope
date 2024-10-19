@@ -11,7 +11,7 @@ import {
   $message,
   $outputTable,
 } from "./bind";
-import { setTable } from "./ui/table";
+import { setDataTable } from "./ui/dataTable";
 
 import { App } from "./app";
 import { getMousePositionInElement } from "./ui/getMousePositionInElement";
@@ -44,7 +44,7 @@ worker.addEventListener("message", (e) => {
   } else {
     $outputTable.style.display = "block";
     const data = message.data;
-    setTable(data);
+    setDataTable(data);
     app.setup(data);
   }
 });
