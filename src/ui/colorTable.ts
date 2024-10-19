@@ -16,6 +16,7 @@ export function setColorTable(
 
     const thColor = document.createElement("th");
     thColor.textContent = "Color";
+    thColor.style.width = "60px";
 
     const thType = document.createElement("th");
     thType.textContent = type === "period" ? "Period" : "Frequency";
