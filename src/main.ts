@@ -69,8 +69,6 @@ $canvas.addEventListener("mousemove", (e) => {
   app.renderColorTableHighlight(position);
 });
 
-$mapTypeSelect;
-
 for (const $radio of $mapTypeSelect) {
   $radio.addEventListener("input", (e) => {
     (e.target as HTMLInputElement).value;
