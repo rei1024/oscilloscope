@@ -2,7 +2,7 @@
 <html lang="en" prefix="og: https://ogp.me/ns#">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/oscilloscope-galaxy.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Oscilloscope</title>
 
@@ -34,28 +34,52 @@
       <h1>Oscilloscope</h1>
     </header>
     <main>
-      <textarea
-        id="input"
-        rows="8"
-        placeholder="x = 3, y = 1, rule = B3/S23
+      <div class="box">
+        <h2>
+          <a
+            href="https://conwaylife.com/wiki/Run_Length_Encoded"
+            target="_blank"
+            rel="noopener"
+            >RLE</a
+          >
+          Input
+        </h2>
+        <textarea
+          id="input"
+          rows="8"
+          placeholder="x = 3, y = 1, rule = B3/S23
 3o!"
-      ></textarea>
-      <select id="example-oscillators">
-        <option value="">-- Example --</option>
-      </select>
-      <button id="analyze">Analyze</button>
-      <div id="message"></div>
-      <canvas id="canvas"></canvas>
-      <div>
-        <input
-          id="anim-frequency"
-          type="range"
-          style="width: 100%; display: none"
-        />
-        <label id="anim-frequency-label" class="tabular-nums"></label>
+        ></textarea>
+        <select id="example-oscillators">
+          <option value="">(Example)</option>
+        </select>
       </div>
-      <table id="period-coolor-table" style="margin-right: auto"></table>
-      <div>
+
+      <button class="btn" id="analyze">Analyze</button>
+      <div class="box" id="message" style="display: none"></div>
+      <div id="map-box" class="box" style="display: none">
+        <h2>Map</h2>
+        <canvas id="canvas"></canvas>
+        <div>
+          <input
+            id="anim-frequency"
+            type="range"
+            style="width: 100%; display: none"
+          />
+          <label
+            for="anim-frequency"
+            id="anim-frequency-label"
+            class="tabular-nums"
+          ></label>
+          <pre
+            style="display: inline"
+          ><span id="generation" class="tabular-nums"></span></pre>
+        </div>
+        <table id="period-coolor-table" style="margin-right: auto"></table>
+      </div>
+
+      <div id="data-box" class="box" style="display: none">
+        <h2>Data</h2>
         <table id="output-table" style="display: none">
           <tr>
             <th>Period</th>

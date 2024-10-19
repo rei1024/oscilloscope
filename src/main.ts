@@ -23,14 +23,23 @@ function post(req: WorkerRequestMessage) {
   worker.postMessage(req);
 }
 
+let analyzingDelayTimeoutId: number | null = null;
+
 worker.addEventListener("message", (e) => {
   const message = e.data as WorkerResponseMessage;
   $message.textContent = "";
+  $message.style.display = "none";
   $outputTable.style.display = "none";
 
   $analyzeButton.disabled = false;
+  if (analyzingDelayTimeoutId) {
+    clearTimeout(analyzingDelayTimeoutId);
+  }
+  $analyzeButton.textContent = "Analyze";
   if (message.kind === "response-error") {
+    $message.style.display = "block";
     $message.textContent = "Error: " + message.message;
+    $message.style.backgroundColor = "#fecaca";
   } else {
     $outputTable.style.display = "block";
     const data = message.data;
@@ -41,6 +50,12 @@ worker.addEventListener("message", (e) => {
 
 $analyzeButton.addEventListener("click", () => {
   $analyzeButton.disabled = true;
+  if (analyzingDelayTimeoutId) {
+    clearTimeout(analyzingDelayTimeoutId);
+  }
+  analyzingDelayTimeoutId = setTimeout(() => {
+    $analyzeButton.textContent = "Analyzing";
+  }, 200);
   post({ kind: "request-analyze", rle: $input.value });
 });
 
@@ -60,6 +75,18 @@ const examples = [
     src: "cisfigureeightonpentadecathlon.rle",
   },
   { name: "Kok's galaxy", src: "koksgalaxy.rle" },
+  {
+    name: "Statorless p3",
+    src: "statorlessp3.rle",
+  },
+  {
+    name: "Cribbage",
+    src: "cribbage.rle",
+  },
+  {
+    name: "David Hilbert",
+    src: "davidhilbert.rle",
+  },
 ];
 
 for (const example of examples) {

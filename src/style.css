@@ -36,6 +36,15 @@ h1 {
   text-align: center;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+}
+
 main {
   display: grid;
   align-items: stretch;
@@ -72,4 +81,57 @@ table {
 
 #output-table th {
   text-align: right;
+}
+
+textarea {
+  border-radius: 8px;
+  padding: 4px;
+}
+
+select {
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.display-none {
+  display: none;
+}
+
+.btn {
+  background-color: #ffffff; /* 背景色 */
+  border: none; /* ボーダーなし */
+  border: 0.5px solid #bbbbbb;
+  color: black; /* テキストカラー */
+  padding: 8px 32px; /* パディング */
+  text-align: center; /* テキスト中央揃え */
+  text-decoration: none; /* テキストの下線をなくす */
+  display: inline-block; /* インラインブロックにする */
+  font-size: 16px; /* フォントサイズ */
+  cursor: pointer; /* マウスオーバー時にポインターを表示 */
+  border-radius: 8px; /* 角を丸くする */
+  transition: background-color 0.3s ease; /* 背景色を変化させるアニメーション */
+}
+
+.btn:hover {
+  background-color: #ecefec; /* ホバー時の背景色 */
+}
+
+.btn:active {
+  background-color: #d5d5d5; /* 背景色 */
+}
+
+.btn:disabled {
+  background-color: #d5d5d5; /* 背景色 */
+  cursor: auto;
+}
+
+.box {
+  display: grid;
+  align-items: stretch;
+  margin: auto;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid #bbbbbb;
+  border-radius: 8px;
+  padding: 8px;
 }

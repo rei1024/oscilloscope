@@ -1,4 +1,8 @@
 export const $message = document.querySelector("#message") as HTMLElement;
+
+export const $mapBox = document.querySelector("#map-box") as HTMLElement;
+export const $dataBox = document.querySelector("#data-box") as HTMLElement;
+
 export const $outputTable = document.querySelector(
   "#output-table"
 ) as HTMLElement;
@@ -62,6 +66,8 @@ export const $animFrequency = document.querySelector(
 export const $animFrequencyLabel = document.querySelector(
   "#anim-frequency-label"
 ) as HTMLInputElement;
+
+export const $generation = document.querySelector("#generation") as HTMLElement;
 
 export const $periodColorTable = document.querySelector(
   "#period-coolor-table"
