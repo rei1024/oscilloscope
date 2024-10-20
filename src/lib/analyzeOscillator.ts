@@ -63,7 +63,11 @@ export type AnalyzeResult = {
   /**
    * Oscillator valatility
    */
-  volatility: string;
+  volatility: number;
+  /**
+   * Oscillator strict valatility
+   */
+  strictVolatility: number;
   histories: BitGridData[];
   bitGridData: {
     width: number;
@@ -144,7 +148,8 @@ export function analyzeOscillator(
     boundingBox: rectToSize(boundingBox),
     stator: stator,
     rotor: allCount - stator,
-    volatility: (rotor / (stator + rotor)).toFixed(3),
+    volatility: rotor / (stator + rotor),
+    strictVolatility: (periodMap.countMap.get(period) ?? 0) / allCount,
     histories: world.histories.map((a) => bitGridToData(a.bitGrid)),
     bitGridData: {
       or: bitGridToData(or),

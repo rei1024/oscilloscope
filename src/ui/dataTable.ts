@@ -7,8 +7,8 @@ import {
   $outputCellsMin,
   $outputHeight,
   $outputPeriod,
-  $outputRotor,
-  $outputStator,
+  $outputCells,
+  $outputStrictVolatility,
   $outputVolatility,
   $outputWidth,
 } from "../bind";
@@ -32,9 +32,10 @@ export function setDataTable(data: AnalyzeResult) {
     data.boundingBox.sizeX * data.boundingBox.sizeY
   ).toString();
 
-  $outputStator.textContent = data.stator.toString();
+  $outputCells.textContent = `stator = ${data.stator}, rotor = ${
+    data.rotor
+  }, total = ${data.stator + data.rotor}`;
 
-  $outputRotor.textContent = data.rotor.toString();
-
-  $outputVolatility.textContent = data.volatility;
+  $outputVolatility.textContent = data.volatility.toFixed(3);
+  $outputStrictVolatility.textContent = data.strictVolatility.toFixed(3);
 }

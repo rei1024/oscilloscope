@@ -49,16 +49,16 @@ export const $outputArea = document.querySelector(
   "#output-area"
 ) as HTMLElement;
 
-export const $outputStator = document.querySelector(
-  "#output-stator"
-) as HTMLElement;
-
-export const $outputRotor = document.querySelector(
-  "#output-rotor"
+export const $outputCells = document.querySelector(
+  "#output-cells"
 ) as HTMLElement;
 
 export const $outputVolatility = document.querySelector(
   "#output-volatility"
+) as HTMLElement;
+
+export const $outputStrictVolatility = document.querySelector(
+  "#output-strict-volatility"
 ) as HTMLElement;
 
 export const $input = document.querySelector("#input") as HTMLTextAreaElement;
