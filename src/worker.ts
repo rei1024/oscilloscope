@@ -51,9 +51,17 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     };
   }
 
+  const cells = rle.cells.filter((x) => x.state === 1).map((x) => x.position);
+  if (cells.length === 0) {
+    return {
+      kind: "response-error",
+      message: "Empty pattern",
+    };
+  }
+
   try {
     const result = analyzeOscillator({
-      cells: rle.cells.filter((x) => x.state === 1).map((x) => x.position),
+      cells: cells,
       transition: rule.transition,
       maxGeneration: 100_000,
     });
