@@ -1,9 +1,10 @@
-import { dataToColor as dataToColor } from "../app";
+import { dataToColor } from "../app";
 import { $colorTable } from "../bind";
+import { displayMapTypeTitle, type MapType } from "./core";
 
 export function setColorTable(
   map: { data: number[][]; list: number[]; countMap: Map<number, number> },
-  type: "period" | "frequency"
+  mapType: MapType
 ) {
   const rows: HTMLTableRowElement[] = [];
 
@@ -19,7 +20,7 @@ export function setColorTable(
     thColor.style.width = "60px";
 
     const thType = document.createElement("th");
-    thType.textContent = type === "period" ? "Period" : "Frequency";
+    thType.textContent = displayMapTypeTitle(mapType);
 
     const thCount = document.createElement("th");
     thCount.textContent = "Count";
@@ -30,7 +31,7 @@ export function setColorTable(
 
   for (const item of list) {
     const row = document.createElement("tr");
-    const color = dataToColor(list, item);
+    const color = dataToColor(list, item, mapType === "heat" ? "heat" : "hue");
     const $color = document.createElement("td");
     $color.style.backgroundColor = color;
     $color.style.width = "40px";

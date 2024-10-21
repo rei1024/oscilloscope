@@ -12,6 +12,7 @@ import {
   $showGridCheckbox,
 } from "./bind";
 import { setColorTable } from "./ui/colorTable";
+import { displayMapTypeLower, type MapType } from "./ui/core";
 
 const cellSize = 10;
 const innerCellSize = 6;
@@ -25,18 +26,28 @@ const frequencyList = [
   300, 400, 500,
 ];
 
-export function dataToColor(list: number[], data: number) {
+export function dataToColor(
+  list: number[],
+  data: number,
+  style: "hue" | "heat"
+) {
   const index = list.findIndex((t) => t === data) ?? 0;
-  const value = index / list.length;
-
   // 80% 0.1
   // return `oklch(92% 0.35 ${value * 360})`;
-  return `lch(70% 70 ${value * 360})`;
-  // return `hsl(${value * 360} 100% 70%)`;
+  if (style === "hue") {
+    const value = index / list.length;
+    return `lch(70% 70 ${value * 360})`;
+  } else if (style === "heat") {
+    // make red
+    const value = (index + 1) / list.length;
+    // Heat map
+    const h = (1 - value) * 240;
+    return "hsl(" + h + " 100% 70%)";
+  } else {
+    throw new Error("unknown style");
+  }
 
-  // Heap map
-  // const h = value * 240;
-  // return "hsl(" + h + " 100% 50%)";
+  // return `hsl(${value * 360} 100% 70%)`;
 }
 
 export class App {
@@ -46,7 +57,7 @@ export class App {
   private gen = 0;
   private valve: Valve;
   private colorTableRows: HTMLTableRowElement[] = [];
-  private mapType: "period" | "frequency" = "period";
+  private mapType: MapType = "period";
 
   constructor(private $canvas: HTMLCanvasElement) {
     const ctx = this.$canvas.getContext("2d", { colorSpace: "display-p3" });
@@ -102,9 +113,13 @@ export class App {
     const list = mapData.list;
     for (const [y, row] of mapData.data.entries()) {
       for (const [x, p] of row.entries()) {
-        if (p >= 1) {
+        if (p >= (this.mapType === "heat" ? 0 : 1)) {
           ctx.beginPath();
-          ctx.fillStyle = dataToColor(list, p);
+          ctx.fillStyle = dataToColor(
+            list,
+            p,
+            this.mapType === "heat" ? "heat" : "hue"
+          );
           ctx.rect(
             (x - dx + safeArea) * cellSize,
             (y - dy + safeArea) * cellSize,
@@ -211,6 +226,8 @@ export class App {
     }
     return this.mapType === "frequency"
       ? this.data.frequencyMap
+      : this.mapType === "heat"
+      ? this.data.heatMap
       : this.data.periodMap;
   }
 
@@ -261,16 +278,13 @@ export class App {
       this.colorTableRows[pointData.index].style.backgroundColor = "#0000FF22";
 
       $hoverInfo.textContent =
-        "  " +
-        (this.mapType === "period" ? "period" : "frequency") +
-        " = " +
-        pointData.cellData;
+        "  " + displayMapTypeLower(this.mapType) + " = " + pointData.cellData;
     } else {
       $hoverInfo.textContent = " "; // 崩れないように
     }
   }
 
-  updateMapType(mapType: "period" | "frequency") {
+  updateMapType(mapType: MapType) {
     this.mapType = mapType;
     this.colorTableRows = setColorTable(this.getMapData(), this.mapType);
   }
