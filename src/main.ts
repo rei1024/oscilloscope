@@ -90,6 +90,10 @@ const examples = [
     src: "statorlessp3.rle",
   },
   {
+    name: "p43 Snark loop",
+    src: "p43gliderloop.rle",
+  },
+  {
     name: "Cribbage",
     src: "cribbage.rle",
   },
