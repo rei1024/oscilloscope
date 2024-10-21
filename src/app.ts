@@ -30,8 +30,8 @@ export function dataToColor(list: number[], data: number) {
   const value = index / list.length;
 
   // 80% 0.1
-  return `oklch(92% 0.35 ${value * 360})`;
-  // return `lch(70% 70 ${value * 360})`;
+  // return `oklch(92% 0.35 ${value * 360})`;
+  return `lch(70% 70 ${value * 360})`;
   // return `hsl(${value * 360} 100% 70%)`;
 
   // Heap map
@@ -244,9 +244,7 @@ export class App {
 
     const mapData = this.getMapData();
     const cellData = mapData.data[y][x];
-    const index = mapData.list
-      .filter((x) => x !== 0)
-      .findIndex((x) => x === cellData);
+    const index = mapData.list.findIndex((x) => x === cellData);
     if (index === -1) {
       return undefined;
     }

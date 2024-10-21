@@ -29,9 +29,6 @@ export function setColorTable(
   }
 
   for (const item of list) {
-    if (item === 0) {
-      continue;
-    }
     const row = document.createElement("tr");
     const color = dataToColor(list, item);
     const $color = document.createElement("td");

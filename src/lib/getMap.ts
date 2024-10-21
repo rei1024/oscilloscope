@@ -55,16 +55,22 @@ export function getMap({
     periodArray[y][x] = findPeriod(states);
   });
 
+  const periodCountMap = getCountMap(periodArray);
+  periodCountMap.delete(0);
+
+  const frequencyCountMap = getCountMap(frequencyArray);
+  frequencyCountMap.delete(0);
+
   return {
     periodMap: {
       data: periodArray,
-      list: mapUnique(periodArray),
-      countMap: getCountMap(periodArray),
+      list: mapUnique(periodArray).filter((x) => x !== 0),
+      countMap: periodCountMap,
     },
     frequencyMap: {
       data: frequencyArray,
-      list: mapUnique(frequencyArray),
-      countMap: getCountMap(frequencyArray),
+      list: mapUnique(frequencyArray).filter((x) => x !== 0),
+      countMap: frequencyCountMap,
     },
   };
 }
@@ -78,9 +84,6 @@ function getCountMap(map: number[][]): Map<number, number> {
   const countMap = new Map<number, number>();
   for (const row of map) {
     for (const x of row) {
-      if (x === 0) {
-        continue;
-      }
       const currentCount = countMap.get(x);
       if (currentCount !== undefined) {
         countMap.set(x, currentCount + 1);
