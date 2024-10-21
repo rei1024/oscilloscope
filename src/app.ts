@@ -27,10 +27,16 @@ const frequencyList = [
 
 export function dataToColor(list: number[], data: number) {
   const index = list.findIndex((t) => t === data) ?? 0;
+  const value = index / list.length;
+
   // 80% 0.1
-  return `oklch(92% 0.35 ${(index * 360) / list.length})`;
-  // return `lch(70% 70 ${(index * 360) / list.length})`;
-  // return `hsl(${(index * 360) / list.length} 100% 70%)`;
+  return `oklch(92% 0.35 ${value * 360})`;
+  // return `lch(70% 70 ${value * 360})`;
+  // return `hsl(${value * 360} 100% 70%)`;
+
+  // Heap map
+  // const h = value * 240;
+  // return "hsl(" + h + " 100% 50%)";
 }
 
 export class App {
