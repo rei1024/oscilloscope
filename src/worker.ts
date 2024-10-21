@@ -63,7 +63,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     const result = analyzeOscillator({
       cells: cells,
       transition: rule.transition,
-      maxGeneration: 100_000,
+      maxGeneration: 50_000,
     });
     return { kind: "response-analyzed", data: result };
   } catch (error) {
