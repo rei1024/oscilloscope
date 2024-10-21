@@ -15,6 +15,7 @@ import { setDataTable } from "./ui/dataTable";
 
 import { App } from "./app";
 import { getMousePositionInElement } from "./ui/getMousePositionInElement";
+import type { MapType } from "./ui/core";
 
 const worker = new MyWorker();
 
@@ -70,7 +71,6 @@ $canvas.addEventListener("mousemove", (e) => {
 });
 
 $canvas.addEventListener("mouseleave", (e) => {
-  console.log(e);
   const position = getMousePositionInElement($canvas, e);
   app.renderColorTableHighlight(position);
 });
@@ -78,9 +78,7 @@ $canvas.addEventListener("mouseleave", (e) => {
 for (const $radio of $mapTypeSelect) {
   $radio.addEventListener("input", (e) => {
     (e.target as HTMLInputElement).value;
-    app.updateMapType(
-      (e.target as HTMLInputElement).value as "period" | "frequency"
-    );
+    app.updateMapType((e.target as HTMLInputElement).value as MapType);
   });
 }
 
