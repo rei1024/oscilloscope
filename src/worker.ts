@@ -43,6 +43,14 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       message: "Unsupported rule",
     };
   }
+
+  if (rule.transition.birth.includes(0)) {
+    return {
+      kind: "response-error",
+      message: "Rules containing B0 is not supported",
+    };
+  }
+
   try {
     const result = analyzeOscillator({
       cells: rle.cells.filter((x) => x.state === 1).map((x) => x.position),
