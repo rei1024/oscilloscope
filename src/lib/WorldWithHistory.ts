@@ -49,14 +49,16 @@ export class WorldWithHistory {
     });
   }
 
-  run({ forceStop }: { forceStop?: () => boolean } = {}) {
+  run({ forceStop }: { forceStop?: () => boolean } = {}):
+    | "forced-stop"
+    | undefined {
     while (true) {
       const res = this.runStep();
       if (res === "end") {
         break;
       }
       if (forceStop && forceStop()) {
-        break;
+        return "forced-stop";
       }
     }
   }

@@ -18,7 +18,12 @@ export function runOscillator(
   for (let i = 0; i < 5; i++) {
     try {
       const world = new WorldWithHistory({ cells, bufferSize, transition });
-      world.run({ forceStop: () => world.getGen() >= maxGeneration });
+      const result = world.run({
+        forceStop: () => world.getGen() >= maxGeneration,
+      });
+      if (result === "forced-stop") {
+        throw new Error("Max Generations.");
+      }
       return {
         world,
       };
