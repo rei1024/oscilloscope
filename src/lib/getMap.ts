@@ -77,8 +77,13 @@ export function getMap({
       const rowIndex = i * width;
       for (let j = 0; j < width; j++) {
         const offset = rowIndex + j;
+        // skip if empty
+        if (orUint32Array[offset] === 0) {
+          continue;
+        }
         const BITS_J = j * BITS;
         for (let u = 0; u < BITS; u++) {
+          // skip if dead
           if (getAlive(orUint32Array, offset, u) === 0) {
             continue;
           }
