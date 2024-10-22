@@ -59,6 +59,8 @@ export function getMap({
   if (firstBitGrid === undefined) {
     throw new Error("no history");
   }
+  const firstBitGridUint32Array = firstBitGrid.asInternalUint32Array();
+  const orUint32Array = or.asInternalUint32Array();
 
   {
     function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
@@ -77,7 +79,7 @@ export function getMap({
         const offset = rowIndex + j;
         const BITS_J = j * BITS;
         for (let u = 0; u < BITS; u++) {
-          if (getAlive(or.asInternalUint32Array(), offset, u) === 0) {
+          if (getAlive(orUint32Array, offset, u) === 0) {
             continue;
           }
 
@@ -86,11 +88,7 @@ export function getMap({
 
           const states: (0 | 1)[] = [];
           let heat = 0;
-          const firstCell = getAlive(
-            histories[0]!.asInternalUint32Array(),
-            offset,
-            u
-          );
+          const firstCell = getAlive(firstBitGridUint32Array, offset, u);
           let prevCell = firstCell;
           for (const h of histories) {
             const array = h.asInternalUint32Array();
