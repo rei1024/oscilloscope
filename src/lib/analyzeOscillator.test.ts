@@ -34,5 +34,20 @@ describe("analyzeOscillator", () => {
       [2, 1, 2],
       [0, 2, 0],
     ]);
+
+    expect(
+      result.frequencyMap.data.slice(15, 18).map((row) => row.slice(31, 34))
+    ).toEqual([
+      [0, 1, 0],
+      [1, 2, 1],
+      [0, 1, 0],
+    ]);
+    expect(
+      result.heatMap.data.slice(15, 18).map((row) => row.slice(31, 34))
+    ).toEqual([
+      [-1, 2, -1],
+      [2, 0, 2],
+      [-1, 2, -1],
+    ]);
   });
 });
