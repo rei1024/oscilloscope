@@ -138,25 +138,20 @@ export function getMap({
   return {
     periodMap: {
       data: periodArray,
-      list: mapUnique(periodArray).filter((x) => x !== 0),
+      list: [...periodCountMap.keys()].sort((a, b) => a - b),
       countMap: periodCountMap,
     },
     frequencyMap: {
       data: frequencyArray,
-      list: mapUnique(frequencyArray).filter((x) => x !== 0),
+      list: [...frequencyCountMap.keys()].sort((a, b) => a - b),
       countMap: frequencyCountMap,
     },
     heatMap: {
       data: heatArray,
-      list: mapUnique(heatArray).filter((x) => x !== -1),
+      list: [...heatCountMap.keys()].sort((a, b) => a - b),
       countMap: heatCountMap,
     },
   };
-}
-
-function mapUnique(map: number[][]): number[] {
-  const set = new Set(map.flat());
-  return [...set].sort((a, b) => a - b);
 }
 
 function getCountMap(map: number[][]): Map<number, number> {
