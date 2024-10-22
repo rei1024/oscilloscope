@@ -55,34 +55,73 @@ export function getMap({
         .map(() => -1)
     );
 
-  const historiesArray = histories.map((h) => h.getArray());
+  const firstBitGrid = histories[0];
+  if (firstBitGrid === undefined) {
+    throw new Error("no history");
+  }
 
-  or.forEachAlive((x, y) => {
-    const states: (0 | 1)[] = [];
-    let heat = 0;
-    let prevCell = historiesArray[0]?.[y][x];
-    for (const h of historiesArray) {
-      const cell = h[y][x];
-      if (prevCell !== undefined && prevCell !== cell) {
-        heat++;
-      }
-      prevCell = cell;
-      states.push(cell);
-      if (cell !== 0) {
-        frequencyArray[y][x]++;
-      }
+  {
+    function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
+      const value = array[offset]!;
+      const alive = (value & (1 << (BITS_MINUS_1 - u))) !== 0 ? 1 : 0;
+      return alive;
     }
 
-    if (
-      historiesArray.length !== 0 &&
-      historiesArray[0][y][x] !==
-        historiesArray[historiesArray.length - 1][y][x]
-    ) {
-      heat++;
+    const width = firstBitGrid.getWidth32();
+    const height = firstBitGrid.getHeight();
+    const BITS = 32;
+    const BITS_MINUS_1 = BITS - 1;
+    for (let i = 0; i < height; i++) {
+      const rowIndex = i * width;
+      for (let j = 0; j < width; j++) {
+        const offset = rowIndex + j;
+        const BITS_J = j * BITS;
+        for (let u = 0; u < BITS; u++) {
+          if (getAlive(or.asInternalUint32Array(), offset, u) === 0) {
+            continue;
+          }
+
+          const x = BITS_J + u;
+          const y = i;
+
+          const states: (0 | 1)[] = [];
+          let heat = 0;
+          const firstCell = getAlive(
+            histories[0]!.asInternalUint32Array(),
+            offset,
+            u
+          );
+          let prevCell = firstCell;
+          for (const h of histories) {
+            const array = h.asInternalUint32Array();
+            const cell = getAlive(array, offset, u);
+            if (prevCell !== undefined && prevCell !== cell) {
+              heat++;
+            }
+            prevCell = cell;
+            states.push(cell);
+            if (cell !== 0) {
+              frequencyArray[y][x]++;
+            }
+          }
+
+          if (
+            histories.length !== 0 &&
+            firstCell !==
+              getAlive(
+                histories[histories.length - 1].asInternalUint32Array(),
+                offset,
+                u
+              )
+          ) {
+            heat++;
+          }
+          heatArray[y][x] = heat;
+          periodArray[y][x] = findPeriod(states);
+        }
+      }
     }
-    heatArray[y][x] = heat;
-    periodArray[y][x] = findPeriod(states);
-  });
+  }
 
   const periodCountMap = getCountMap(periodArray);
   periodCountMap.delete(0);
