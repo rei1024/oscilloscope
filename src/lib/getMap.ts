@@ -95,6 +95,7 @@ export function getMap({
           let heat = 0;
           const firstCell = getAlive(firstBitGridUint32Array, offset, u);
           let prevCell = firstCell;
+          let frequency = 0;
           for (const h of histories) {
             const array = h.asInternalUint32Array();
             const cell = getAlive(array, offset, u);
@@ -104,23 +105,23 @@ export function getMap({
             prevCell = cell;
             states.push(cell);
             if (cell !== 0) {
-              frequencyArray[y][x]++;
+              frequency++;
             }
           }
 
           if (
-            histories.length !== 0 &&
             firstCell !==
-              getAlive(
-                histories[histories.length - 1].asInternalUint32Array(),
-                offset,
-                u
-              )
+            getAlive(
+              histories[histories.length - 1]!.asInternalUint32Array(),
+              offset,
+              u
+            )
           ) {
             heat++;
           }
           heatArray[y][x] = heat;
           periodArray[y][x] = findPeriod(states);
+          frequencyArray[y][x] = frequency;
         }
       }
     }
