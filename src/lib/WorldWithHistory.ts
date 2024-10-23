@@ -22,10 +22,16 @@ export class WorldWithHistory {
   constructor({
     cells,
     bufferSize,
-    transition,
+    rule,
   }: {
     cells: { x: number; y: number }[];
-    transition: { birth: number[]; survive: number[] };
+    rule:
+      | {
+          transition: { birth: number[]; survive: number[] };
+        }
+      | {
+          intTransition: { birth: string[]; survive: string[] };
+        };
     bufferSize?: number;
   }) {
     this.bufferSize = bufferSize ?? 32;
@@ -35,7 +41,12 @@ export class WorldWithHistory {
       width: sizeX + this.bufferSize,
       height: sizeY + this.bufferSize,
     });
-    this.bitWorld.setRule(transition);
+    if ("transition" in rule && rule.transition !== undefined) {
+      this.bitWorld.setRule(rule.transition);
+    } else if ("intTransition" in rule && rule.intTransition !== undefined) {
+      this.bitWorld.setINTRule(rule.intTransition);
+    }
+
     setCellsToBitGrid(this.bitWorld.bitGrid, cells, { sizeX, sizeY });
 
     this.initialBitGrid = this.bitWorld.bitGrid.clone();

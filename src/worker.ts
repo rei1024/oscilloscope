@@ -37,14 +37,12 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     };
   }
 
-  if (rule.type !== "outer-totalistic") {
+  if (rule.type === "outer-totalistic" && rule.transition.birth.includes(0)) {
     return {
       kind: "response-error",
-      message: "Unsupported rule",
+      message: "Rules containing B0 is not supported",
     };
-  }
-
-  if (rule.transition.birth.includes(0)) {
+  } else if (rule.type === "int" && rule.transition.birth.includes("0")) {
     return {
       kind: "response-error",
       message: "Rules containing B0 is not supported",
@@ -62,8 +60,11 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
   try {
     const result = analyzeOscillator({
       cells: cells,
-      transition: rule.transition,
-      maxGeneration: 50_000,
+      rule:
+        rule.type === "int"
+          ? { intTransition: rule.transition }
+          : { transition: rule.transition },
+      maxGeneration: rule.type === "int" ? 2_000 : 50_000,
     });
     return { kind: "response-analyzed", data: result };
   } catch (error) {
