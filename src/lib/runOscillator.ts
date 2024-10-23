@@ -48,5 +48,5 @@ export function runOscillator(
     }
   }
 
-  throw new Error("Error: analyzeOscillator");
+  throw new Error("Error: Oscillator not detected");
 }
