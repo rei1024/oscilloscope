@@ -16,6 +16,12 @@ export type RunOscillatorResult = {
   world: WorldWithHistory;
 };
 
+export class MaxGenerationError extends Error {
+  constructor(maxGen: number) {
+    super("Maximum generation is " + maxGen);
+  }
+}
+
 export function runOscillator(
   config: RunOscillatorConfig
 ): RunOscillatorResult {
@@ -28,7 +34,7 @@ export function runOscillator(
         forceStop: () => world.getGen() >= maxGeneration,
       });
       if (result === "forced-stop") {
-        throw new Error("Max Generations.");
+        throw new MaxGenerationError(config.maxGeneration);
       }
       return {
         world,

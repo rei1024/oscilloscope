@@ -1,6 +1,7 @@
 import { analyzeOscillator, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { parseRule } from "@ca-ts/rule";
+import { MaxGenerationError } from "./lib/runOscillator";
 
 export type WorkerRequestMessage = {
   kind: "request-analyze";
@@ -56,7 +57,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       message: "Empty pattern",
     };
   }
-
+  const maxGeneration = rule.type === "int" ? 2_000 : 50_000;
   try {
     const result = analyzeOscillator({
       cells: cells,
@@ -64,11 +65,17 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         rule.type === "int"
           ? { intTransition: rule.transition }
           : { transition: rule.transition },
-      maxGeneration: rule.type === "int" ? 2_000 : 50_000,
+      maxGeneration: maxGeneration,
     });
     return { kind: "response-analyzed", data: result };
   } catch (error) {
     console.error(error);
+    if (error instanceof MaxGenerationError) {
+      return {
+        kind: "response-error",
+        message: `maximum period is ${maxGeneration.toLocaleString()}`,
+      };
+    }
     return {
       kind: "response-error",
       message: "Analyzation Error",
