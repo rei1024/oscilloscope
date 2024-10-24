@@ -2,7 +2,13 @@ import { WorldSizeError, WorldWithHistory } from "./WorldWithHistory";
 
 export type RunOscillatorConfig = {
   cells: { x: number; y: number }[];
-  transition: { birth: number[]; survive: number[] };
+  rule:
+    | {
+        transition: { birth: number[]; survive: number[] };
+      }
+    | {
+        intTransition: { birth: string[]; survive: string[] };
+      };
   maxGeneration: number;
 };
 
@@ -10,19 +16,25 @@ export type RunOscillatorResult = {
   world: WorldWithHistory;
 };
 
+export class MaxGenerationError extends Error {
+  constructor(maxGen: number) {
+    super("Maximum generation is " + maxGen);
+  }
+}
+
 export function runOscillator(
   config: RunOscillatorConfig
 ): RunOscillatorResult {
-  const { cells, transition, maxGeneration } = config;
+  const { cells, rule, maxGeneration } = config;
   let bufferSize = 32;
   for (let i = 0; i < 5; i++) {
     try {
-      const world = new WorldWithHistory({ cells, bufferSize, transition });
+      const world = new WorldWithHistory({ cells, bufferSize, rule });
       const result = world.run({
         forceStop: () => world.getGen() >= maxGeneration,
       });
       if (result === "forced-stop") {
-        throw new Error("Max Generations.");
+        throw new MaxGenerationError(config.maxGeneration);
       }
       return {
         world,
@@ -36,5 +48,5 @@ export function runOscillator(
     }
   }
 
-  throw new Error("Error: analyzeOscillator");
+  throw new Error("Error: Oscillator not detected");
 }

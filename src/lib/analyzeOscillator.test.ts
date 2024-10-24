@@ -8,9 +8,11 @@ describe("analyzeOscillator", () => {
       cells: parseRLE(`ooo`)
         .cells.filter((x) => x.state === 1)
         .map((x) => x.position),
-      transition: {
-        birth: [3],
-        survive: [2, 3],
+      rule: {
+        transition: {
+          birth: [3],
+          survive: [2, 3],
+        },
       },
       maxGeneration: 1000,
     });
