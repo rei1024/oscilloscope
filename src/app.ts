@@ -26,28 +26,30 @@ const frequencyList = [
   300, 400, 500,
 ];
 
-export function dataToColor(
+export function makeColorMap(
   list: number[],
-  data: number,
   style: "hue" | "heat"
-) {
-  const index = list.findIndex((t) => t === data) ?? 0;
-  // 80% 0.1
-  // return `oklch(92% 0.35 ${value * 360})`;
-  if (style === "hue") {
-    const value = index / list.length;
-    return `lch(70% 70 ${value * 360})`;
-  } else if (style === "heat") {
-    // make red
-    const value = (index + 1) / list.length;
-    // Heat map
-    const h = (1 - value) * 240;
-    return "hsl(" + h + " 100% 70%)";
-  } else {
-    throw new Error("unknown style");
-  }
+): Map<number, string> {
+  const len = list.length;
+  return new Map(
+    list.map((x, index) => {
+      let color: string;
+      if (style === "hue") {
+        const value = index / len;
+        color = `lch(70% 70 ${value * 360})`;
+      } else if (style === "heat") {
+        // make red
+        const value = (index + 1) / len;
+        // Heat map
+        const h = (1 - value) * 240;
+        color = "hsl(" + h + " 100% 70%)";
+      } else {
+        throw new Error("unknown style");
+      }
 
-  // return `hsl(${value * 360} 100% 70%)`;
+      return [x, color];
+    })
+  );
 }
 
 export class App {
@@ -111,15 +113,15 @@ export class App {
 
     const mapData = this.getMapData();
     const list = mapData.list;
+    const colorMap = makeColorMap(
+      list,
+      this.mapType === "heat" ? "heat" : "hue"
+    );
     for (const [y, row] of mapData.data.entries()) {
       for (const [x, p] of row.entries()) {
         if (p >= (this.mapType === "heat" ? 0 : 1)) {
           ctx.beginPath();
-          ctx.fillStyle = dataToColor(
-            list,
-            p,
-            this.mapType === "heat" ? "heat" : "hue"
-          );
+          ctx.fillStyle = colorMap.get(p) ?? "";
           ctx.rect(
             (x - dx + safeArea) * cellSize,
             (y - dy + safeArea) * cellSize,

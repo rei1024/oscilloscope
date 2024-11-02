@@ -1,4 +1,4 @@
-import { dataToColor } from "../app";
+import { makeColorMap } from "../app";
 import { $colorTable } from "../bind";
 import { displayMapTypeTitle, type MapType } from "./core";
 
@@ -29,9 +29,10 @@ export function setColorTable(
     $colorTable.append(trHead);
   }
 
+  const colorMap = makeColorMap(list, mapType === "heat" ? "heat" : "hue");
   for (const item of list) {
     const row = document.createElement("tr");
-    const color = dataToColor(list, item, mapType === "heat" ? "heat" : "hue");
+    const color = colorMap.get(item) ?? "";
     const $color = document.createElement("td");
     $color.style.backgroundColor = color;
     $color.style.width = "40px";
