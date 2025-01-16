@@ -38,12 +38,22 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     };
   }
 
-  if (rule.type === "outer-totalistic" && rule.transition.birth.includes(0)) {
-    return {
-      kind: "response-error",
-      message: "Rules containing B0 is not supported",
-    };
-  } else if (rule.type === "int" && rule.transition.birth.includes("0")) {
+  if (rule.type === "outer-totalistic") {
+    if (rule.generations != undefined) {
+      return {
+        kind: "response-error",
+        message: "Generations is not supported",
+      };
+    }
+    if (rule.transition.birth.includes(0)) {
+      return {
+        kind: "response-error",
+        message: "Rules containing B0 is not supported",
+      };
+    }
+  }
+
+  if (rule.type === "int" && rule.transition.birth.includes("0")) {
     return {
       kind: "response-error",
       message: "Rules containing B0 is not supported",
