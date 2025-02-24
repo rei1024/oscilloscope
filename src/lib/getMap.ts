@@ -75,6 +75,12 @@ export function getMap({
     const BITS_MINUS_1 = BITS - 1;
     for (let i = 0; i < height; i++) {
       const rowIndex = i * width;
+      const y = i;
+
+      const heatArrayRow = heatArray[y];
+      const periodArrayRow = periodArray[y];
+      const frequencyArrayRow = frequencyArray[y];
+
       for (let j = 0; j < width; j++) {
         const offset = rowIndex + j;
         // skip if empty
@@ -89,7 +95,6 @@ export function getMap({
           }
 
           const x = BITS_J + u;
-          const y = i;
 
           const states: (0 | 1)[] = [];
           let heat = 0;
@@ -119,9 +124,9 @@ export function getMap({
           ) {
             heat++;
           }
-          heatArray[y][x] = heat;
-          periodArray[y][x] = findPeriod(states);
-          frequencyArray[y][x] = frequency;
+          heatArrayRow[x] = heat;
+          periodArrayRow[x] = findPeriod(states);
+          frequencyArrayRow[x] = frequency;
         }
       }
     }

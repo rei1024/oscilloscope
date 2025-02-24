@@ -23,7 +23,7 @@
     "@ca-ts/rle": "npm:@jsr/ca-ts__rle@^0.8.0",
     "@ca-ts/rule": "npm:@jsr/ca-ts__rule@^0.6.0",
     "typescript": "^5.7.3",
-    "vite": "^6.1.0",
-    "vitest": "^3.0.5"
+    "vite": "^6.1.1",
+    "vitest": "^3.0.6"
   }
 }
