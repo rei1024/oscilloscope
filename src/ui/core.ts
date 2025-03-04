@@ -14,6 +14,6 @@ export function displayMapTypeTitle(mapType: MapType) {
   return mapType === "period"
     ? "Period"
     : mapType === "heat"
-    ? "Heat"
-    : "Frequency";
+      ? "Heat"
+      : "Frequency";
 }

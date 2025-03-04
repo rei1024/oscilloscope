@@ -1,6 +1,6 @@
 export function getMousePositionInElement(
   element: Element,
-  mouseEvent: MouseEvent
+  mouseEvent: MouseEvent,
 ) {
   const rect = element.getBoundingClientRect();
   return {

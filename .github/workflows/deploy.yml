@@ -1,4 +1,5 @@
 # https://docs.github.com/ja/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+# Deploy to GitHub Pages
 name: Deploy
 
 on:

@@ -119,7 +119,7 @@ $exampleOscillators.addEventListener("change", async () => {
     return;
   }
   const response = await fetch(
-    "/oscilloscope/data/" + $exampleOscillators.value
+    "/oscilloscope/data/" + $exampleOscillators.value,
   );
   if (!response.ok) {
     throw new Error("fetch error");

@@ -17,6 +17,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: "./.node-version"
-      - run: npm ci
-      - run: npm run test
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
+      - name: Test
+        run: npm run test
+      - name: Build
+        run: npm run build
+      - name: Format Check
+        run: npm run fmt:check

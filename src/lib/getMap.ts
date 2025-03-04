@@ -34,7 +34,7 @@ export function getMap({
     .map(() =>
       Array(width)
         .fill(0)
-        .map(() => 0)
+        .map(() => 0),
     );
 
   const frequencyArray = Array(height)
@@ -43,7 +43,7 @@ export function getMap({
     .map(() =>
       Array(width)
         .fill(0)
-        .map(() => 0)
+        .map(() => 0),
     );
 
   const heatArray = Array(height)
@@ -52,7 +52,7 @@ export function getMap({
     .map(() =>
       Array(width)
         .fill(0)
-        .map(() => -1)
+        .map(() => -1),
     );
 
   const firstBitGrid = histories[0];
@@ -119,7 +119,7 @@ export function getMap({
             getAlive(
               histories[histories.length - 1]!.asInternalUint32Array(),
               offset,
-              u
+              u,
             )
           ) {
             heat++;

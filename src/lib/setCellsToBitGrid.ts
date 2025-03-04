@@ -20,7 +20,7 @@ export function boundingBox(cells: { x: number; y: number }[]) {
 export function setCellsToBitGrid(
   bitGrid: BitGrid,
   cells: { x: number; y: number }[],
-  { sizeX, sizeY }: { sizeX: number; sizeY: number }
+  { sizeX, sizeY }: { sizeX: number; sizeY: number },
 ) {
   const centerX = Math.floor(bitGrid.getWidth() / 2) - Math.floor(sizeX / 2);
   const centerY = Math.floor(bitGrid.getHeight() / 2) - Math.floor(sizeY / 2);

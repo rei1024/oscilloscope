@@ -28,7 +28,7 @@ const frequencyList = [
 
 export function makeColorMap(
   list: number[],
-  style: "hue" | "heat"
+  style: "hue" | "heat",
 ): Map<number, string> {
   const len = list.length;
   return new Map(
@@ -48,7 +48,7 @@ export function makeColorMap(
       }
 
       return [x, color];
-    })
+    }),
   );
 }
 
@@ -60,8 +60,10 @@ export class App {
   private valve: Valve;
   private colorTableRows: HTMLTableRowElement[] = [];
   private mapType: MapType = "period";
+  private $canvas: HTMLCanvasElement;
 
-  constructor(private $canvas: HTMLCanvasElement) {
+  constructor($canvas: HTMLCanvasElement) {
+    this.$canvas = $canvas;
     const ctx = this.$canvas.getContext("2d", { colorSpace: "display-p3" });
     if (ctx == null) {
       throw Error("Context");
@@ -75,7 +77,7 @@ export class App {
         }
         this.gen = (this.gen + num) % this.histories.length;
       },
-      { frequency: 20 }
+      { frequency: 20 },
     );
     this.valve.disabled = false;
 
@@ -115,7 +117,7 @@ export class App {
     const list = mapData.list;
     const colorMap = makeColorMap(
       list,
-      this.mapType === "heat" ? "heat" : "hue"
+      this.mapType === "heat" ? "heat" : "hue",
     );
     for (const [y, row] of mapData.data.entries()) {
       for (const [x, p] of row.entries()) {
@@ -126,7 +128,7 @@ export class App {
             (x - dx + safeArea) * cellSize,
             (y - dy + safeArea) * cellSize,
             cellSize,
-            cellSize
+            cellSize,
           );
           ctx.fill();
         }
@@ -145,7 +147,7 @@ export class App {
           (x - dx + safeArea) * cellSize + innerCellOffset,
           (y - dy + safeArea) * cellSize + innerCellOffset,
           innerCellSize,
-          innerCellSize
+          innerCellSize,
         );
       });
       ctx.fill();
@@ -177,7 +179,7 @@ export class App {
             posX + gridWidth / 2,
             posY + gridWidth / 2,
             cellSize - gridWidth,
-            cellSize - gridWidth
+            cellSize - gridWidth,
           );
         }
       }
@@ -211,8 +213,8 @@ export class App {
       data.histories.length <= 3
         ? frequencyList.filter((x) => x <= 3).length - 1
         : data.histories.length <= 10
-        ? frequencyList.filter((x) => x <= 10).length - 1
-        : "10"
+          ? frequencyList.filter((x) => x <= 10).length - 1
+          : "10"
     ).toString();
     $animFrequencyLabel.textContent =
       this.valve.frequency.toLocaleString() + "Hz";
@@ -229,8 +231,8 @@ export class App {
     return this.mapType === "frequency"
       ? this.data.frequencyMap
       : this.mapType === "heat"
-      ? this.data.heatMap
-      : this.data.periodMap;
+        ? this.data.heatMap
+        : this.data.periodMap;
   }
 
   updateFrequency() {
@@ -251,14 +253,14 @@ export class App {
       dx +
       Math.floor(
         (pixelPosition.x / this.$canvas.clientWidth) *
-          (this.data.boundingBox.sizeX + safeArea * 2)
+          (this.data.boundingBox.sizeX + safeArea * 2),
       );
     const y =
       -safeArea +
       dy +
       Math.floor(
         (pixelPosition.y / this.$canvas.clientHeight) *
-          (this.data.boundingBox.sizeY + safeArea * 2)
+          (this.data.boundingBox.sizeY + safeArea * 2),
       );
 
     const mapData = this.getMapData();

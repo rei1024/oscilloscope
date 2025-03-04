@@ -30,7 +30,7 @@ describe("analyzeOscillator", () => {
     });
 
     expect(
-      result.periodMap.data.slice(15, 18).map((row) => row.slice(31, 34))
+      result.periodMap.data.slice(15, 18).map((row) => row.slice(31, 34)),
     ).toEqual([
       [0, 2, 0],
       [2, 1, 2],
@@ -38,14 +38,14 @@ describe("analyzeOscillator", () => {
     ]);
 
     expect(
-      result.frequencyMap.data.slice(15, 18).map((row) => row.slice(31, 34))
+      result.frequencyMap.data.slice(15, 18).map((row) => row.slice(31, 34)),
     ).toEqual([
       [0, 1, 0],
       [1, 2, 1],
       [0, 1, 0],
     ]);
     expect(
-      result.heatMap.data.slice(15, 18).map((row) => row.slice(31, 34))
+      result.heatMap.data.slice(15, 18).map((row) => row.slice(31, 34)),
     ).toEqual([
       [-1, 2, -1],
       [2, 0, 2],

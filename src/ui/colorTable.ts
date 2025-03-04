@@ -4,7 +4,7 @@ import { displayMapTypeTitle, type MapType } from "./core";
 
 export function setColorTable(
   map: { data: number[][]; list: number[]; countMap: Map<number, number> },
-  mapType: MapType
+  mapType: MapType,
 ) {
   const rows: HTMLTableRowElement[] = [];
 

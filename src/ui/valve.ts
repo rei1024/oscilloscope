@@ -20,7 +20,7 @@ export class Valve {
    */
   constructor(
     handler: (value: number) => void,
-    { frequency, signal }: { frequency: number; signal?: AbortSignal }
+    { frequency, signal }: { frequency: number; signal?: AbortSignal },
   ) {
     this.#frequency = frequency;
     const raf = requestAnimationFrame;
