@@ -71,10 +71,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
   try {
     const result = analyzeOscillator({
       cells: cells,
-      rule:
-        rule.type === "int"
-          ? { intTransition: rule.transition }
-          : { transition: rule.transition },
+      rule: rule,
       maxGeneration: maxGeneration,
     });
     return { kind: "response-analyzed", data: result };

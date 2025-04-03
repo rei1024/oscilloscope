@@ -1,14 +1,9 @@
+import type { INTRule, OuterTotalisticRule } from "@ca-ts/rule";
 import { WorldSizeError, WorldWithHistory } from "./WorldWithHistory";
 
 export type RunOscillatorConfig = {
   cells: { x: number; y: number }[];
-  rule:
-    | {
-        transition: { birth: number[]; survive: number[] };
-      }
-    | {
-        intTransition: { birth: string[]; survive: string[] };
-      };
+  rule: OuterTotalisticRule | INTRule;
   maxGeneration: number;
 };
 
@@ -23,7 +18,7 @@ export class MaxGenerationError extends Error {
 }
 
 export function runOscillator(
-  config: RunOscillatorConfig,
+  config: RunOscillatorConfig
 ): RunOscillatorResult {
   const { cells, rule, maxGeneration } = config;
   let bufferSize = 32;

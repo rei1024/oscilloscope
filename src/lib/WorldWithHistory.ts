@@ -1,5 +1,7 @@
 import { BitGrid, BitWorld } from "@ca-ts/algo/bit";
-import { boundingBox, setCellsToBitGrid } from "./setCellsToBitGrid.ts";
+import { setCellsToBitGrid } from "./setCellsToBitGrid.ts";
+import { CACellList } from "@ca-ts/pattern";
+import type { INTRule, OuterTotalisticRule } from "@ca-ts/rule";
 
 export class WorldSizeError extends Error {
   constructor() {
@@ -25,29 +27,33 @@ export class WorldWithHistory {
     rule,
   }: {
     cells: { x: number; y: number }[];
-    rule:
-      | {
-          transition: { birth: number[]; survive: number[] };
-        }
-      | {
-          intTransition: { birth: string[]; survive: string[] };
-        };
+    rule: OuterTotalisticRule | INTRule;
     bufferSize?: number;
   }) {
     this.bufferSize = bufferSize ?? 32;
 
-    const { sizeX, sizeY } = boundingBox(cells);
+    const cellList = CACellList.fromCells(
+      cells.map((c) => ({ position: c, state: 1 }))
+    );
+
+    const boundingRect = cellList.boundingRect;
+
+    if (boundingRect == undefined) {
+      throw new Error("Invalid cells");
+    }
     this.bitWorld = BitWorld.make({
-      width: sizeX + this.bufferSize,
-      height: sizeY + this.bufferSize,
+      width: boundingRect.width + this.bufferSize,
+      height: boundingRect.height + this.bufferSize,
     });
-    if ("transition" in rule && rule.transition !== undefined) {
+    if (rule.type === "outer-totalistic") {
       this.bitWorld.setRule(rule.transition);
-    } else if ("intTransition" in rule && rule.intTransition !== undefined) {
-      this.bitWorld.setINTRule(rule.intTransition);
+    } else if (rule.type === "int") {
+      this.bitWorld.setINTRule(rule.transition);
+    } else {
+      rule satisfies never;
     }
 
-    setCellsToBitGrid(this.bitWorld.bitGrid, cells, { sizeX, sizeY });
+    setCellsToBitGrid(this.bitWorld.bitGrid, cellList);
 
     this.initialBitGrid = this.bitWorld.bitGrid.clone();
     this.pushHistory();
