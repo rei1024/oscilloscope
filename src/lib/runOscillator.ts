@@ -18,7 +18,7 @@ export class MaxGenerationError extends Error {
 }
 
 export function runOscillator(
-  config: RunOscillatorConfig
+  config: RunOscillatorConfig,
 ): RunOscillatorResult {
   const { cells, rule, maxGeneration } = config;
   let bufferSize = 32;

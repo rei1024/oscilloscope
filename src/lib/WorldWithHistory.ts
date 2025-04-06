@@ -33,7 +33,7 @@ export class WorldWithHistory {
     this.bufferSize = bufferSize ?? 32;
 
     const cellList = CACellList.fromCells(
-      cells.map((c) => ({ position: c, state: 1 }))
+      cells.map((c) => ({ position: c, state: 1 })),
     );
 
     const boundingRect = cellList.boundingRect;
