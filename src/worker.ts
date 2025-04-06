@@ -67,7 +67,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       message: "Empty pattern",
     };
   }
-  const maxGeneration = rule.type === "int" ? 2_000 : 50_000;
+  const maxGeneration = 50_000;
   try {
     const result = analyzeOscillator({
       cells: cells,
