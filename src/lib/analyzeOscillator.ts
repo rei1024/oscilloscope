@@ -34,6 +34,9 @@ type BitGridData = {
 };
 
 export type AnalyzeResult = {
+  /**
+   * Period
+   */
   period: number;
   population: {
     /** Maximum population */
@@ -41,7 +44,7 @@ export type AnalyzeResult = {
     /** Minimum population */
     min: number;
     /** Average population */
-    avg: string;
+    avg: number;
     /** Median of population */
     median: number;
   };
@@ -78,11 +81,21 @@ export type AnalyzeResult = {
     and: BitGridData;
   };
   /**
+   * [Heat](https://conwaylife.com/wiki/Heat)
+   */
+  heat: number;
+  /**
+   * [Temperature](https://conwaylife.com/wiki/Temperature)
+   */
+  temperature: number;
+  /**
    * [Period map](https://conwaylife.com/wiki/Map#Period_map)
    */
   periodMap: {
     /**
      * Period of each cells
+     *
+     * 0 for the empty cell
      */
     data: number[][];
     list: number[];
@@ -92,11 +105,17 @@ export type AnalyzeResult = {
    * [Frequency map](https://conwaylife.com/wiki/Map#Frequency_map)
    */
   frequencyMap: {
+    /**
+     * 0 for the empty cell
+     */
     data: number[][];
     list: number[];
     countMap: Map<number, number>;
   };
   heatMap: {
+    /**
+     * -1 for the empty cell
+     */
     data: number[][];
     list: number[];
     countMap: Map<number, number>;
@@ -115,12 +134,12 @@ export function bitGridFromData(bitGridData: BitGridData): BitGrid {
   return new BitGrid(
     bitGridData.width32,
     bitGridData.height,
-    bitGridData.uint32,
+    bitGridData.uint32
   );
 }
 
 export function analyzeOscillator(
-  runConfig: RunOscillatorConfig,
+  runConfig: RunOscillatorConfig
 ): AnalyzeResult {
   const { world } = runOscillator(runConfig);
 
@@ -142,12 +161,18 @@ export function analyzeOscillator(
     histories: world.histories.map((x) => x.bitGrid),
   });
 
+  const heat =
+    heatMap.data
+      .flat()
+      .filter((x) => x !== -1)
+      .reduce((acc, x) => acc + x, 0) / period;
+
   return {
     period,
     population: {
       max: max(populations),
       min: min(populations),
-      avg: average(populations).toFixed(2),
+      avg: average(populations),
       median: median(populations),
     },
     boundingBox: rectToSize(boundingBox),
@@ -164,6 +189,8 @@ export function analyzeOscillator(
       minX: boundingBox.minX,
       minY: boundingBox.minY,
     },
+    heat,
+    temperature: heat / allCount,
     periodMap,
     frequencyMap,
     heatMap,
