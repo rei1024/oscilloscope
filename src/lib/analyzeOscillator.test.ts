@@ -32,6 +32,7 @@ describe("analyzeOscillator", () => {
     });
 
     expect(result.heat).toEqual(4);
+    expect(result.temperature).toEqual(0.8);
     expect(
       result.periodMap.data.slice(15, 18).map((row) => row.slice(31, 34)),
     ).toEqual([
