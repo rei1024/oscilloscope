@@ -19,17 +19,20 @@ describe("analyzeOscillator", () => {
     });
 
     expect(result.period).toEqual(2);
-
     expect(result.volatility).toEqual(0.8);
+    expect(result.stator).toEqual(1);
+    expect(result.rotor).toEqual(4);
     expect(result.strictVolatility).toEqual(0.8);
     expect(result.boundingBox).toEqual({ sizeX: 3, sizeY: 3 });
     expect(result.population).toEqual({
       min: 3,
       max: 3,
-      avg: "3.00",
+      avg: 3,
       median: 3,
     });
 
+    expect(result.heat).toEqual(4);
+    expect(result.temperature).toEqual(0.8);
     expect(
       result.periodMap.data.slice(15, 18).map((row) => row.slice(31, 34)),
     ).toEqual([

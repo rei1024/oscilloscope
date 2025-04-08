@@ -23,6 +23,13 @@ export const $outputTable = document.querySelector(
 export const $outputPeriod = document.querySelector(
   "#output-period",
 ) as HTMLElement;
+export const $outputHeat = document.querySelector(
+  "#output-heat",
+) as HTMLElement;
+export const $outputTemperature = document.querySelector(
+  "#output-temperature",
+) as HTMLElement;
+
 export const $outputCellsMin = document.querySelector(
   "#output-cells-min",
 ) as HTMLElement;

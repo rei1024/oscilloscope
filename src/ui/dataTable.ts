@@ -11,16 +11,22 @@ import {
   $outputStrictVolatility,
   $outputVolatility,
   $outputWidth,
+  $outputHeat,
+  $outputTemperature,
 } from "../bind";
 
 export function setDataTable(data: AnalyzeResult) {
   $outputPeriod.textContent = data.period.toString();
 
+  $outputHeat.textContent = data.heat.toFixed(2);
+
+  $outputTemperature.textContent = data.temperature.toFixed(2);
+
   $outputCellsMin.textContent = data.population.min.toString();
 
   $outputCellsMax.textContent = data.population.max.toString();
 
-  $outputCellsAvg.textContent = data.population.avg.toString();
+  $outputCellsAvg.textContent = data.population.avg.toFixed(2);
 
   $outputCellsMedian.textContent = data.population.median.toString();
 
