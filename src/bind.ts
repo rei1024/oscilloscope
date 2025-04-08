@@ -7,74 +7,74 @@ export const $mapTypeSelect = [
 ] as HTMLInputElement[];
 
 export const $showAnimationCheckbox = document.querySelector(
-  "#show-animation-checkbox"
+  "#show-animation-checkbox",
 ) as HTMLInputElement;
 
 export const $showGridCheckbox = document.querySelector(
-  "#show-grid-checkbox"
+  "#show-grid-checkbox",
 ) as HTMLInputElement;
 
 export const $dataBox = document.querySelector("#data-box") as HTMLElement;
 
 export const $outputTable = document.querySelector(
-  "#output-table"
+  "#output-table",
 ) as HTMLElement;
 
 export const $outputPeriod = document.querySelector(
-  "#output-period"
+  "#output-period",
 ) as HTMLElement;
 export const $outputHeat = document.querySelector(
-  "#output-heat"
+  "#output-heat",
 ) as HTMLElement;
 export const $outputTemperature = document.querySelector(
-  "#output-temperature"
+  "#output-temperature",
 ) as HTMLElement;
 
 export const $outputCellsMin = document.querySelector(
-  "#output-cells-min"
+  "#output-cells-min",
 ) as HTMLElement;
 export const $outputCellsMax = document.querySelector(
-  "#output-cells-max"
+  "#output-cells-max",
 ) as HTMLElement;
 export const $outputCellsAvg = document.querySelector(
-  "#output-cells-avg"
+  "#output-cells-avg",
 ) as HTMLElement;
 
 export const $outputCellsMedian = document.querySelector(
-  "#output-cells-median"
+  "#output-cells-median",
 ) as HTMLElement;
 
 export const $outputWidth = document.querySelector(
-  "#output-width"
+  "#output-width",
 ) as HTMLElement;
 
 export const $outputHeight = document.querySelector(
-  "#output-height"
+  "#output-height",
 ) as HTMLElement;
 
 export const $outputArea = document.querySelector(
-  "#output-area"
+  "#output-area",
 ) as HTMLElement;
 
 export const $outputCells = document.querySelector(
-  "#output-cells"
+  "#output-cells",
 ) as HTMLElement;
 
 export const $outputVolatility = document.querySelector(
-  "#output-volatility"
+  "#output-volatility",
 ) as HTMLElement;
 
 export const $outputStrictVolatility = document.querySelector(
-  "#output-strict-volatility"
+  "#output-strict-volatility",
 ) as HTMLElement;
 
 export const $input = document.querySelector("#input") as HTMLTextAreaElement;
 export const $analyzeButton = document.querySelector(
-  "#analyze"
+  "#analyze",
 ) as HTMLButtonElement;
 
 export const $exampleOscillators = document.querySelector(
-  "#example-oscillators"
+  "#example-oscillators",
 ) as HTMLSelectElement;
 
 export const $canvas = document.querySelector("#canvas") as HTMLCanvasElement;
@@ -82,15 +82,15 @@ export const $canvas = document.querySelector("#canvas") as HTMLCanvasElement;
 export const $hoverInfo = document.querySelector("#hover-info") as HTMLElement;
 
 export const $animFrequency = document.querySelector(
-  "#anim-frequency"
+  "#anim-frequency",
 ) as HTMLInputElement;
 
 export const $animFrequencyLabel = document.querySelector(
-  "#anim-frequency-label"
+  "#anim-frequency-label",
 ) as HTMLInputElement;
 
 export const $generation = document.querySelector("#generation") as HTMLElement;
 
 export const $colorTable = document.querySelector(
-  "#color-table"
+  "#color-table",
 ) as HTMLTableElement;

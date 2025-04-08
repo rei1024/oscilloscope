@@ -134,12 +134,12 @@ export function bitGridFromData(bitGridData: BitGridData): BitGrid {
   return new BitGrid(
     bitGridData.width32,
     bitGridData.height,
-    bitGridData.uint32
+    bitGridData.uint32,
   );
 }
 
 export function analyzeOscillator(
-  runConfig: RunOscillatorConfig
+  runConfig: RunOscillatorConfig,
 ): AnalyzeResult {
   const { world } = runOscillator(runConfig);
 
