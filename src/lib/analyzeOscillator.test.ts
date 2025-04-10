@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { analyzeOscillator } from "./analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
+import { CACellList } from "@ca-ts/pattern";
 
 describe("analyzeOscillator", () => {
   it("analyze blinker", () => {
@@ -33,8 +34,10 @@ describe("analyzeOscillator", () => {
 
     expect(result.heat).toEqual(4);
     expect(result.temperature).toEqual(0.8);
+
+    // HACK
     expect(
-      result.periodMap.data.slice(15, 18).map((row) => row.slice(31, 34)),
+      CACellList.from2dArray(result.periodMap.data).to2dArray()?.array,
     ).toEqual([
       [0, 2, 0],
       [2, 1, 2],
@@ -42,14 +45,17 @@ describe("analyzeOscillator", () => {
     ]);
 
     expect(
-      result.frequencyMap.data.slice(15, 18).map((row) => row.slice(31, 34)),
+      CACellList.from2dArray(result.frequencyMap.data).to2dArray()?.array,
     ).toEqual([
       [0, 1, 0],
       [1, 2, 1],
       [0, 1, 0],
     ]);
+
     expect(
-      result.heatMap.data.slice(15, 18).map((row) => row.slice(31, 34)),
+      result.heatMap.data
+        .filter((row) => !row.every((c) => c === -1))
+        .map((row) => row.slice(15, 18)),
     ).toEqual([
       [-1, 2, -1],
       [2, 0, 2],

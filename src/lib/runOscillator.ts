@@ -21,7 +21,7 @@ export function runOscillator(
   config: RunOscillatorConfig,
 ): RunOscillatorResult {
   const { cells, rule, maxGeneration } = config;
-  let bufferSize = 32;
+  let bufferSize = 16;
   for (let i = 0; i < 5; i++) {
     try {
       const world = new WorldWithHistory({ cells, bufferSize, rule });
