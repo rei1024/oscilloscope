@@ -18,4 +18,4 @@ const end = performance.now();
 
 console.log(end - start);
 
-// npx vite-node src/lib/bench.ts
+// npx vite-node src/lib/runOscillator_bench.ts
