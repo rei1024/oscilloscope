@@ -20,7 +20,7 @@ export type WorkerResponseMessage =
 
 function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
   let rle;
-  let rule;
+  let rule: ReturnType<typeof parseRule> | "LifeHistory";
   if (data.rle.trim() === "") {
     return {
       kind: "response-error",
@@ -29,13 +29,37 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
   }
   try {
     rle = parseRLE(data.rle);
+    if (rle.ruleString.trim() === "") {
+      rle.ruleString = "B3/S23";
+    }
     rule = parseRule(rle.ruleString);
   } catch (error) {
-    console.error(error);
-    return {
-      kind: "response-error",
-      message: "Unsupported rule or rle error",
+    if (rle?.ruleString.toLowerCase() === "lifehistory") {
+      rule = "LifeHistory";
+    } else {
+      console.error(error);
+      return {
+        kind: "response-error",
+        message: "Unsupported rule or rle error",
+      };
+    }
+  }
+
+  if (rule === "LifeHistory") {
+    // LifeHistory
+    rule = {
+      type: "outer-totalistic",
+      transition: {
+        birth: [3],
+        survive: [2, 3],
+      },
     };
+    rle.cells = rle.cells.map((cell) => {
+      return {
+        ...cell,
+        state: cell.state % 2 === 0 ? 0 : 1,
+      };
+    });
   }
 
   if (rule.type === "outer-totalistic") {
@@ -57,6 +81,13 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     return {
       kind: "response-error",
       message: "Rules containing B0 is not supported",
+    };
+  }
+
+  if (rule.type === "map") {
+    return {
+      kind: "response-error",
+      message: "MAP rules is not supported",
     };
   }
 
