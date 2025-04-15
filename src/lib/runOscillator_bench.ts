@@ -9,9 +9,13 @@ x = 14, y = 10, rule = B3/S23
 bo6b2o$bo6b2obo$obo9bo$bo7bo$bo8bob2o$bo10b2o$bo$obo$bo$bo!`;
 
 const start = performance.now();
+const rule = parseRule("B3/S23");
+if (rule.type !== "outer-totalistic") {
+  throw new Error("error");
+}
 runOscillator({
   cells: parseRLE(pattern).cells.map((x) => x.position),
-  rule: parseRule("B3/S23"),
+  rule,
   maxGeneration: 10000,
 });
 const end = performance.now();
