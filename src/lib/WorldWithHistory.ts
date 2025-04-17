@@ -1,7 +1,7 @@
 import { BitGrid, BitWorld } from "@ca-ts/algo/bit";
 import { setCellsToBitGrid } from "./setCellsToBitGrid.ts";
 import { CACellList } from "@ca-ts/pattern";
-import type { INTRule, OuterTotalisticRule } from "@ca-ts/rule";
+import type { INTRule, MAPRule, OuterTotalisticRule } from "@ca-ts/rule";
 
 export class WorldSizeError extends Error {
   constructor() {
@@ -27,7 +27,7 @@ export class WorldWithHistory {
     rule,
   }: {
     cells: { x: number; y: number }[];
-    rule: OuterTotalisticRule | INTRule;
+    rule: OuterTotalisticRule | INTRule | MAPRule;
     bufferSize?: number;
   }) {
     this.bufferSize = bufferSize ?? 32;
@@ -49,6 +49,8 @@ export class WorldWithHistory {
       this.bitWorld.setRule(rule.transition);
     } else if (rule.type === "int") {
       this.bitWorld.setINTRule(rule.transition);
+    } else if (rule.type === "map") {
+      this.bitWorld.setMAPRule(rule.data);
     } else {
       rule satisfies never;
     }

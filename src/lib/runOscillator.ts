@@ -1,9 +1,9 @@
-import type { INTRule, OuterTotalisticRule } from "@ca-ts/rule";
+import type { INTRule, MAPRule, OuterTotalisticRule } from "@ca-ts/rule";
 import { WorldSizeError, WorldWithHistory } from "./WorldWithHistory";
 
 export type RunOscillatorConfig = {
   cells: { x: number; y: number }[];
-  rule: OuterTotalisticRule | INTRule;
+  rule: OuterTotalisticRule | INTRule | MAPRule;
   maxGeneration: number;
 };
 
