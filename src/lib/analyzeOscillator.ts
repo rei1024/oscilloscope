@@ -144,8 +144,11 @@ export function analyzeOscillator(
   const { world } = runOscillator(runConfig);
 
   const period = world.getGen();
-  const populations = world.histories.map((h) => h.bitGrid.getPopulation());
-  const { or, and } = getOrAndGrid(world.histories.map((h) => h.bitGrid));
+  const historiesBitGrid = world.histories.map((h) => h.bitGrid);
+  const populations = historiesBitGrid.map((bitGrid) =>
+    bitGrid.getPopulation(),
+  );
+  const { or, and } = getOrAndGrid(historiesBitGrid);
   const stator = and.getPopulation();
   const allCount = or.getPopulation();
   const rotor = allCount - stator;
@@ -158,14 +161,12 @@ export function analyzeOscillator(
     width,
     height,
     or,
-    histories: world.histories.map((x) => x.bitGrid),
+    histories: historiesBitGrid,
   });
 
   const heat =
-    heatMap.data
-      .flat()
-      .filter((x) => x !== -1)
-      .reduce((acc, x) => acc + x, 0) / period;
+    heatMap.data.flat().reduce((acc, x) => (x === -1 ? acc : acc + x), 0) /
+    period;
 
   return {
     period,
