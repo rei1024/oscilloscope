@@ -1,5 +1,8 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
-import { findPeriod } from "./findPeriod";
+import { findPeriodUint8 } from "./findPeriod";
+
+// reduce allocation
+let statesAlloc = new Uint8Array();
 
 export function getMap({
   width,
@@ -73,6 +76,10 @@ export function getMap({
     const height = firstBitGrid.getHeight();
     const BITS = 32;
     const BITS_MINUS_1 = BITS - 1;
+
+    // reuse array
+    statesAlloc = new Uint8Array(histories.length);
+
     for (let i = 0; i < height; i++) {
       const rowIndex = i * width;
       const y = i;
@@ -96,19 +103,19 @@ export function getMap({
 
           const x = BITS_J + u;
 
-          const states: (0 | 1)[] = [];
           let heat = 0;
           const firstCell = getAlive(firstBitGridUint32Array, offset, u);
           let prevCell = firstCell;
           let frequency = 0;
-          for (const h of histories) {
-            const array = h.asInternalUint32Array();
+          const lenHistories = histories.length;
+          for (let index = 0; index < lenHistories; index++) {
+            const array = histories[index].asInternalUint32Array();
             const cell = getAlive(array, offset, u);
-            if (prevCell !== undefined && prevCell !== cell) {
+            if (/* prevCell !== undefined && */ prevCell !== cell) {
               heat++;
             }
             prevCell = cell;
-            states.push(cell);
+            statesAlloc[index] = cell;
             if (cell !== 0) {
               frequency++;
             }
@@ -125,7 +132,7 @@ export function getMap({
             heat++;
           }
           heatArrayRow[x] = heat;
-          periodArrayRow[x] = findPeriod(states);
+          periodArrayRow[x] = findPeriodUint8(statesAlloc);
           frequencyArrayRow[x] = frequency;
         }
       }

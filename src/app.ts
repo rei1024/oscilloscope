@@ -119,9 +119,10 @@ export class App {
       list,
       this.mapType === "heat" ? "heat" : "hue",
     );
+    const minValue = this.mapType === "heat" ? 0 : 1;
     for (const [y, row] of mapData.data.entries()) {
       for (const [x, p] of row.entries()) {
-        if (p >= (this.mapType === "heat" ? 0 : 1)) {
+        if (p >= minValue) {
           ctx.beginPath();
           ctx.fillStyle = colorMap.get(p) ?? "";
           ctx.rect(
