@@ -83,18 +83,20 @@ export class WorldWithHistory {
   }
 
   runStep(): "end" | "continue" {
-    this.gen++;
-    this.bitWorld.next();
+    const bitWorld = this.bitWorld;
 
-    if (this.bitWorld.bitGrid.equal(this.initialBitGrid)) {
+    if (bitWorld.hasAliveCellAtBorder()) {
+      throw new WorldSizeError();
+    }
+
+    this.gen++;
+    bitWorld.next();
+
+    if (bitWorld.bitGrid.equal(this.initialBitGrid)) {
       return "end";
     }
 
     this.pushHistory();
-
-    if (this.bitWorld.hasAliveCellAtBorder()) {
-      throw new WorldSizeError();
-    }
 
     return "continue";
   }

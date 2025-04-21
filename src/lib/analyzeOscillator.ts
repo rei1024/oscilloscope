@@ -181,7 +181,7 @@ export function analyzeOscillator(
     rotor: allCount - stator,
     volatility: rotor / (stator + rotor),
     strictVolatility: (periodMap.countMap.get(period) ?? 0) / allCount,
-    histories: world.histories.map((a) => bitGridToData(a.bitGrid)),
+    histories: historiesBitGrid.map((bitGrid) => bitGridToData(bitGrid)),
     bitGridData: {
       or: bitGridToData(or),
       and: bitGridToData(and),
