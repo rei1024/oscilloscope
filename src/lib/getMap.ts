@@ -1,5 +1,6 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
 import { findPeriodUint8 } from "./findPeriod";
+import { BITS, BITS_MINUS_1 } from "./const";
 
 // reduce allocation
 let statesAlloc = new Uint8Array();
@@ -66,16 +67,8 @@ export function getMap({
   const orUint32Array = or.asInternalUint32Array();
 
   {
-    function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
-      const value = array[offset]!;
-      const alive = (value & (1 << (BITS_MINUS_1 - u))) !== 0 ? 1 : 0;
-      return alive;
-    }
-
     const width = firstBitGrid.getWidth32();
     const height = firstBitGrid.getHeight();
-    const BITS = 32;
-    const BITS_MINUS_1 = BITS - 1;
 
     // reuse array
     statesAlloc = new Uint8Array(histories.length);
@@ -165,6 +158,12 @@ export function getMap({
       countMap: heatCountMap,
     },
   };
+}
+
+function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
+  const value = array[offset]!;
+  const alive = (value & (1 << (BITS_MINUS_1 - u))) !== 0 ? 1 : 0;
+  return alive;
 }
 
 function getCountMap(map: number[][]): Map<number, number> {

@@ -154,8 +154,8 @@ export function analyzeOscillator(
   const rotor = allCount - stator;
   const boundingBox = or.getBoundingBox();
 
-  const width = world.histories[0]?.bitGrid.getWidth() ?? 0;
-  const height = world.histories[0]?.bitGrid.getHeight() ?? 0;
+  const width = historiesBitGrid[0]!.getWidth();
+  const height = historiesBitGrid[0]!.getHeight();
 
   const { periodMap, frequencyMap, heatMap } = getMap({
     width,
