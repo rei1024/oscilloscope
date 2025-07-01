@@ -4,8 +4,11 @@ import { parseRLE } from "@ca-ts/rle";
 import { CACellList } from "@ca-ts/pattern";
 
 const conwayLife = {
-  birth: [3],
-  survive: [2, 3],
+  type: "outer-totalistic" as const,
+  transition: {
+    birth: [3],
+    survive: [2, 3],
+  },
 };
 
 describe("analyzeOscillator", () => {
@@ -14,10 +17,7 @@ describe("analyzeOscillator", () => {
       cells: parseRLE(`ooo`)
         .cells.filter((x) => x.state === 1)
         .map((x) => x.position),
-      rule: {
-        type: "outer-totalistic",
-        transition: conwayLife,
-      },
+      rule: conwayLife,
       maxGeneration: 1000,
     });
 
@@ -71,10 +71,7 @@ describe("analyzeOscillator", () => {
 2bo2bobob$2obob3ob$bo6bo$2o5bob2$bo5b2o$o6bob$b3obob2o$bobo2bo!`)
         .cells.filter((x) => x.state === 1)
         .map((x) => x.position),
-      rule: {
-        type: "outer-totalistic",
-        transition: conwayLife,
-      },
+      rule: conwayLife,
       maxGeneration: 1000,
     });
 
@@ -106,10 +103,7 @@ x = 35, y = 7, rule = B3/S23
       cells: parseRLE(str)
         .cells.filter((x) => x.state === 1)
         .map((x) => x.position),
-      rule: {
-        type: "outer-totalistic",
-        transition: conwayLife,
-      },
+      rule: conwayLife,
       maxGeneration: 1000,
     });
 
@@ -144,10 +138,7 @@ o2b2o$10bo15b3o2bo$24bo4bobo$13b2o9bob3obo$13bo11bo2bo$14b3o9b2o2bo$
       cells: parseRLE(str)
         .cells.filter((x) => x.state === 1)
         .map((x) => x.position),
-      rule: {
-        type: "outer-totalistic",
-        transition: conwayLife,
-      },
+      rule: conwayLife,
       maxGeneration: 1000,
     });
 
