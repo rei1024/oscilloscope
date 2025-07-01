@@ -1,96 +1,70 @@
-export const $message = document.querySelector("#message") as HTMLElement;
+function $(selector: string): HTMLElement {
+  const element = document.querySelector(selector);
+  if (!element) {
+    throw new Error(`Element not found: ${selector}`);
+  }
+  return element as HTMLElement;
+}
 
-export const $mapBox = document.querySelector("#map-box") as HTMLElement;
+export const $message = $("#message") as HTMLElement;
+
+export const $mapBox = $("#map-box") as HTMLElement;
 
 export const $mapTypeSelect = [
   ...document.querySelectorAll('[name="map-type-select"]'),
 ] as HTMLInputElement[];
 
-export const $showAnimationCheckbox = document.querySelector(
+export const $showAnimationCheckbox = $(
   "#show-animation-checkbox",
 ) as HTMLInputElement;
 
-export const $showGridCheckbox = document.querySelector(
-  "#show-grid-checkbox",
-) as HTMLInputElement;
+export const $showGridCheckbox = $("#show-grid-checkbox") as HTMLInputElement;
 
-export const $dataBox = document.querySelector("#data-box") as HTMLElement;
+export const $dataBox = $("#data-box") as HTMLElement;
 
-export const $outputTable = document.querySelector(
-  "#output-table",
-) as HTMLElement;
+export const $outputTable = $("#output-table") as HTMLElement;
 
-export const $outputPeriod = document.querySelector(
-  "#output-period",
-) as HTMLElement;
-export const $outputHeat = document.querySelector(
-  "#output-heat",
-) as HTMLElement;
-export const $outputTemperature = document.querySelector(
-  "#output-temperature",
-) as HTMLElement;
+export const $outputPeriod = $("#output-period") as HTMLElement;
+export const $outputHeat = $("#output-heat") as HTMLElement;
+export const $outputTemperature = $("#output-temperature") as HTMLElement;
 
-export const $outputCellsMin = document.querySelector(
-  "#output-cells-min",
-) as HTMLElement;
-export const $outputCellsMax = document.querySelector(
-  "#output-cells-max",
-) as HTMLElement;
-export const $outputCellsAvg = document.querySelector(
-  "#output-cells-avg",
-) as HTMLElement;
+export const $outputCellsMin = $("#output-cells-min") as HTMLElement;
+export const $outputCellsMax = $("#output-cells-max") as HTMLElement;
+export const $outputCellsAvg = $("#output-cells-avg") as HTMLElement;
 
-export const $outputCellsMedian = document.querySelector(
-  "#output-cells-median",
-) as HTMLElement;
+export const $outputCellsMedian = $("#output-cells-median") as HTMLElement;
 
-export const $outputWidth = document.querySelector(
-  "#output-width",
-) as HTMLElement;
+export const $outputWidth = $("#output-width") as HTMLElement;
 
-export const $outputHeight = document.querySelector(
-  "#output-height",
-) as HTMLElement;
+export const $outputHeight = $("#output-height") as HTMLElement;
 
-export const $outputArea = document.querySelector(
-  "#output-area",
-) as HTMLElement;
+export const $outputArea = $("#output-area") as HTMLElement;
 
-export const $outputCells = document.querySelector(
-  "#output-cells",
-) as HTMLElement;
+export const $outputCells = $("#output-cells") as HTMLElement;
 
-export const $outputVolatility = document.querySelector(
-  "#output-volatility",
-) as HTMLElement;
+export const $outputVolatility = $("#output-volatility") as HTMLElement;
 
-export const $outputStrictVolatility = document.querySelector(
+export const $outputStrictVolatility = $(
   "#output-strict-volatility",
 ) as HTMLElement;
 
-export const $input = document.querySelector("#input") as HTMLTextAreaElement;
-export const $analyzeButton = document.querySelector(
-  "#analyze",
-) as HTMLButtonElement;
+export const $input = $("#input") as HTMLTextAreaElement;
+export const $analyzeButton = $("#analyze") as HTMLButtonElement;
 
-export const $exampleOscillators = document.querySelector(
+export const $exampleOscillators = $(
   "#example-oscillators",
 ) as HTMLSelectElement;
 
-export const $canvas = document.querySelector("#canvas") as HTMLCanvasElement;
+export const $canvas = $("#canvas") as HTMLCanvasElement;
 
-export const $hoverInfo = document.querySelector("#hover-info") as HTMLElement;
+export const $hoverInfo = $("#hover-info") as HTMLElement;
 
-export const $animFrequency = document.querySelector(
-  "#anim-frequency",
-) as HTMLInputElement;
+export const $animFrequency = $("#anim-frequency") as HTMLInputElement;
 
-export const $animFrequencyLabel = document.querySelector(
+export const $animFrequencyLabel = $(
   "#anim-frequency-label",
 ) as HTMLInputElement;
 
-export const $generation = document.querySelector("#generation") as HTMLElement;
+export const $generation = $("#generation") as HTMLElement;
 
-export const $colorTable = document.querySelector(
-  "#color-table",
-) as HTMLTableElement;
+export const $colorTable = $("#color-table") as HTMLTableElement;

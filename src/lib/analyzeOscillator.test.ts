@@ -3,6 +3,11 @@ import { analyzeOscillator } from "./analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { CACellList } from "@ca-ts/pattern";
 
+const conwayLife = {
+  birth: [3],
+  survive: [2, 3],
+};
+
 describe("analyzeOscillator", () => {
   it("analyze blinker", () => {
     const result = analyzeOscillator({
@@ -11,10 +16,7 @@ describe("analyzeOscillator", () => {
         .map((x) => x.position),
       rule: {
         type: "outer-totalistic",
-        transition: {
-          birth: [3],
-          survive: [2, 3],
-        },
+        transition: conwayLife,
       },
       maxGeneration: 1000,
     });
@@ -71,10 +73,7 @@ describe("analyzeOscillator", () => {
         .map((x) => x.position),
       rule: {
         type: "outer-totalistic",
-        transition: {
-          birth: [3],
-          survive: [2, 3],
-        },
+        transition: conwayLife,
       },
       maxGeneration: 1000,
     });
@@ -109,10 +108,7 @@ x = 35, y = 7, rule = B3/S23
         .map((x) => x.position),
       rule: {
         type: "outer-totalistic",
-        transition: {
-          birth: [3],
-          survive: [2, 3],
-        },
+        transition: conwayLife,
       },
       maxGeneration: 1000,
     });
@@ -130,5 +126,35 @@ x = 35, y = 7, rule = B3/S23
 
     expect(result.heat.toFixed(2)).toEqual("49.07");
     expect(result.temperature.toFixed(2)).toEqual("0.22");
+  });
+
+  it("analyze Cribbage", () => {
+    const str = `#N Cribbage
+#O Mitchell Riley
+#C Discovered on July 14, 2023
+#C This was the first period-19 oscillator to be found.
+#C https://conwaylife.com/wiki/Cribbage
+x = 32, y = 21, rule = B3/S23
+4b2o$4bo$b2obo10bo$bo2b2o9b3o$3bo2bo11bo$bob3obo9b2o$obo4bo$o2b3o15bo$
+b2o2bo5bo8b2o7b2o$3b2o6bo16bobo$3bo7bo8bo7bo$bobo16bo6b2o$b2o7b2o8bo5b
+o2b2o$10bo15b3o2bo$24bo4bobo$13b2o9bob3obo$13bo11bo2bo$14b3o9b2o2bo$
+16bo10bob2o$27bo$26b2o!`;
+
+    const result = analyzeOscillator({
+      cells: parseRLE(str)
+        .cells.filter((x) => x.state === 1)
+        .map((x) => x.position),
+      rule: {
+        type: "outer-totalistic",
+        transition: conwayLife,
+      },
+      maxGeneration: 1000,
+    });
+
+    expect(result.period).toEqual(19);
+    expect(result.volatility.toFixed(2)).toEqual("0.72");
+    expect(result.strictVolatility.toFixed(2)).toEqual("0.72");
+    expect(result.boundingBox).toEqual({ sizeX: 32, sizeY: 21 });
+    expect(result.heat.toFixed(1)).toEqual("33.5");
   });
 });
