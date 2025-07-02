@@ -3,12 +3,6 @@ import { setCellsToBitGrid } from "./setCellsToBitGrid.ts";
 import { CACellList } from "@ca-ts/pattern";
 import type { INTRule, MAPRule, OuterTotalisticRule } from "@ca-ts/rule";
 
-export class WorldSizeError extends Error {
-  constructor() {
-    super("not enough size");
-  }
-}
-
 interface HistoryEntry {
   gen: number;
   bitGrid: BitGrid;
@@ -19,19 +13,14 @@ export class WorldWithHistory {
   private gen = 0;
   private initialBitGrid: BitGrid;
   public histories: HistoryEntry[] = [];
-  public bufferSize: number;
 
   constructor({
     cells,
-    bufferSize,
     rule,
   }: {
     cells: { x: number; y: number }[];
     rule: OuterTotalisticRule | INTRule | MAPRule;
-    bufferSize?: number;
   }) {
-    this.bufferSize = bufferSize ?? 32;
-
     const cellList = CACellList.fromCells(
       cells.map((c) => ({ position: c, state: 1 })),
     );
@@ -42,8 +31,8 @@ export class WorldWithHistory {
       throw new Error("Invalid cells");
     }
     this.bitWorld = BitWorld.make({
-      width: boundingRect.width + this.bufferSize,
-      height: boundingRect.height + this.bufferSize,
+      width: boundingRect.width + 16,
+      height: boundingRect.height + 16,
     });
     if (rule.type === "outer-totalistic") {
       this.bitWorld.setRule(rule.transition);
@@ -82,13 +71,55 @@ export class WorldWithHistory {
     }
   }
 
-  runStep(): "end" | "continue" {
+  private expandIfNeeded() {
     const bitWorld = this.bitWorld;
 
-    if (bitWorld.hasAliveCellAtBorder()) {
-      throw new WorldSizeError();
+    if (!bitWorld.hasAliveCellAtBorder()) {
+      // No need to expand
+      return;
     }
 
+    const border = bitWorld.bitGrid.borderAlive();
+
+    const BUFFER_SIZE = 32;
+
+    let expandX = 0;
+    let expandY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+    if (border.left) {
+      expandX += BUFFER_SIZE;
+      offsetX += BUFFER_SIZE;
+    }
+    if (border.right) {
+      expandX += BUFFER_SIZE;
+    }
+    if (border.top) {
+      expandY += BUFFER_SIZE;
+      offsetY += BUFFER_SIZE;
+    }
+    if (border.bottom) {
+      expandY += BUFFER_SIZE;
+    }
+    if (expandX > 0 || expandY > 0) {
+      const config = {
+        expand: { x: expandX, y: expandY },
+        offset: { x: offsetX, y: offsetY },
+      };
+      const newBitGrid = bitWorld.bitGrid.expanded(config);
+
+      bitWorld.setBitGrid(newBitGrid);
+      this.initialBitGrid = this.initialBitGrid.expanded(config);
+      this.histories = this.histories.map((h) => ({
+        ...h,
+        bitGrid: h.bitGrid.expanded(config),
+      }));
+    }
+  }
+
+  runStep(): "end" | "continue" {
+    const bitWorld = this.bitWorld;
+    this.expandIfNeeded();
     this.gen++;
     bitWorld.next();
 
