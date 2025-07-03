@@ -35,7 +35,20 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     rule = parseRule(rle.ruleString);
   } catch (error) {
     if (rle?.ruleString.toLowerCase() === "lifehistory") {
-      rule = "LifeHistory";
+      // LifeHistory
+      rule = {
+        type: "outer-totalistic",
+        transition: {
+          birth: [3],
+          survive: [2, 3],
+        },
+      };
+      rle.cells = rle.cells.map((cell) => {
+        return {
+          ...cell,
+          state: cell.state % 2 === 0 ? 0 : 1,
+        };
+      });
     } else {
       console.error(error);
       return {
@@ -43,23 +56,6 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Unsupported rule or rle error",
       };
     }
-  }
-
-  if (rule === "LifeHistory") {
-    // LifeHistory
-    rule = {
-      type: "outer-totalistic",
-      transition: {
-        birth: [3],
-        survive: [2, 3],
-      },
-    };
-    rle.cells = rle.cells.map((cell) => {
-      return {
-        ...cell,
-        state: cell.state % 2 === 0 ? 0 : 1,
-      };
-    });
   }
 
   if (rule.type === "outer-totalistic") {
