@@ -14,12 +14,12 @@ import {
 import { setColorTable } from "./ui/colorTable";
 import { displayMapTypeLower, type MapType } from "./ui/core";
 
-const cellSize = 10;
-const innerCellSize = 6;
+const cellSize = 20;
+const innerCellSize = 12;
 const innerCellOffset = (cellSize - innerCellSize) / 2;
-const gridWidth = 1;
+const gridWidth = 2;
 
-const safeArea = 1;
+const safeArea = 2;
 
 const frequencyList = [
   2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200,

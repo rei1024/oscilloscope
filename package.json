@@ -27,7 +27,7 @@
     "@ca-ts/pattern": "npm:@jsr/ca-ts__pattern@^0.2.0",
     "prettier": "3.6.2",
     "typescript": "^5.8.3",
-    "vite": "^7.0.1",
+    "vite": "^7.0.5",
     "vitest": "^3.2.4"
   }
 }
