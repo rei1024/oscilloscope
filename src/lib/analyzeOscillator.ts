@@ -28,7 +28,7 @@ function getOrAndGrid(histories: BitGrid[]) {
 }
 
 type BitGridData = {
-  uint32: Uint32Array;
+  uint32: Uint32Array<ArrayBuffer>;
   width32: number;
   height: number;
 };
