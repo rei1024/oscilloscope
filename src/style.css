@@ -21,6 +21,10 @@ footer {
   padding-inline: 8px;
 }
 
+footer {
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
 @media (max-width: 800px) {
   main,
   header,
