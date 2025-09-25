@@ -13,6 +13,7 @@ import {
 } from "./bind";
 import { setColorTable } from "./ui/colorTable";
 import { displayMapTypeLower, type MapType } from "./ui/core";
+import { makeColorMap } from "./make-color";
 
 const cellSize = 20;
 const innerCellSize = 12;
@@ -26,32 +27,6 @@ const frequencyList = [
   300, 400, 500,
 ];
 
-export function makeColorMap(
-  list: number[],
-  style: "hue" | "heat",
-): Map<number, string> {
-  const len = list.length;
-  return new Map(
-    list.map((x, index) => {
-      let color: string;
-      if (style === "hue") {
-        const value = index / len;
-        color = `lch(70% 70 ${value * 360})`;
-      } else if (style === "heat") {
-        // make red
-        const value = (index + 1) / len;
-        // Heat map
-        const h = (1 - value) * 240;
-        color = "hsl(" + h + " 100% 70%)";
-      } else {
-        throw new Error("unknown style");
-      }
-
-      return [x, color];
-    }),
-  );
-}
-
 export class App {
   private data: AnalyzeResult | null = null;
   private histories: BitGrid[] | null = null;
@@ -60,6 +35,7 @@ export class App {
   private valve: Valve;
   private colorTableRows: HTMLTableRowElement[] = [];
   private mapType: MapType = "period";
+  private colorMap: Map<number, string> = new Map();
   private $canvas: HTMLCanvasElement;
 
   constructor($canvas: HTMLCanvasElement) {
@@ -114,12 +90,8 @@ export class App {
     const dy = this.data.bitGridData.minY;
 
     const mapData = this.getMapData();
-    const list = mapData.list;
-    const colorMap = makeColorMap(
-      list,
-      this.mapType === "heat" ? "heat" : "hue",
-    );
     const minValue = this.mapType === "heat" ? 0 : 1;
+    const colorMap = this.colorMap;
     for (const [y, row] of mapData.data.entries()) {
       for (const [x, p] of row.entries()) {
         if (p >= minValue) {
@@ -220,20 +192,50 @@ export class App {
     $animFrequencyLabel.textContent =
       this.valve.frequency.toLocaleString() + "Hz";
 
+    this.setupColorMap();
     this.updateFrequency();
+    this.colorTableRows = setColorTable(
+      this.getMapData(),
+      this.colorMap,
+      this.mapType,
+    );
+  }
 
-    this.colorTableRows = setColorTable(this.getMapData(), this.mapType);
+  private setupColorMap() {
+    if (this.data == null) {
+      return;
+    }
+    const mapData = this.getMapData();
+    const list = mapData.list;
+    const colorMap = makeColorMap({
+      list,
+      style: (
+        {
+          period: "hue-for-period",
+          frequency: "gray",
+          heat: "heat",
+        } as const
+      )[this.mapType],
+    });
+    this.colorMap = colorMap;
   }
 
   private getMapData() {
-    if (this.data == null) {
+    const data = this.data;
+    if (data == null) {
       throw null;
     }
-    return this.mapType === "frequency"
-      ? this.data.frequencyMap
-      : this.mapType === "heat"
-        ? this.data.heatMap
-        : this.data.periodMap;
+    switch (this.mapType) {
+      case "frequency": {
+        return data.frequencyMap;
+      }
+      case "heat": {
+        return data.heatMap;
+      }
+      case "period": {
+        return data.periodMap;
+      }
+    }
   }
 
   updateFrequency() {
@@ -265,11 +267,20 @@ export class App {
       );
 
     const mapData = this.getMapData();
+    if (y < 0 || y >= mapData.data.length) {
+      return undefined;
+    }
+
     const cellData = mapData.data[y][x];
+    if (cellData === undefined) {
+      return undefined;
+    }
+
     const index = mapData.list.findIndex((x) => x === cellData);
     if (index === -1) {
       return undefined;
     }
+
     return { cellData, index };
   }
 
@@ -291,6 +302,11 @@ export class App {
 
   updateMapType(mapType: MapType) {
     this.mapType = mapType;
-    this.colorTableRows = setColorTable(this.getMapData(), this.mapType);
+    this.setupColorMap();
+    this.colorTableRows = setColorTable(
+      this.getMapData(),
+      this.colorMap,
+      this.mapType,
+    );
   }
 }

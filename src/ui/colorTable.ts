@@ -1,9 +1,9 @@
-import { makeColorMap } from "../app";
 import { $colorTable } from "../bind";
 import { displayMapTypeTitle, type MapType } from "./core";
 
 export function setColorTable(
   map: { data: number[][]; list: number[]; countMap: Map<number, number> },
+  colorMap: Map<number, string>,
   mapType: MapType,
 ) {
   const rows: HTMLTableRowElement[] = [];
@@ -29,7 +29,6 @@ export function setColorTable(
     $colorTable.append(trHead);
   }
 
-  const colorMap = makeColorMap(list, mapType === "heat" ? "heat" : "hue");
   for (const item of list) {
     const row = document.createElement("tr");
     const color = colorMap.get(item) ?? "";

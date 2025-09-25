@@ -10,10 +10,10 @@ export function displayMapTypeLower(mapType: MapType) {
 /**
  * 表示用
  */
-export function displayMapTypeTitle(mapType: MapType) {
-  return mapType === "period"
-    ? "Period"
-    : mapType === "heat"
-      ? "Heat"
-      : "Frequency";
+export function displayMapTypeTitle(mapType: MapType): string {
+  return {
+    period: "Period",
+    frequency: "Frequency",
+    heat: "Heat",
+  }[mapType];
 }
