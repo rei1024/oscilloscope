@@ -12,8 +12,9 @@ import {
   $showGridCheckbox,
   $animFrequency,
   $animFrequencyLabel,
+  $colorTable,
 } from "./bind";
-import { setColorTable } from "./ui/colorTable";
+import { ColorTableUI } from "./ui/colorTable";
 import { displayMapTypeLower, type ColorType, type MapType } from "./ui/core";
 import { makeColorMap } from "./make-color";
 import { FrequencyUI } from "./ui/frequency";
@@ -31,12 +32,12 @@ export class App {
   private ctx: CanvasRenderingContext2D;
   private gen = 0;
   private valve: Valve;
-  private colorTableRows: HTMLTableRowElement[] = [];
   private mapType: MapType = "period";
   private colorType: ColorType = "hue";
   private colorMap: Map<number, string> = new Map();
   private $canvas: HTMLCanvasElement;
   private frequencyUI: FrequencyUI;
+  private colorTable: ColorTableUI;
 
   constructor($canvas: HTMLCanvasElement) {
     this.$canvas = $canvas;
@@ -62,6 +63,8 @@ export class App {
       $animFrequency,
       this.valve,
     );
+
+    this.colorTable = new ColorTableUI($colorTable, $hoverInfo);
 
     const update = () => {
       this.render();
@@ -185,11 +188,7 @@ export class App {
 
     this.setupColorMap();
     this.updateFrequency();
-    this.colorTableRows = setColorTable(
-      this.getMapData(),
-      this.colorMap,
-      this.mapType,
-    );
+    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
   }
 
   private setupColorMap() {
@@ -233,7 +232,12 @@ export class App {
   }
 
   updateFrequency() {
-    this.valve.frequency = this.frequencyUI.updateFrequency();
+    this.valve.frequency = this.frequencyUI.getFrequency();
+  }
+
+  renderColorTableHighlight(position: { x: number; y: number }) {
+    const data = this.getMapIndexAt(position);
+    this.colorTable.renderColorTableHighlight(data ?? null, this.mapType);
   }
 
   private getMapIndexAt(pixelPosition: {
@@ -278,22 +282,6 @@ export class App {
     return { cellData, index };
   }
 
-  renderColorTableHighlight(pixelPosition: { x: number; y: number }) {
-    for (const row of this.colorTableRows) {
-      row.style.backgroundColor = "";
-    }
-
-    const pointData = this.getMapIndexAt(pixelPosition);
-    if (pointData !== undefined) {
-      this.colorTableRows[pointData.index].style.backgroundColor = "#0000FF22";
-
-      $hoverInfo.textContent =
-        "  " + displayMapTypeLower(this.mapType) + " = " + pointData.cellData;
-    } else {
-      $hoverInfo.textContent = " "; // 崩れないように
-    }
-  }
-
   updateMapType(mapType: MapType) {
     if (mapType === "heat") {
       $colorSelectContainer.style.display = "none";
@@ -302,20 +290,12 @@ export class App {
     }
     this.mapType = mapType;
     this.setupColorMap();
-    this.colorTableRows = setColorTable(
-      this.getMapData(),
-      this.colorMap,
-      this.mapType,
-    );
+    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
   }
 
   updateColor(color: ColorType) {
     this.colorType = color;
     this.setupColorMap();
-    this.colorTableRows = setColorTable(
-      this.getMapData(),
-      this.colorMap,
-      this.mapType,
-    );
+    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
   }
 }

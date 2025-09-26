@@ -43,7 +43,7 @@ export class FrequencyUI {
     }
   }
 
-  updateFrequency() {
+  getFrequency() {
     return frequencyList[parseInt(this.$input.value, 10)];
   }
 }
