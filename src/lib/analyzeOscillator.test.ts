@@ -148,4 +148,29 @@ o2b2o$10bo15b3o2bo$24bo4bobo$13b2o9bob3obo$13bo11bo2bo$14b3o9b2o2bo$
     expect(result.boundingBox).toEqual({ sizeX: 32, sizeY: 21 });
     expect(result.heat.toFixed(1)).toEqual("33.5");
   });
+
+  // from https://conwaylife.com/forums/viewtopic.php?p=196346#p196346
+  it("analyze p661", () => {
+    const str = `x = 63, y = 63, rule = B356/S23
+28bo5bo$26bob2o3b2obo$26b2obo3bob2o$25bo11bo22$3bo55bo$b2o57b2o$2bo57b
+o$2o59b2o$b2o57b2o4$b2o57b2o$2o59b2o$2bo57bo$b2o57b2o$3bo55bo22$25bo
+11bo$26b2obo3bob2o$26bob2o3b2obo$28bo5bo!`;
+    const result = analyzeOscillator({
+      cells: parseRLE(str)
+        .cells.filter((x) => x.state === 1)
+        .map((x) => x.position),
+      rule: {
+        type: "outer-totalistic" as const,
+        transition: {
+          birth: [3, 5, 6],
+          survive: [2, 3],
+        },
+      },
+      maxGeneration: 1000,
+    });
+
+    expect(result.period).toEqual(661);
+    expect(result.volatility.toFixed(3)).toEqual("1.000");
+    expect(result.boundingBox).toEqual({ sizeX: 99, sizeY: 99 });
+  });
 });
