@@ -27,11 +27,20 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       message: "RLE is empty",
     };
   }
+
   try {
     rle = parseRLE(data.rle);
     if (rle.ruleString.trim() === "") {
       rle.ruleString = "B3/S23";
     }
+  } catch (error) {
+    return {
+      kind: "response-error",
+      message: "Invalid RLE",
+    };
+  }
+
+  try {
     rule = parseRule(rle.ruleString);
   } catch (error) {
     if (rle?.ruleString.toLowerCase() === "lifehistory") {
@@ -53,7 +62,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       console.error(error);
       return {
         kind: "response-error",
-        message: "Unsupported rule or rle error",
+        message: "Unsupported rule",
       };
     }
   }
@@ -65,10 +74,28 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Generations is not supported",
       };
     }
+    if (rule.neighborhood === "hexagonal") {
+      return {
+        kind: "response-error",
+        message: "Hexagonal neighborhood is not supported",
+      };
+    }
+    if (rule.neighborhood === "von-neumann") {
+      return {
+        kind: "response-error",
+        message: "von Neumann neighborhood is not supported",
+      };
+    }
+    if (rule.neighborhood === "triangular") {
+      return {
+        kind: "response-error",
+        message: "Triangular neighborhood is not supported",
+      };
+    }
     if (rule.neighborhood != undefined) {
       return {
         kind: "response-error",
-        message: "Hexagonal or von Neumann neighborhood is not supported",
+        message: "Unsupported neighborhood",
       };
     }
     if (rule.transition.birth.includes(0)) {
@@ -77,20 +104,48 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Rules containing B0 is not supported",
       };
     }
+    if (rule.gridParameter != undefined) {
+      return {
+        kind: "response-error",
+        message: "Bounded grids are not supported",
+      };
+    }
   }
 
-  if (rule.type === "int" && rule.transition.birth.includes("0")) {
-    return {
-      kind: "response-error",
-      message: "Rules containing B0 is not supported",
-    };
+  if (rule.type === "int") {
+    if (rule.transition.birth.includes("0")) {
+      return {
+        kind: "response-error",
+        message: "Rules containing B0 is not supported",
+      };
+    }
+    if (rule.generations != undefined) {
+      return {
+        kind: "response-error",
+        message: "Generations is not supported",
+      };
+    }
+    if (rule.gridParameter != undefined) {
+      return {
+        kind: "response-error",
+        message: "Bounded grids are not supported",
+      };
+    }
   }
 
-  if (rule.type === "map" && rule.neighbors !== "moore") {
-    return {
-      kind: "response-error",
-      message: "Non Moore neighborhood is not supported for MAP rules",
-    };
+  if (rule.type === "map") {
+    if (rule.neighbors !== "moore") {
+      return {
+        kind: "response-error",
+        message: "Non Moore neighborhood is not supported for MAP rules",
+      };
+    }
+    if (rule.gridParameter != undefined) {
+      return {
+        kind: "response-error",
+        message: "Bounded grids are not supported",
+      };
+    }
   }
 
   const cells = rle.cells.filter((x) => x.state === 1).map((x) => x.position);
