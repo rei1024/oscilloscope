@@ -17,15 +17,17 @@ function hueForPeriodColor(
   len: number,
   hasStableCell: boolean,
 ): string {
-  if (hasStableCell && index === len - 1) {
-    // stable cell is gray
+  if (hasStableCell && index === 0) {
+    // for stable cell
+    return "hsl(0 0% 65%)";
+  } else if (index === len - 1) {
+    // full period cells
     return "hsl(0 0% 90%)";
-  } else if (index === 0) {
-    // last cell is lighter gray
-    return "hsl(0 0% 70%)";
   }
 
-  const value = index / len;
+  const correctedLen = hasStableCell ? len - 2 : len - 1;
+
+  const value = index / correctedLen;
   const hue = value * 360;
   return `lch(70% 70 ${hue})`;
 }
