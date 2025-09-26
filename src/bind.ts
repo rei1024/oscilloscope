@@ -20,6 +20,10 @@ export const $showAnimationCheckbox = $(
 
 export const $showGridCheckbox = $("#show-grid-checkbox") as HTMLInputElement;
 
+export const $blackBackgroundCheckbox = $(
+  "#black-background-checkbox",
+) as HTMLInputElement;
+
 export const $dataBox = $("#data-box") as HTMLElement;
 
 export const $outputTable = $("#output-table") as HTMLElement;

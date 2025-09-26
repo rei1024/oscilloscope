@@ -4,6 +4,7 @@ import { Valve } from "./ui/valve";
 import {
   $animFrequency,
   $animFrequencyLabel,
+  $blackBackgroundCheckbox,
   $dataBox,
   $generation,
   $hoverInfo,
@@ -82,7 +83,7 @@ export class App {
     }
 
     // Background
-    ctx.fillStyle = "white";
+    ctx.fillStyle = $blackBackgroundCheckbox.checked ? "black" : "white";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // Map
