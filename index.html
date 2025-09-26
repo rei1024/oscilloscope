@@ -250,13 +250,23 @@
         </table>
       </div>
     </main>
+    <style>
+      footer ul {
+        padding-left: 24px;
+      }
+    </style>
     <footer>
       <section style="margin-bottom: 20px">
         <h2>Note</h2>
         <ul>
+          <li>Supported rules</li>
+          <ul>
+            <li>Outer-totalistic rules (range 1 Moore)</li>
+            <li>Isotropic non-totalistic (INT) rules (range 1 Moore)</li>
+            <li>Non isotropic (MAP) rules (range 1 Moore)</li>
+          </ul>
           <li>
-            Outer-totalistic rules, isotropic non-totalistic (INT) rules and non
-            isotropic (MAP) rules are supported (without B0).
+            Rules containing B0 (birth with 0 neighbors) are not supported.
           </li>
           <li>The supplied pattern must be a phase of an oscillator.</li>
           <li>The maximum period that can be analyzed is 50,000.</li>
