@@ -17,3 +17,5 @@ export function displayMapTypeTitle(mapType: MapType): string {
     heat: "Heat",
   }[mapType];
 }
+
+export type ColorType = "grayscale" | "hue";

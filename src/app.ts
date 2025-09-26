@@ -5,6 +5,7 @@ import {
   $animFrequency,
   $animFrequencyLabel,
   $blackBackgroundCheckbox,
+  $colorSelectContainer,
   $dataBox,
   $generation,
   $hoverInfo,
@@ -13,7 +14,7 @@ import {
   $showGridCheckbox,
 } from "./bind";
 import { setColorTable } from "./ui/colorTable";
-import { displayMapTypeLower, type MapType } from "./ui/core";
+import { displayMapTypeLower, type ColorType, type MapType } from "./ui/core";
 import { makeColorMap } from "./make-color";
 
 const cellSize = 20;
@@ -36,6 +37,7 @@ export class App {
   private valve: Valve;
   private colorTableRows: HTMLTableRowElement[] = [];
   private mapType: MapType = "period";
+  private colorType: ColorType = "hue";
   private colorMap: Map<number, string> = new Map();
   private $canvas: HTMLCanvasElement;
 
@@ -212,11 +214,14 @@ export class App {
       list,
       style: (
         {
-          period: "hue-for-period",
-          frequency: "gray",
+          period:
+            this.colorType === "grayscale" ? "gray-reverse" : "hue-for-period",
+          frequency:
+            this.colorType === "grayscale" ? "gray" : "hue-for-frequency",
           heat: "heat",
         } as const
       )[this.mapType],
+      hasStableCell: this.data.periodMap.list.some((x) => x === 1),
     });
     this.colorMap = colorMap;
   }
@@ -302,7 +307,22 @@ export class App {
   }
 
   updateMapType(mapType: MapType) {
+    if (mapType === "heat") {
+      $colorSelectContainer.style.display = "none";
+    } else {
+      $colorSelectContainer.style.display = "";
+    }
     this.mapType = mapType;
+    this.setupColorMap();
+    this.colorTableRows = setColorTable(
+      this.getMapData(),
+      this.colorMap,
+      this.mapType,
+    );
+  }
+
+  updateColor(color: ColorType) {
+    this.colorType = color;
     this.setupColorMap();
     this.colorTableRows = setColorTable(
       this.getMapData(),

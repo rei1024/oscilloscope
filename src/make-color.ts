@@ -6,10 +6,30 @@ function heatColor(index: number, len: number): string {
   return "hsl(" + h + " 100% 70%)";
 }
 
+function hueForFrequencyColor(
+  index: number,
+  len: number,
+  hasStableCell: boolean,
+): string {
+  if (hasStableCell && index === len - 1) {
+    // for stable cell
+    return "hsl(0 0% 65%)";
+  }
+
+  const correctedLen = hasStableCell ? len - 1 : len;
+
+  const value = index / correctedLen;
+  const hue = (1 - value + 0.2) * 330;
+  return `lch(70% 70 ${hue})`;
+}
+
 function grayColor(index: number, len: number): string {
   const value = (index + 1) / len;
   const lightness = 100 * (3 / 4 - value / 2);
   return `hsl(0 0% ${lightness}%)`;
+}
+function grayReverseColor(index: number, len: number): string {
+  return grayColor(len - 1 - index, len);
 }
 
 function hueForPeriodColor(
@@ -28,25 +48,38 @@ function hueForPeriodColor(
   const correctedLen = hasStableCell ? len - 2 : len - 1;
 
   const value = index / correctedLen;
-  const hue = value * 360;
-  return `lch(70% 70 ${hue})`;
+  return `lch(70% 70 ${value * 360})`;
 }
 
 export function makeColorMap({
   list,
   style,
+  hasStableCell,
 }: {
   list: number[];
-  style: "gray" | "hue-for-period" | "heat";
+  style:
+    | "gray"
+    | "gray-reverse"
+    | "hue-for-frequency"
+    | "hue-for-period"
+    | "heat";
+  hasStableCell: boolean;
 }): Map<number, string> {
   const len = list.length;
-  const hasStableCell = list.some((x) => x === 1);
   return new Map(
     list.map((x, index) => {
       let color: string;
       switch (style) {
         case "gray": {
           color = grayColor(index, len);
+          break;
+        }
+        case "gray-reverse": {
+          color = grayReverseColor(index, len);
+          break;
+        }
+        case "hue-for-frequency": {
+          color = hueForFrequencyColor(index, len, hasStableCell);
           break;
         }
         case "hue-for-period": {
