@@ -2,9 +2,7 @@ import { BitGrid } from "@ca-ts/algo/bit";
 import { bitGridFromData, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { Valve } from "./ui/valve";
 import {
-  $animFrequency,
-  $animFrequencyLabel,
-  $blackBackgroundCheckbox,
+  $darkBackgroundCheckbox,
   $colorSelectContainer,
   $dataBox,
   $generation,
@@ -12,10 +10,13 @@ import {
   $mapBox,
   $showAnimationCheckbox,
   $showGridCheckbox,
+  $animFrequency,
+  $animFrequencyLabel,
 } from "./bind";
 import { setColorTable } from "./ui/colorTable";
 import { displayMapTypeLower, type ColorType, type MapType } from "./ui/core";
 import { makeColorMap } from "./make-color";
+import { FrequencyUI } from "./ui/frequency";
 
 const cellSize = 20;
 const innerCellSize = 12;
@@ -23,11 +24,6 @@ const innerCellOffset = (cellSize - innerCellSize) / 2;
 const gridWidth = 2;
 
 const safeArea = 2;
-
-const frequencyList = [
-  2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200,
-  300, 400, 500,
-];
 
 export class App {
   private data: AnalyzeResult | null = null;
@@ -40,6 +36,7 @@ export class App {
   private colorType: ColorType = "hue";
   private colorMap: Map<number, string> = new Map();
   private $canvas: HTMLCanvasElement;
+  private frequencyUI: FrequencyUI;
 
   constructor($canvas: HTMLCanvasElement) {
     this.$canvas = $canvas;
@@ -60,6 +57,12 @@ export class App {
     );
     this.valve.disabled = false;
 
+    this.frequencyUI = new FrequencyUI(
+      $animFrequencyLabel,
+      $animFrequency,
+      this.valve,
+    );
+
     const update = () => {
       this.render();
       requestAnimationFrame(update);
@@ -69,9 +72,9 @@ export class App {
   }
 
   render() {
-    $animFrequencyLabel.textContent =
-      this.valve.frequency.toLocaleString() + "Hz";
-
+    this.frequencyUI.render({
+      showAnimationChecked: $showAnimationCheckbox.checked,
+    });
     if (this.histories == null || this.data == null) {
       return;
     }
@@ -85,7 +88,7 @@ export class App {
     }
 
     // Background
-    ctx.fillStyle = $blackBackgroundCheckbox.checked ? "black" : "white";
+    ctx.fillStyle = $darkBackgroundCheckbox.checked ? "black" : "white";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // Map
@@ -113,8 +116,6 @@ export class App {
     ctx.fill();
 
     if ($showAnimationCheckbox.checked) {
-      $animFrequency.style.display = "";
-      $animFrequencyLabel.style.display = "";
       // Alive Cells
       ctx.beginPath();
       ctx.fillStyle = "black";
@@ -136,8 +137,6 @@ export class App {
         "/" +
         this.histories.length;
     } else {
-      $animFrequency.style.display = "none";
-      $animFrequencyLabel.style.display = "none";
       $generation.textContent = "";
     }
 
@@ -177,23 +176,12 @@ export class App {
       $canvas.style.width = "";
       $canvas.style.height = "400px";
     }
-    $animFrequency.style.display = "inline";
 
     this.data = data;
     this.histories = data.histories.map((h) => bitGridFromData(h));
     this.gen = 0;
 
-    $animFrequency.min = (0).toString();
-    $animFrequency.max = (frequencyList.length - 1).toString();
-    $animFrequency.value = (
-      data.histories.length <= 3
-        ? frequencyList.filter((x) => x <= 3).length - 1
-        : data.histories.length <= 10
-          ? frequencyList.filter((x) => x <= 10).length - 1
-          : "10"
-    ).toString();
-    $animFrequencyLabel.textContent =
-      this.valve.frequency.toLocaleString() + "Hz";
+    this.frequencyUI.setup(data);
 
     this.setupColorMap();
     this.updateFrequency();
@@ -245,7 +233,7 @@ export class App {
   }
 
   updateFrequency() {
-    this.valve.frequency = frequencyList[Number($animFrequency.value)];
+    this.valve.frequency = this.frequencyUI.updateFrequency();
   }
 
   private getMapIndexAt(pixelPosition: {

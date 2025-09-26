@@ -28,8 +28,8 @@ export const $showAnimationCheckbox = $(
 
 export const $showGridCheckbox = $("#show-grid-checkbox") as HTMLInputElement;
 
-export const $blackBackgroundCheckbox = $(
-  "#black-background-checkbox",
+export const $darkBackgroundCheckbox = $(
+  "#dark-background-checkbox",
 ) as HTMLInputElement;
 
 export const $dataBox = $("#data-box") as HTMLElement;
