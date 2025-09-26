@@ -208,7 +208,7 @@ export class App {
           heat: "heat",
         } as const
       )[this.mapType],
-      hasStableCell: this.data.periodMap.list.some((x) => x === 1),
+      hasStatorCell: this.data.periodMap.list.some((x) => x === 1),
     });
     this.colorMap = colorMap;
   }

@@ -39,16 +39,17 @@ export function average(array: number[]): number {
  * @throws if empty
  */
 export function median(array: number[]): number {
-  if (array.length === 0) {
-    throw Error("average: length is 0");
+  const len = array.length;
+  if (len === 0) {
+    throw Error("median: length is 0");
   }
 
   const sorted = array.slice().sort((a, b) => a - b);
 
-  if (sorted.length % 2 === 0) {
-    const idx = Math.floor(sorted.length / 2) - 1;
+  if (len % 2 === 0) {
+    const idx = (len >> 1) - 1;
     return (sorted[idx] + sorted[idx + 1]) / 2;
   } else {
-    return sorted[Math.floor(sorted.length / 2)];
+    return sorted[len >> 1];
   }
 }
