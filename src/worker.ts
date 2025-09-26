@@ -89,7 +89,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
   if (rule.type === "map" && rule.neighbors !== "moore") {
     return {
       kind: "response-error",
-      message: "Non Moore neighborhood is not suuported for MAP rules",
+      message: "Non Moore neighborhood is not supported for MAP rules",
     };
   }
 
