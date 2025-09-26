@@ -1,4 +1,3 @@
-import "./style.css";
 import type { WorkerRequestMessage, WorkerResponseMessage } from "./worker";
 import MyWorker from "./worker?worker";
 import {
