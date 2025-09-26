@@ -1,10 +1,10 @@
-import "./style.css";
 import type { WorkerRequestMessage, WorkerResponseMessage } from "./worker";
 import MyWorker from "./worker?worker";
 import {
   $analyzeButton,
   $animFrequency,
   $canvas,
+  $colorSelect,
   $exampleOscillators,
   $input,
   $mapTypeSelect,
@@ -15,7 +15,7 @@ import { setDataTable } from "./ui/dataTable";
 
 import { App } from "./app";
 import { getMousePositionInElement } from "./ui/getMousePositionInElement";
-import type { MapType } from "./ui/core";
+import type { ColorType, MapType } from "./ui/core";
 
 const worker = new MyWorker();
 
@@ -79,6 +79,13 @@ for (const $radio of $mapTypeSelect) {
   $radio.addEventListener("input", (e) => {
     (e.target as HTMLInputElement).value;
     app.updateMapType((e.target as HTMLInputElement).value as MapType);
+  });
+}
+
+for (const $radio of $colorSelect) {
+  $radio.addEventListener("input", (e) => {
+    (e.target as HTMLInputElement).value;
+    app.updateColor((e.target as HTMLInputElement).value as ColorType);
   });
 }
 

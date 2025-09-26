@@ -2,17 +2,22 @@ import { BitGrid } from "@ca-ts/algo/bit";
 import { bitGridFromData, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { Valve } from "./ui/valve";
 import {
-  $animFrequency,
-  $animFrequencyLabel,
+  $darkBackgroundCheckbox,
+  $colorSelectContainer,
   $dataBox,
   $generation,
   $hoverInfo,
   $mapBox,
   $showAnimationCheckbox,
   $showGridCheckbox,
+  $animFrequency,
+  $animFrequencyLabel,
+  $colorTable,
 } from "./bind";
-import { setColorTable } from "./ui/colorTable";
-import { displayMapTypeLower, type MapType } from "./ui/core";
+import { ColorTableUI } from "./ui/colorTable";
+import { displayMapTypeLower, type ColorType, type MapType } from "./ui/core";
+import { makeColorMap } from "./make-color";
+import { FrequencyUI } from "./ui/frequency";
 
 const cellSize = 20;
 const innerCellSize = 12;
@@ -21,46 +26,18 @@ const gridWidth = 2;
 
 const safeArea = 2;
 
-const frequencyList = [
-  2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200,
-  300, 400, 500,
-];
-
-export function makeColorMap(
-  list: number[],
-  style: "hue" | "heat",
-): Map<number, string> {
-  const len = list.length;
-  return new Map(
-    list.map((x, index) => {
-      let color: string;
-      if (style === "hue") {
-        const value = index / len;
-        color = `lch(70% 70 ${value * 360})`;
-      } else if (style === "heat") {
-        // make red
-        const value = (index + 1) / len;
-        // Heat map
-        const h = (1 - value) * 240;
-        color = "hsl(" + h + " 100% 70%)";
-      } else {
-        throw new Error("unknown style");
-      }
-
-      return [x, color];
-    }),
-  );
-}
-
 export class App {
   private data: AnalyzeResult | null = null;
   private histories: BitGrid[] | null = null;
   private ctx: CanvasRenderingContext2D;
   private gen = 0;
   private valve: Valve;
-  private colorTableRows: HTMLTableRowElement[] = [];
   private mapType: MapType = "period";
+  private colorType: ColorType = "hue";
+  private colorMap: Map<number, string> = new Map();
   private $canvas: HTMLCanvasElement;
+  private frequencyUI: FrequencyUI;
+  private colorTable: ColorTableUI;
 
   constructor($canvas: HTMLCanvasElement) {
     this.$canvas = $canvas;
@@ -81,6 +58,14 @@ export class App {
     );
     this.valve.disabled = false;
 
+    this.frequencyUI = new FrequencyUI(
+      $animFrequencyLabel,
+      $animFrequency,
+      this.valve,
+    );
+
+    this.colorTable = new ColorTableUI($colorTable, $hoverInfo);
+
     const update = () => {
       this.render();
       requestAnimationFrame(update);
@@ -90,9 +75,9 @@ export class App {
   }
 
   render() {
-    $animFrequencyLabel.textContent =
-      this.valve.frequency.toLocaleString() + "Hz";
-
+    this.frequencyUI.render({
+      showAnimationChecked: $showAnimationCheckbox.checked,
+    });
     if (this.histories == null || this.data == null) {
       return;
     }
@@ -106,7 +91,7 @@ export class App {
     }
 
     // Background
-    ctx.fillStyle = "white";
+    ctx.fillStyle = $darkBackgroundCheckbox.checked ? "black" : "white";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // Map
@@ -114,12 +99,8 @@ export class App {
     const dy = this.data.bitGridData.minY;
 
     const mapData = this.getMapData();
-    const list = mapData.list;
-    const colorMap = makeColorMap(
-      list,
-      this.mapType === "heat" ? "heat" : "hue",
-    );
     const minValue = this.mapType === "heat" ? 0 : 1;
+    const colorMap = this.colorMap;
     for (const [y, row] of mapData.data.entries()) {
       for (const [x, p] of row.entries()) {
         if (p >= minValue) {
@@ -138,8 +119,6 @@ export class App {
     ctx.fill();
 
     if ($showAnimationCheckbox.checked) {
-      $animFrequency.style.display = "";
-      $animFrequencyLabel.style.display = "";
       // Alive Cells
       ctx.beginPath();
       ctx.fillStyle = "black";
@@ -161,8 +140,6 @@ export class App {
         "/" +
         this.histories.length;
     } else {
-      $animFrequency.style.display = "none";
-      $animFrequencyLabel.style.display = "none";
       $generation.textContent = "";
     }
 
@@ -202,42 +179,65 @@ export class App {
       $canvas.style.width = "";
       $canvas.style.height = "400px";
     }
-    $animFrequency.style.display = "inline";
 
     this.data = data;
     this.histories = data.histories.map((h) => bitGridFromData(h));
     this.gen = 0;
 
-    $animFrequency.min = (0).toString();
-    $animFrequency.max = (frequencyList.length - 1).toString();
-    $animFrequency.value = (
-      data.histories.length <= 3
-        ? frequencyList.filter((x) => x <= 3).length - 1
-        : data.histories.length <= 10
-          ? frequencyList.filter((x) => x <= 10).length - 1
-          : "10"
-    ).toString();
-    $animFrequencyLabel.textContent =
-      this.valve.frequency.toLocaleString() + "Hz";
+    this.frequencyUI.setup(data);
 
+    this.setupColorMap();
     this.updateFrequency();
+    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+  }
 
-    this.colorTableRows = setColorTable(this.getMapData(), this.mapType);
+  private setupColorMap() {
+    if (this.data == null) {
+      return;
+    }
+    const mapData = this.getMapData();
+    const list = mapData.list;
+    const colorMap = makeColorMap({
+      list,
+      style: (
+        {
+          period:
+            this.colorType === "grayscale" ? "gray-reverse" : "hue-for-period",
+          frequency:
+            this.colorType === "grayscale" ? "gray" : "hue-for-frequency",
+          heat: "heat",
+        } as const
+      )[this.mapType],
+      hasStableCell: this.data.periodMap.list.some((x) => x === 1),
+    });
+    this.colorMap = colorMap;
   }
 
   private getMapData() {
-    if (this.data == null) {
+    const data = this.data;
+    if (data == null) {
       throw null;
     }
-    return this.mapType === "frequency"
-      ? this.data.frequencyMap
-      : this.mapType === "heat"
-        ? this.data.heatMap
-        : this.data.periodMap;
+    switch (this.mapType) {
+      case "frequency": {
+        return data.frequencyMap;
+      }
+      case "heat": {
+        return data.heatMap;
+      }
+      case "period": {
+        return data.periodMap;
+      }
+    }
   }
 
   updateFrequency() {
-    this.valve.frequency = frequencyList[Number($animFrequency.value)];
+    this.valve.frequency = this.frequencyUI.getFrequency();
+  }
+
+  renderColorTableHighlight(position: { x: number; y: number }) {
+    const data = this.getMapIndexAt(position);
+    this.colorTable.renderColorTableHighlight(data ?? null, this.mapType);
   }
 
   private getMapIndexAt(pixelPosition: {
@@ -265,32 +265,37 @@ export class App {
       );
 
     const mapData = this.getMapData();
+    if (y < 0 || y >= mapData.data.length) {
+      return undefined;
+    }
+
     const cellData = mapData.data[y][x];
+    if (cellData === undefined) {
+      return undefined;
+    }
+
     const index = mapData.list.findIndex((x) => x === cellData);
     if (index === -1) {
       return undefined;
     }
+
     return { cellData, index };
   }
 
-  renderColorTableHighlight(pixelPosition: { x: number; y: number }) {
-    for (const row of this.colorTableRows) {
-      row.style.backgroundColor = "";
-    }
-
-    const pointData = this.getMapIndexAt(pixelPosition);
-    if (pointData !== undefined) {
-      this.colorTableRows[pointData.index].style.backgroundColor = "#0000FF22";
-
-      $hoverInfo.textContent =
-        "  " + displayMapTypeLower(this.mapType) + " = " + pointData.cellData;
+  updateMapType(mapType: MapType) {
+    if (mapType === "heat") {
+      $colorSelectContainer.style.display = "none";
     } else {
-      $hoverInfo.textContent = " "; // 崩れないように
+      $colorSelectContainer.style.display = "";
     }
+    this.mapType = mapType;
+    this.setupColorMap();
+    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
   }
 
-  updateMapType(mapType: MapType) {
-    this.mapType = mapType;
-    this.colorTableRows = setColorTable(this.getMapData(), this.mapType);
+  updateColor(color: ColorType) {
+    this.colorType = color;
+    this.setupColorMap();
+    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
   }
 }

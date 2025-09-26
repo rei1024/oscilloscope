@@ -1,9 +1,9 @@
-import { makeColorMap } from "../app";
-import { $colorTable } from "../bind";
-import { displayMapTypeTitle, type MapType } from "./core";
+import { displayMapTypeLower, displayMapTypeTitle, type MapType } from "./core";
 
-export function setColorTable(
+function createColorTable(
+  $colorTable: HTMLElement,
   map: { data: number[][]; list: number[]; countMap: Map<number, number> },
+  colorMap: Map<number, string>,
   mapType: MapType,
 ) {
   const rows: HTMLTableRowElement[] = [];
@@ -29,7 +29,6 @@ export function setColorTable(
     $colorTable.append(trHead);
   }
 
-  const colorMap = makeColorMap(list, mapType === "heat" ? "heat" : "hue");
   for (const item of list) {
     const row = document.createElement("tr");
     const color = colorMap.get(item) ?? "";
@@ -51,4 +50,43 @@ export function setColorTable(
   }
 
   return rows;
+}
+
+export class ColorTableUI {
+  private $colorTable: HTMLElement;
+  private $hoverInfo: HTMLElement;
+  private rows: HTMLTableRowElement[] = [];
+  constructor($colorTable: HTMLElement, $hoverInfo: HTMLElement) {
+    this.$colorTable = $colorTable;
+    this.$hoverInfo = $hoverInfo;
+  }
+
+  setup(
+    map: { data: number[][]; list: number[]; countMap: Map<number, number> },
+    colorMap: Map<number, string>,
+    mapType: MapType,
+  ) {
+    this.rows = createColorTable(this.$colorTable, map, colorMap, mapType);
+  }
+
+  renderColorTableHighlight(
+    data: {
+      index: number;
+      cellData: number;
+    } | null,
+    mapType: MapType,
+  ) {
+    for (const row of this.rows) {
+      row.style.backgroundColor = "";
+    }
+
+    if (data != undefined) {
+      this.rows[data.index].style.backgroundColor = "#0000FF22";
+
+      this.$hoverInfo.textContent =
+        "  " + displayMapTypeLower(mapType) + " = " + data.cellData;
+    } else {
+      this.$hoverInfo.textContent = " "; // 崩れないように
+    }
+  }
 }

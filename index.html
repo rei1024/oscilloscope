@@ -2,7 +2,7 @@
 <html lang="en" prefix="og: https://ogp.me/ns#">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="/oscilloscope-galaxy.png" />
+    <link rel="icon" type="image/png" href="/galaxy.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Oscilloscope - Oscillator analyzer</title>
 
@@ -34,6 +34,7 @@
     />
 
     <script src="./src/main.ts" type="module"></script>
+    <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
     <header>
@@ -77,8 +78,12 @@
       <div id="map-box" class="box" style="display: none">
         <h2>Map</h2>
         <div>
-          <span style="margin-right: 16px">
-            <label for="map-period-select" style="user-select: none">
+          <div style="margin-right: 16px; margin-bottom: 8px">
+            Type:
+            <label
+              for="map-period-select"
+              style="user-select: none; margin-right: 8px"
+            >
               <input
                 id="map-period-select"
                 value="period"
@@ -89,7 +94,10 @@
               Period
             </label>
 
-            <label for="map-frequency-select" style="user-select: none">
+            <label
+              for="map-frequency-select"
+              style="user-select: none; margin-right: 8px"
+            >
               <input
                 id="map-frequency-select"
                 value="frequency"
@@ -98,7 +106,10 @@
               />
               Frequency
             </label>
-            <label for="map-heat-select" style="user-select: none">
+            <label
+              for="map-heat-select"
+              style="user-select: none; margin-right: 8px"
+            >
               <input
                 id="map-heat-select"
                 value="heat"
@@ -107,15 +118,64 @@
               />
               Heat
             </label>
-          </span>
-          <label style="user-select: none" for="show-animation-checkbox">
+          </div>
+
+          <div
+            id="color-select-container"
+            style="margin-right: 16px; margin-bottom: 8px"
+          >
+            Color:
+
+            <label
+              for="color-hue-select"
+              style="user-select: none; margin-right: 8px"
+            >
+              <input
+                id="color-hue-select"
+                value="hue"
+                name="color-select"
+                type="radio"
+                checked
+              />
+              Hue
+            </label>
+
+            <label
+              for="color-grayscale-select"
+              style="user-select: none; margin-right: 8px"
+            >
+              <input
+                id="color-grayscale-select"
+                value="grayscale"
+                name="color-select"
+                type="radio"
+              />
+              Grayscale
+            </label>
+          </div>
+
+          <label
+            style="user-select: none; margin-right: 8px"
+            for="show-animation-checkbox"
+          >
             <input id="show-animation-checkbox" type="checkbox" checked />
             Show animation
           </label>
 
-          <label style="user-select: none" for="show-grid-checkbox">
+          <label
+            style="user-select: none; margin-right: 8px"
+            for="show-grid-checkbox"
+          >
             <input id="show-grid-checkbox" type="checkbox" />
             Show grid
+          </label>
+
+          <label
+            style="user-select: none; margin-right: 8px"
+            for="dark-background-checkbox"
+          >
+            <input id="dark-background-checkbox" type="checkbox" />
+            Dark background
           </label>
         </div>
 
@@ -220,9 +280,14 @@
             >
           </li>
           <li>
+            <a href="/oscilloscope/pages/changelog/">Changelog</a>
+          </li>
+          <li>
             <a href="https://github.com/rei1024/oscilloscope"
               >Source Code | GitHub</a
             >
+            If you find a bug or have a request for improvement, please create
+            an issue here.
           </li>
         </ul>
       </section>

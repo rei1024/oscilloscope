@@ -14,11 +14,23 @@ export const $mapTypeSelect = [
   ...document.querySelectorAll('[name="map-type-select"]'),
 ] as HTMLInputElement[];
 
+export const $colorSelectContainer = $(
+  "#color-select-container",
+) as HTMLElement;
+
+export const $colorSelect = [
+  ...document.querySelectorAll('[name="color-select"]'),
+] as HTMLInputElement[];
+
 export const $showAnimationCheckbox = $(
   "#show-animation-checkbox",
 ) as HTMLInputElement;
 
 export const $showGridCheckbox = $("#show-grid-checkbox") as HTMLInputElement;
+
+export const $darkBackgroundCheckbox = $(
+  "#dark-background-checkbox",
+) as HTMLInputElement;
 
 export const $dataBox = $("#data-box") as HTMLElement;
 
