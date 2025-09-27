@@ -16,6 +16,9 @@ import { setDataTable } from "./ui/dataTable";
 import { App } from "./app";
 import { getMousePositionInElement } from "./ui/getMousePositionInElement";
 import type { ColorType, MapType } from "./ui/core";
+import { setupShowAnimationCheckbox } from "./ui/show-animation-checkbox";
+
+setupShowAnimationCheckbox();
 
 const worker = new MyWorker();
 
