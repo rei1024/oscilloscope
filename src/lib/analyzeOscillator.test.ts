@@ -11,12 +11,16 @@ const conwayLife = {
   },
 };
 
+function rleToCells(rle: string) {
+  return parseRLE(rle)
+    .cells.filter((x) => x.state === 1)
+    .map((x) => x.position);
+}
+
 describe("analyzeOscillator", () => {
   it("analyze blinker", () => {
     const result = analyzeOscillator({
-      cells: parseRLE(`ooo`)
-        .cells.filter((x) => x.state === 1)
-        .map((x) => x.position),
+      cells: rleToCells(`ooo`),
       rule: conwayLife,
       maxGeneration: 1000,
     });
@@ -67,10 +71,8 @@ describe("analyzeOscillator", () => {
 
   it("analyze Kok's galaxy", () => {
     const result = analyzeOscillator({
-      cells: parseRLE(`x = 9, y = 9, rule = 23/3
-2bo2bobob$2obob3ob$bo6bo$2o5bob2$bo5b2o$o6bob$b3obob2o$bobo2bo!`)
-        .cells.filter((x) => x.state === 1)
-        .map((x) => x.position),
+      cells: rleToCells(`x = 9, y = 9, rule = 23/3
+2bo2bobob$2obob3ob$bo6bo$2o5bob2$bo5b2o$o6bob$b3obob2o$bobo2bo!`),
       rule: conwayLife,
       maxGeneration: 1000,
     });
@@ -100,9 +102,7 @@ x = 35, y = 7, rule = B3/S23
 2bo4bo$2ob4ob2o$2bo4bo$16bo$17b2o8bo4bo$16b2o7b2ob4ob2o$27bo4bo!`;
 
     const result = analyzeOscillator({
-      cells: parseRLE(str)
-        .cells.filter((x) => x.state === 1)
-        .map((x) => x.position),
+      cells: rleToCells(str),
       rule: conwayLife,
       maxGeneration: 1000,
     });
@@ -135,9 +135,7 @@ o2b2o$10bo15b3o2bo$24bo4bobo$13b2o9bob3obo$13bo11bo2bo$14b3o9b2o2bo$
 16bo10bob2o$27bo$26b2o!`;
 
     const result = analyzeOscillator({
-      cells: parseRLE(str)
-        .cells.filter((x) => x.state === 1)
-        .map((x) => x.position),
+      cells: rleToCells(str),
       rule: conwayLife,
       maxGeneration: 1000,
     });
@@ -156,9 +154,7 @@ o2b2o$10bo15b3o2bo$24bo4bobo$13b2o9bob3obo$13bo11bo2bo$14b3o9b2o2bo$
 o$2o59b2o$b2o57b2o4$b2o57b2o$2o59b2o$2bo57bo$b2o57b2o$3bo55bo22$25bo
 11bo$26b2obo3bob2o$26bob2o3b2obo$28bo5bo!`;
     const result = analyzeOscillator({
-      cells: parseRLE(str)
-        .cells.filter((x) => x.state === 1)
-        .map((x) => x.position),
+      cells: rleToCells(str),
       rule: {
         type: "outer-totalistic" as const,
         transition: {

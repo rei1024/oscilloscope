@@ -40,31 +40,30 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     };
   }
 
-  try {
-    rule = parseRule(rle.ruleString);
-  } catch (error) {
-    if (rle?.ruleString.toLowerCase() === "lifehistory") {
-      // LifeHistory
-      rule = {
-        type: "outer-totalistic",
-        transition: {
-          birth: [3],
-          survive: [2, 3],
-        },
-      };
+  // LifeHistory and LifeSuper
+  const lowerRuleString = rle.ruleString.toLowerCase();
+  const suffix = ["history", "super"];
+  for (const s of suffix) {
+    if (lowerRuleString.endsWith(s)) {
+      rle.ruleString = rle.ruleString.slice(0, -s.length);
       rle.cells = rle.cells.map((cell) => {
         return {
           ...cell,
           state: cell.state % 2 === 0 ? 0 : 1,
         };
       });
-    } else {
-      console.error(error);
-      return {
-        kind: "response-error",
-        message: "Unsupported rule",
-      };
+      break;
     }
+  }
+
+  try {
+    rule = parseRule(rle.ruleString);
+  } catch (error) {
+    console.error(error);
+    return {
+      kind: "response-error",
+      message: "Unsupported rule",
+    };
   }
 
   if (rule.type === "outer-totalistic") {
@@ -74,22 +73,24 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Generations is not supported",
       };
     }
-    if (rule.neighborhood === "hexagonal") {
+    const unsupportedNeighborhoods = [
+      "hexagonal",
+      "von-neumann",
+      "triangular",
+    ] as const;
+    if (
+      rule.neighborhood &&
+      unsupportedNeighborhoods.includes(rule.neighborhood)
+    ) {
       return {
         kind: "response-error",
-        message: "Hexagonal neighborhood is not supported",
-      };
-    }
-    if (rule.neighborhood === "von-neumann") {
-      return {
-        kind: "response-error",
-        message: "von Neumann neighborhood is not supported",
-      };
-    }
-    if (rule.neighborhood === "triangular") {
-      return {
-        kind: "response-error",
-        message: "Triangular neighborhood is not supported",
+        message: `${
+          {
+            hexagonal: "Hexagonal",
+            "von-neumann": "von Neumann",
+            triangular: "Triangular",
+          }[rule.neighborhood]
+        } neighborhood is not supported`,
       };
     }
     if (rule.neighborhood != undefined) {
