@@ -47,6 +47,13 @@
             rel="noopener"
             >Oscillator</a
           >
+          and
+          <a
+            href="https://conwaylife.com/wiki/Spaceship"
+            target="_blank"
+            rel="noopener"
+            >spaceship</a
+          >
           analyzer</small
         >
       </div>
@@ -204,50 +211,7 @@
 
       <div id="data-box" class="box" style="display: none">
         <h2>Data</h2>
-        <table id="output-table" style="display: none">
-          <tr>
-            <th>Period</th>
-            <td id="output-period"></td>
-          </tr>
-          <tr>
-            <th>Heat</th>
-            <td id="output-heat"></td>
-          </tr>
-          <tr>
-            <th>Temperature</th>
-            <td id="output-temperature"></td>
-          </tr>
-          <tr>
-            <th>Population</th>
-            <td>
-              min = <span id="output-cells-min"></span>, max =
-              <span id="output-cells-max"></span>, avg =
-              <span id="output-cells-avg"></span>, median =
-              <span id="output-cells-median"></span>
-            </td>
-          </tr>
-          <tr>
-            <th>Bounding Box</th>
-            <td>
-              <span id="output-width"></span> x
-              <span id="output-height"></span> = <span id="output-area"></span>
-            </td>
-          </tr>
-          <tr>
-            <th>Cells</th>
-            <td>
-              <span id="output-cells"></span>
-            </td>
-          </tr>
-          <tr>
-            <th>Volatility</th>
-            <td><span id="output-volatility"></span></td>
-          </tr>
-          <tr>
-            <th>Strict volatility</th>
-            <td><span id="output-strict-volatility"></span></td>
-          </tr>
-        </table>
+        <table id="output-table" style="display: none"></table>
       </div>
     </main>
     <style>
@@ -268,7 +232,10 @@
           <li>
             Rules containing B0 (birth with 0 neighbors) are not supported.
           </li>
-          <li>The supplied pattern must be a phase of an oscillator.</li>
+          <li>
+            The supplied pattern must be a phase of an oscillator or a
+            spaceship.
+          </li>
           <li>The maximum period that can be analyzed is 50,000.</li>
         </ul>
       </section>
