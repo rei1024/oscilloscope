@@ -13,6 +13,7 @@ export class WorldWithHistory {
   private gen = 0;
   private initialBitGrid: BitGrid;
   public histories: HistoryEntry[] = [];
+  private lastBitGrid: BitGrid | undefined;
 
   constructor({
     cells,
@@ -123,7 +124,8 @@ export class WorldWithHistory {
     this.gen++;
     bitWorld.next();
 
-    if (bitWorld.bitGrid.equal(this.initialBitGrid)) {
+    if (bitWorld.bitGrid.isSamePatternIgnoreTranslation(this.initialBitGrid)) {
+      this.lastBitGrid = bitWorld.bitGrid.clone();
       return "end";
     }
 
@@ -134,5 +136,9 @@ export class WorldWithHistory {
 
   getGen() {
     return this.gen;
+  }
+
+  getLastBitGrid() {
+    return this.lastBitGrid;
   }
 }

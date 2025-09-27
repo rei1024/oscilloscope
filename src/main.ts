@@ -48,7 +48,7 @@ worker.addEventListener("message", (e) => {
   } else {
     $outputTable.style.display = "block";
     const data = message.data;
-    setDataTable(data);
+    setDataTable($outputTable, data);
     app.setup(data);
   }
 });
@@ -114,6 +114,14 @@ const examples = [
   {
     name: "David Hilbert",
     src: "davidhilbert.rle",
+  },
+  {
+    name: "Glider",
+    src: "glider.rle",
+  },
+  {
+    name: "Sir Robin",
+    src: "sirrobin.rle",
   },
 ];
 

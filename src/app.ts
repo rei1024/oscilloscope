@@ -90,7 +90,9 @@ export class App {
   }
 
   setup(data: AnalyzeResult) {
-    $mapBox.style.display = "";
+    // Do not show map for spaceship
+    $mapBox.style.display = data.isSpaceship ? "none" : "";
+
     $dataBox.style.display = "";
 
     this.mapCanvasUI.setup({ data });
