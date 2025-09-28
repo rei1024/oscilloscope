@@ -134,6 +134,11 @@ export type AnalyzeResult = {
     list: number[];
     countMap: Map<number, number>;
   };
+  signatureMap: {
+    data: bigint[][];
+    list: bigint[];
+    countMap: Map<bigint, number>;
+  };
 };
 
 export function bitGridToData(bitGrid: BitGrid): BitGridData {
@@ -189,7 +194,7 @@ export function analyzeOscillator(
   const width = historiesBitGrid[0]!.getWidth();
   const height = historiesBitGrid[0]!.getHeight();
 
-  const { periodMap, frequencyMap, heatMap } = getMap({
+  const { periodMap, frequencyMap, heatMap, signatureMap } = getMap({
     width,
     height,
     or,
@@ -229,5 +234,6 @@ export function analyzeOscillator(
     periodMap,
     frequencyMap,
     heatMap,
+    signatureMap,
   };
 }

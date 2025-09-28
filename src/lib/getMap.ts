@@ -1,6 +1,7 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
 import { findPeriodUint8 } from "./findPeriod";
 import { BITS, BITS_MINUS_1 } from "./const";
+import { rotateLeftBigInt } from "../util/rotate";
 
 // reduce allocation
 let statesAlloc = new Uint8Array();
@@ -31,6 +32,11 @@ export function getMap({
     list: number[];
     countMap: Map<number, number>;
   };
+  signatureMap: {
+    data: bigint[][];
+    list: bigint[];
+    countMap: Map<bigint, number>;
+  };
 } {
   const periodArray = Array(height)
     .fill(0)
@@ -59,6 +65,15 @@ export function getMap({
         .map(() => -1),
     );
 
+  const signatureArray = Array(height)
+    .fill(0)
+    .map(() => 0)
+    .map(() =>
+      Array(width)
+        .fill(0)
+        .map(() => 0n),
+    );
+
   const firstBitGrid = histories[0];
   if (firstBitGrid === undefined) {
     throw new Error("no history");
@@ -73,6 +88,8 @@ export function getMap({
     // reuse array
     statesAlloc = new Uint8Array(histories.length);
 
+    const signatureList: bigint[] = [];
+
     for (let i = 0; i < height; i++) {
       const rowIndex = i * width;
       const y = i;
@@ -80,6 +97,7 @@ export function getMap({
       const heatArrayRow = heatArray[y];
       const periodArrayRow = periodArray[y];
       const frequencyArrayRow = frequencyArray[y];
+      const signatureArrayRow = signatureArray[y];
 
       for (let j = 0; j < width; j++) {
         const offset = rowIndex + j;
@@ -100,6 +118,7 @@ export function getMap({
           const firstCell = getAlive(firstBitGridUint32Array, offset, u);
           let prevCell = firstCell;
           let frequency = 0;
+          let signature = 0n;
           const lenHistories = histories.length;
           for (let index = 0; index < lenHistories; index++) {
             const array = histories[index].asInternalUint32Array();
@@ -109,8 +128,10 @@ export function getMap({
             }
             prevCell = cell;
             statesAlloc[index] = cell;
+            signature <<= 1n;
             if (cell !== 0) {
               frequency++;
+              signature |= 1n;
             }
           }
 
@@ -127,6 +148,29 @@ export function getMap({
           heatArrayRow[x] = heat;
           periodArrayRow[x] = findPeriodUint8(statesAlloc);
           frequencyArrayRow[x] = frequency;
+
+          let found = false;
+          // FIXME: this is too slow
+          outer: for (const otherSignature of signatureList) {
+            for (let shift = 0; shift < lenHistories; shift++) {
+              const rotated = rotateLeftBigInt(
+                otherSignature,
+                BigInt(lenHistories),
+                BigInt(shift),
+              );
+              if (rotated === signature) {
+                signature = rotated;
+                found = true;
+                break outer;
+              }
+            }
+          }
+
+          if (!found) {
+            signatureList.push(signature);
+          }
+
+          signatureArrayRow[x] = signature;
         }
       }
     }
@@ -140,6 +184,9 @@ export function getMap({
 
   const heatCountMap = getCountMap(heatArray);
   heatCountMap.delete(-1);
+
+  const signatureMap = getCountMap(signatureArray);
+  signatureMap.delete(0n);
 
   return {
     periodMap: {
@@ -157,6 +204,11 @@ export function getMap({
       list: [...heatCountMap.keys()].sort((a, b) => a - b),
       countMap: heatCountMap,
     },
+    signatureMap: {
+      data: signatureArray,
+      list: [...signatureMap.keys()], // TODO sort
+      countMap: signatureMap,
+    },
   };
 }
 
@@ -166,8 +218,8 @@ function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
   return alive;
 }
 
-function getCountMap(map: number[][]): Map<number, number> {
-  const countMap = new Map<number, number>();
+function getCountMap<T>(map: T[][]): Map<T, number> {
+  const countMap = new Map<T, number>();
   for (const row of map) {
     for (const x of row) {
       const currentCount = countMap.get(x);

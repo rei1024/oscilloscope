@@ -67,6 +67,32 @@ describe("analyzeOscillator", () => {
       [2, 0, 2],
       [-1, 2, -1],
     ]);
+
+    expect(
+      CACellList.from2dArray(
+        result.signatureMap.data.map((row) => row.map((x) => Number(x))),
+      ).to2dArray()?.array,
+    ).toEqual([
+      [0, 1, 0],
+      [1, 2, 1],
+      [0, 1, 0],
+    ]);
+  });
+
+  it("analyze signature", () => {
+    const str = `x = 7, y = 7, rule = B3/S23
+  3b2o$bobo$o5bo$bo3b2o2$3bobo$4bo!
+  `;
+    const result = analyzeOscillator({
+      cells: rleToCells(str),
+      rule: conwayLife,
+      maxGeneration: 1000,
+    });
+    // expect(
+    //   CACellList.from2dArray(
+    //     result.signatureMap.data.map((row) => row.map((x) => Number(x))),
+    //   ).to2dArray()?.array,
+    // ).toEqual([]); // TODO
   });
 
   it("analyze Kok's galaxy", () => {
