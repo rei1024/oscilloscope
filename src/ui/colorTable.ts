@@ -1,3 +1,4 @@
+import { stringToRGB } from "../util/string-to-rgb";
 import { displayMapTypeLower, displayMapTypeTitle, type MapType } from "./core";
 
 function createColorTable(
@@ -25,7 +26,10 @@ function createColorTable(
     const thCount = document.createElement("th");
     thCount.textContent = "Count";
 
-    trHead.append(thColor, thType, thCount);
+    const thColorText = document.createElement("th");
+    thColorText.textContent = "Hex";
+
+    trHead.append(thColor, thType, thCount, thColorText);
     $colorTable.append(trHead);
   }
 
@@ -44,7 +48,15 @@ function createColorTable(
     $count.textContent = map.countMap.get(item)?.toString() ?? "-";
     $count.style.textAlign = "right";
 
-    row.append($color, $detail, $count);
+    const $colorText = document.createElement("td");
+    const [r, g, b] = stringToRGB(color, "display-p3");
+    $colorText.textContent =
+      "#" +
+      [r, g, b]
+        .map((x) => x.toString(16).padStart(2, "0").toUpperCase())
+        .join("");
+
+    row.append($color, $detail, $count, $colorText);
     $colorTable.append(row);
     rows.push(row);
   }
