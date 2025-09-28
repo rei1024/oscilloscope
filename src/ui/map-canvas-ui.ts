@@ -8,10 +8,10 @@ import type { AnalyzeResult } from "../lib/analyzeOscillator";
 import type { MapType } from "./core";
 
 const safeArea = 2;
-const cellSize = 20;
-const innerCellSize = 12;
+const cellSize = 10;
+const innerCellSize = 6;
 const innerCellOffset = (cellSize - innerCellSize) / 2;
-const gridWidth = 2;
+const gridWidth = 1;
 
 export class MapCanvasUI {
   private $canvas: HTMLCanvasElement;

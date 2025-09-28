@@ -35,6 +35,20 @@ type BitGridData = {
 
 export type AnalyzeResult = {
   /**
+   * is a spaceship
+   */
+  isSpaceship: boolean;
+  /**
+   * Speed of a spaceship
+   */
+  speed: {
+    /**
+     * may be negative
+     */
+    dx: number;
+    dy: number;
+  };
+  /**
    * Period
    */
   period: number;
@@ -138,6 +152,19 @@ export function bitGridFromData(bitGridData: BitGridData): BitGrid {
   );
 }
 
+function getSpeed(
+  firstBitGrid: BitGrid,
+  lastBitGrid: BitGrid,
+): { dx: number; dy: number } {
+  const { x: x0, y: y0 } = firstBitGrid.getTopRowLeftCellPosition()!;
+  const { x: x1, y: y1 } = lastBitGrid.getTopRowLeftCellPosition()!;
+
+  return {
+    dx: x1 - x0,
+    dy: y1 - y0,
+  };
+}
+
 export function analyzeOscillator(
   runConfig: RunOscillatorConfig,
 ): AnalyzeResult {
@@ -145,6 +172,7 @@ export function analyzeOscillator(
 
   const period = world.getGen();
   const historiesBitGrid = world.histories.map((h) => h.bitGrid);
+
   const populations = historiesBitGrid.map((bitGrid) =>
     bitGrid.getPopulation(),
   );
@@ -153,6 +181,10 @@ export function analyzeOscillator(
   const allCount = or.getPopulation();
   const rotor = allCount - stator;
   const boundingBox = or.getBoundingBox();
+
+  const speed = getSpeed(historiesBitGrid[0]!, world.getLastBitGrid()!);
+
+  const isSpaceship = speed.dx !== 0 || speed.dy !== 0;
 
   const width = historiesBitGrid[0]!.getWidth();
   const height = historiesBitGrid[0]!.getHeight();
@@ -169,6 +201,8 @@ export function analyzeOscillator(
     period;
 
   return {
+    isSpaceship,
+    speed,
     period,
     population: {
       max: max(populations),

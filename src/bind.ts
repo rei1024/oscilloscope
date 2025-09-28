@@ -34,31 +34,7 @@ export const $darkBackgroundCheckbox = $(
 
 export const $dataBox = $("#data-box") as HTMLElement;
 
-export const $outputTable = $("#output-table") as HTMLElement;
-
-export const $outputPeriod = $("#output-period") as HTMLElement;
-export const $outputHeat = $("#output-heat") as HTMLElement;
-export const $outputTemperature = $("#output-temperature") as HTMLElement;
-
-export const $outputCellsMin = $("#output-cells-min") as HTMLElement;
-export const $outputCellsMax = $("#output-cells-max") as HTMLElement;
-export const $outputCellsAvg = $("#output-cells-avg") as HTMLElement;
-
-export const $outputCellsMedian = $("#output-cells-median") as HTMLElement;
-
-export const $outputWidth = $("#output-width") as HTMLElement;
-
-export const $outputHeight = $("#output-height") as HTMLElement;
-
-export const $outputArea = $("#output-area") as HTMLElement;
-
-export const $outputCells = $("#output-cells") as HTMLElement;
-
-export const $outputVolatility = $("#output-volatility") as HTMLElement;
-
-export const $outputStrictVolatility = $(
-  "#output-strict-volatility",
-) as HTMLElement;
+export const $outputTable = $("#output-table") as HTMLTableElement;
 
 export const $input = $("#input") as HTMLTextAreaElement;
 export const $analyzeButton = $("#analyze") as HTMLButtonElement;
