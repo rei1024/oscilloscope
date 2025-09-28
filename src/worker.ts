@@ -1,6 +1,6 @@
 import { analyzeOscillator, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
-import { parseRule } from "@ca-ts/rule";
+import { parseRule, type GridParameter } from "@ca-ts/rule";
 import { MaxGenerationError } from "./lib/runOscillator";
 
 export type WorkerRequestMessage = {
@@ -17,6 +17,23 @@ export type WorkerResponseMessage =
       kind: "response-error";
       message: string;
     };
+
+function isInfiniteGrid(
+  gridParameter: GridParameter | null | undefined,
+): boolean {
+  if (gridParameter == null) {
+    return true;
+  }
+  if (
+    (gridParameter.topology.type === "P" ||
+      gridParameter.topology.type === "T") &&
+    gridParameter.size.width === 0 &&
+    gridParameter.size.height === 0
+  ) {
+    return true;
+  }
+  return false;
+}
 
 function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
   let rle;
@@ -105,7 +122,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Rules containing B0 is not supported",
       };
     }
-    if (rule.gridParameter != undefined) {
+    if (!isInfiniteGrid(rule.gridParameter)) {
       return {
         kind: "response-error",
         message: "Bounded grids are not supported",
@@ -126,7 +143,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Generations is not supported",
       };
     }
-    if (rule.gridParameter != undefined) {
+    if (!isInfiniteGrid(rule.gridParameter)) {
       return {
         kind: "response-error",
         message: "Bounded grids are not supported",
@@ -141,7 +158,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Non Moore neighborhood is not supported for MAP rules",
       };
     }
-    if (rule.gridParameter != undefined) {
+    if (!isInfiniteGrid(rule.gridParameter)) {
       return {
         kind: "response-error",
         message: "Bounded grids are not supported",
