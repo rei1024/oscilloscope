@@ -52,7 +52,9 @@ export class App {
     this.colorTable = new ColorTableUI($colorTable, $hoverInfo);
 
     const update = () => {
-      this.render();
+      if (!this.valve.disabled) {
+        this.render();
+      }
       requestAnimationFrame(update);
     };
 
@@ -106,6 +108,8 @@ export class App {
     this.setupColorMap();
     this.updateFrequency();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
   }
 
   private setupColorMap() {
@@ -172,11 +176,19 @@ export class App {
     this.mapType = mapType;
     this.setupColorMap();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
   }
 
   updateColor(color: ColorType) {
     this.colorType = color;
     this.setupColorMap();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
+  }
+
+  valveEnable(enable: boolean) {
+    this.valve.disabled = !enable;
   }
 }
