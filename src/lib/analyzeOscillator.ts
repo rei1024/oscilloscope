@@ -134,6 +134,12 @@ export type AnalyzeResult = {
     list: number[];
     countMap: Map<number, number>;
   };
+  /**
+   * For omnifrequency
+   *
+   * [The Omnifrequency Project | Forum](https://conwaylife.com/forums/viewtopic.php?f=2&t=7026)
+   */
+  missingFrequencies: number[];
 };
 
 export function bitGridToData(bitGrid: BitGrid): BitGridData {
@@ -229,5 +235,24 @@ export function analyzeOscillator(
     periodMap,
     frequencyMap,
     heatMap,
+    missingFrequencies: getMissingFrequencies(frequencyMap.list, period),
   };
+}
+
+function getMissingFrequencies(
+  frequencyList: number[],
+  period: number,
+): number[] {
+  if (frequencyList.length === period) {
+    return [];
+  }
+
+  const set = new Set(frequencyList);
+
+  const missingFrequencies = Array(period)
+    .fill(0)
+    .map((_, i) => i + 1)
+    .filter((f) => !set.has(f));
+
+  return missingFrequencies;
 }

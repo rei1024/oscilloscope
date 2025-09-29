@@ -4,6 +4,7 @@ import { MathExtra } from "../util/math";
 type DataTableRow = {
   header: string;
   content: string;
+  url?: string;
 };
 
 function getDataTableRows(data: AnalyzeResult): DataTableRow[] {
@@ -55,7 +56,48 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
       header: "Strict volatility",
       content: data.strictVolatility.toFixed(3),
     },
+    {
+      header: "Is omnifrequent",
+      content: isOmnifrequent(data),
+      url: "https://conwaylife.com/forums/viewtopic.php?f=2&t=7026",
+    },
   ];
+}
+
+function isOmnifrequent(data: AnalyzeResult): string {
+  const missingFrequencies = data.missingFrequencies;
+  if (missingFrequencies.length === 0) {
+    return "Yes";
+  }
+  return `No (has ${data.frequencyMap.list.length}/${data.period}, missing ${compactRanges(missingFrequencies).join(", ")})`;
+}
+
+/**
+ * @param arr sorted
+ * @returns
+ */
+function compactRanges(arr: number[]): string[] {
+  const len = arr.length;
+  if (len === 0) {
+    return [];
+  }
+  const result = [];
+  let start = arr[0];
+  let end = arr[0];
+
+  for (let i = 1; i < len; i++) {
+    const item = arr[i];
+    if (item === end + 1) {
+      end = item;
+    } else {
+      result.push(start === end ? `${start}` : `${start}-${end}`);
+      start = item;
+      end = item;
+    }
+  }
+
+  result.push(start === end ? `${start}` : `${start}-${end}`);
+  return result;
 }
 
 // Do not show Heat, Temperature, Bounding Box, Cells, Volatility, Strict volatility
@@ -135,8 +177,17 @@ export function setDataTable($table: HTMLTableElement, data: AnalyzeResult) {
 
     // Header cell (th)
     const $th = document.createElement("th");
-    $th.textContent = row.header;
-    $tr.appendChild($th);
+
+    if (row.url) {
+      const a = document.createElement("a");
+      a.href = row.url;
+      a.textContent = row.header;
+      $th.append(a);
+      $tr.append($th);
+    } else {
+      $th.textContent = row.header;
+      $tr.appendChild($th);
+    }
 
     // Content cell (td)
     const $td = $tr.insertCell();
