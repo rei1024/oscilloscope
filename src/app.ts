@@ -109,7 +109,8 @@ export class App {
   }
 
   private setupColorMap() {
-    if (this.data == null) {
+    const data = this.data;
+    if (data == null) {
       return;
     }
     const mapData = this.getMapData();
@@ -125,7 +126,8 @@ export class App {
           heat: "heat",
         } as const
       )[this.mapType],
-      hasStatorCell: this.data.periodMap.list.some((x) => x === 1),
+      hasStatorCell: data.periodMap.list.some((x) => x === 1),
+      hasFullPeriodCell: data.periodMap.list.some((x) => x === data.period),
     });
     this.colorMap = colorMap;
   }
