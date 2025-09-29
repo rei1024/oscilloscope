@@ -21,7 +21,7 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
   return [
     {
       header: "Type",
-      content: "Oscillator",
+      content: data.period === 1 ? "Still life" : "Oscillator",
     },
     {
       header: "Period",
