@@ -151,6 +151,13 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     }
   }
 
+  if (rule.type === "hexagonal-int") {
+    return {
+      kind: "response-error",
+      message: `Hexagonal neighborhood isotropic non-totalistic rule is not supported`,
+    };
+  }
+
   if (rule.type === "map") {
     if (rule.neighbors !== "moore") {
       return {

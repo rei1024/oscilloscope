@@ -19,7 +19,7 @@ function hueForFrequencyColor(
     return "hsl(0 0% 65%)";
   }
 
-  const correctedLen = hasStatorCell ? len - 1 : len;
+  const correctedLen = len - (hasStatorCell ? 1 : 0);
 
   const value = index / correctedLen;
   const hue = (1 - value + 0.2) * 330;
@@ -40,16 +40,18 @@ function hueForPeriodColor(
   index: number,
   len: number,
   hasStatorCell: boolean,
+  hasFullPeriodCell: boolean,
 ): string {
   if (hasStatorCell && index === 0) {
     // for stable cell
     return "hsl(0 0% 65%)";
-  } else if (index === len - 1) {
+  } else if (hasFullPeriodCell && index === len - 1) {
     // full period cells
     return "hsl(0 0% 90%)";
   }
 
-  const correctedLen = hasStatorCell ? len - 2 : len - 1;
+  const correctedLen =
+    len - ((hasStatorCell ? 1 : 0) + (hasFullPeriodCell ? 1 : 0));
 
   const value = index / correctedLen;
   return `lch(70% 70 ${value * 360})`;
@@ -59,6 +61,7 @@ export function makeColorMap({
   list,
   style,
   hasStatorCell,
+  hasFullPeriodCell,
 }: {
   list: number[];
   style:
@@ -68,6 +71,7 @@ export function makeColorMap({
     | "hue-for-period"
     | "heat";
   hasStatorCell: boolean;
+  hasFullPeriodCell: boolean;
 }): Map<number, string> {
   const len = list.length;
   return new Map(
@@ -87,7 +91,12 @@ export function makeColorMap({
           break;
         }
         case "hue-for-period": {
-          color = hueForPeriodColor(index, len, hasStatorCell);
+          color = hueForPeriodColor(
+            index,
+            len,
+            hasStatorCell,
+            hasFullPeriodCell,
+          );
           break;
         }
         case "heat": {
