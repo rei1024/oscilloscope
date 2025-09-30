@@ -2,6 +2,7 @@ import { analyzeOscillator, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { parseRule, type GridParameter } from "@ca-ts/rule";
 import { MaxGenerationError } from "./lib/runOscillator";
+import { WorldSizeError } from "./lib/WorldWithHistory";
 
 export type WorkerRequestMessage = {
   kind: "request-analyze";
@@ -180,12 +181,14 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       message: "Empty pattern",
     };
   }
+
   const maxGeneration = 50_000;
   try {
     const result = analyzeOscillator({
       cells: cells,
       rule: rule,
       maxGeneration: maxGeneration,
+      maxSize: 8192,
     });
     return { kind: "response-analyzed", data: result };
   } catch (error) {
@@ -194,6 +197,12 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       return {
         kind: "response-error",
         message: `maximum period is ${maxGeneration.toLocaleString()}`,
+      };
+    }
+    if (error instanceof WorldSizeError) {
+      return {
+        kind: "response-error",
+        message: error.message,
       };
     }
     return {
