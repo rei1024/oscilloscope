@@ -8,11 +8,36 @@ type DataTableRow = {
 };
 
 function getDataTableRows(data: AnalyzeResult): DataTableRow[] {
-  if (data.isSpaceship) {
+  if (data.period === 1) {
+    return getDataTableRowsForStillLife(data);
+  } else if (data.isSpaceship) {
     return getDataTableRowsForSpaceship(data);
   } else {
     return getDataTableRowsForOscillator(data);
   }
+}
+
+function getDataTableRowsForStillLife(data: AnalyzeResult): DataTableRow[] {
+  const boundingBoxArea = data.boundingBox.sizeX * data.boundingBox.sizeY;
+
+  return [
+    {
+      header: "Type",
+      content: "Still life",
+    },
+    {
+      header: "Population",
+      content: data.population.min.toString(),
+    },
+    {
+      header: "Bounding Box",
+      content: `${data.boundingBox.sizeX} x ${data.boundingBox.sizeY} = ${boundingBoxArea}`,
+    },
+    {
+      header: "Density",
+      content: (data.population.min / boundingBoxArea).toFixed(2),
+    },
+  ];
 }
 
 function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
@@ -22,7 +47,7 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
   return [
     {
       header: "Type",
-      content: data.period === 1 ? "Still life" : "Oscillator",
+      content: "Oscillator",
     },
     {
       header: "Period",
