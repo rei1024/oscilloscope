@@ -5,13 +5,14 @@ import {
   $animFrequency,
   $canvas,
   $colorSelect,
-  $darkBackgroundCheckbox,
+  $darkModeCheckbox,
   $exampleOscillators,
   $input,
   $mapTypeSelect,
   $message,
   $outputTable,
   $showAnimationCheckbox,
+  $showGridCheckbox,
 } from "./bind";
 import { setDataTable } from "./ui/dataTable";
 
@@ -156,6 +157,10 @@ $input.addEventListener("input", () => {
   $exampleOscillators.value = "";
 });
 
-$darkBackgroundCheckbox.addEventListener("change", () => {
+$darkModeCheckbox.addEventListener("change", () => {
+  app.render();
+});
+
+$showGridCheckbox.addEventListener("change", () => {
   app.render();
 });
