@@ -11,6 +11,7 @@ import {
   $animFrequency,
   $animFrequencyLabel,
   $colorTable,
+  $showGridCheckbox,
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";

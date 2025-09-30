@@ -94,6 +94,8 @@ export class MapCanvasUI {
 
     const isDot = getIsDot(data);
 
+    $showGridCheckbox.disabled = isDot;
+
     const sizePixel = isDot ? 1 : cellSize;
 
     for (const [y, row] of mapData.data.entries()) {
