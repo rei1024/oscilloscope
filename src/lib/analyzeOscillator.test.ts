@@ -18,6 +18,30 @@ function rleToCells(rle: string) {
 }
 
 describe("analyzeOscillator", () => {
+  it("analyze block", () => {
+    const result = analyzeOscillator({
+      cells: rleToCells(`2o$2o`),
+      rule: conwayLife,
+      maxGeneration: 1,
+    });
+
+    expect(result.period).toEqual(1);
+    expect(result.volatility).toEqual(0);
+    expect(result.stator).toEqual(4);
+    expect(result.rotor).toEqual(0);
+    expect(result.strictVolatility).toEqual(1);
+    expect(result.boundingBox).toEqual({ sizeX: 2, sizeY: 2 });
+    expect(result.population).toEqual({
+      min: 4,
+      max: 4,
+      avg: 4,
+      median: 4,
+    });
+
+    expect(result.heat).toEqual(0);
+    expect(result.temperature).toEqual(0);
+  });
+
   it("analyze blinker", () => {
     const result = analyzeOscillator({
       cells: rleToCells(`ooo`),
@@ -196,5 +220,8 @@ o$22b2o3bo$21bo$21b2obo$20bo$19b5o$19bo4bo$18b3ob3o$18bob5o$18bo$20bo$
     expect(result.period).toEqual(6);
     expect(result.isSpaceship).toEqual(true);
     expect(result.speed).toEqual({ dx: -1, dy: -2 });
+    expect(result.boundingBoxMovingEncloses).toEqual({ sizeX: 31, sizeY: 79 });
+    expect(result.boundingBoxMaxArea.size).toEqual({ sizeX: 31, sizeY: 79 });
+    expect(result.boundingBoxMinArea.size).toEqual({ sizeX: 30, sizeY: 79 });
   });
 });
