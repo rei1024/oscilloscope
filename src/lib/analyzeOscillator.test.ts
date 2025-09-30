@@ -18,6 +18,30 @@ function rleToCells(rle: string) {
 }
 
 describe("analyzeOscillator", () => {
+  it("analyze block", () => {
+    const result = analyzeOscillator({
+      cells: rleToCells(`2o$2o`),
+      rule: conwayLife,
+      maxGeneration: 1,
+    });
+
+    expect(result.period).toEqual(1);
+    expect(result.volatility).toEqual(0);
+    expect(result.stator).toEqual(4);
+    expect(result.rotor).toEqual(0);
+    expect(result.strictVolatility).toEqual(1);
+    expect(result.boundingBox).toEqual({ sizeX: 2, sizeY: 2 });
+    expect(result.population).toEqual({
+      min: 4,
+      max: 4,
+      avg: 4,
+      median: 4,
+    });
+
+    expect(result.heat).toEqual(0);
+    expect(result.temperature).toEqual(0);
+  });
+
   it("analyze blinker", () => {
     const result = analyzeOscillator({
       cells: rleToCells(`ooo`),
