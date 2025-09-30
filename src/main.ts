@@ -20,9 +20,14 @@ import { App } from "./app";
 import { getMousePositionInElement } from "./ui/getMousePositionInElement";
 import type { ColorType, MapType } from "./ui/core";
 import { setupShowAnimationCheckbox } from "./ui/show-animation-checkbox";
+import { setupDarkModeCheckbox } from "./ui/dark-mode-checkbox";
 
 setupShowAnimationCheckbox(() => {
   app.valveEnable($showAnimationCheckbox.checked);
+  app.render();
+});
+
+setupDarkModeCheckbox(() => {
   app.render();
 });
 
@@ -155,10 +160,6 @@ $exampleOscillators.addEventListener("change", async () => {
 
 $input.addEventListener("input", () => {
   $exampleOscillators.value = "";
-});
-
-$darkModeCheckbox.addEventListener("change", () => {
-  app.render();
 });
 
 $showGridCheckbox.addEventListener("change", () => {
