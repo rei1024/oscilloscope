@@ -17,9 +17,17 @@ function getDataTableRows(data: AnalyzeResult): DataTableRow[] {
   }
 }
 
-function getDataTableRowsForStillLife(data: AnalyzeResult): DataTableRow[] {
-  const boundingBoxArea = data.boundingBox.sizeX * data.boundingBox.sizeY;
+function getBoundingBoxText({
+  sizeX,
+  sizeY,
+}: {
+  sizeX: number;
+  sizeY: number;
+}) {
+  return `${sizeX} x ${sizeY} = ${sizeX * sizeY}`;
+}
 
+function getDataTableRowsForStillLife(data: AnalyzeResult): DataTableRow[] {
   return [
     {
       header: "Type",
@@ -31,17 +39,19 @@ function getDataTableRowsForStillLife(data: AnalyzeResult): DataTableRow[] {
     },
     {
       header: "Bounding Box",
-      content: `${data.boundingBox.sizeX} x ${data.boundingBox.sizeY} = ${boundingBoxArea}`,
+      content: getBoundingBoxText(data.boundingBox),
     },
     {
       header: "Density",
-      content: (data.population.min / boundingBoxArea).toFixed(2),
+      content: (
+        data.population.min /
+        (data.boundingBox.sizeX * data.boundingBox.sizeY)
+      ).toFixed(2),
     },
   ];
 }
 
 function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
-  const boundingBoxArea = data.boundingBox.sizeX * data.boundingBox.sizeY;
   const totalCells = data.stator + data.rotor;
 
   return [
@@ -67,7 +77,7 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
     },
     {
       header: "Bounding Box",
-      content: `${data.boundingBox.sizeX} x ${data.boundingBox.sizeY} = ${boundingBoxArea}`,
+      content: getBoundingBoxText(data.boundingBox),
     },
     {
       header: "Cells",
@@ -140,6 +150,14 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
     {
       header: "Population",
       content: `min = ${data.population.min}, max = ${data.population.max}, avg = ${data.population.avg.toFixed(2)}, median = ${data.population.median}`,
+    },
+    {
+      header: "Bounding Box",
+      content:
+        getBoundingBoxText(data.boundingBoxMovingEncloses) +
+        ", " +
+        `Min: ${getBoundingBoxText(data.boundingBoxMinArea.size)}, ` +
+        ` Max: ${getBoundingBoxText(data.boundingBoxMaxArea.size)}`,
     },
     {
       header: "Direction",
