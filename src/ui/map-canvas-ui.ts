@@ -1,6 +1,6 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
 import {
-  $darkBackgroundCheckbox,
+  $darkModeCheckbox,
   $showAnimationCheckbox,
   $showGridCheckbox,
 } from "../bind";
@@ -84,8 +84,10 @@ export class MapCanvasUI {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
 
+    const isDarkMode = $darkModeCheckbox.checked;
+
     // Background
-    ctx.fillStyle = $darkBackgroundCheckbox.checked ? "black" : "white";
+    ctx.fillStyle = isDarkMode ? "black" : "white";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // Map
@@ -145,7 +147,7 @@ export class MapCanvasUI {
         const posY = y * cellSize;
         for (let x = 0; x < xMax; x++) {
           const posX = x * cellSize;
-          ctx.strokeStyle = "#dddddd";
+          ctx.strokeStyle = isDarkMode ? "#444444" : "#dddddd";
           ctx.strokeRect(
             posX + gridWidth / 2,
             posY + gridWidth / 2,

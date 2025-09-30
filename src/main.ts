@@ -5,7 +5,7 @@ import {
   $animFrequency,
   $canvas,
   $colorSelect,
-  $darkBackgroundCheckbox,
+  $darkModeCheckbox,
   $exampleOscillators,
   $input,
   $mapTypeSelect,
@@ -156,6 +156,6 @@ $input.addEventListener("input", () => {
   $exampleOscillators.value = "";
 });
 
-$darkBackgroundCheckbox.addEventListener("change", () => {
+$darkModeCheckbox.addEventListener("change", () => {
   app.render();
 });
