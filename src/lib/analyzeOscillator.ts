@@ -1,5 +1,5 @@
 import { average, max, median, min } from "./collection";
-import { rectToSize } from "./rect";
+import { rectToArea, rectToSize } from "./rect";
 import { BitGrid } from "@ca-ts/algo/bit";
 import { runOscillator, type RunOscillatorConfig } from "./runOscillator";
 import { getMap } from "./getMap";
@@ -68,6 +68,28 @@ export type AnalyzeResult = {
   boundingBox: {
     sizeX: number;
     sizeY: number;
+  };
+  /**
+   * The bounding box that encloses all phases
+   */
+  boundingBoxMovingEncloses: {
+    sizeX: number;
+    sizeY: number;
+  };
+  boundingBoxMinArea: {
+    // FIXME: different from LifeViewer?
+    tick: number;
+    size: {
+      sizeX: number;
+      sizeY: number;
+    };
+  };
+  boundingBoxMaxArea: {
+    tick: number;
+    size: {
+      sizeX: number;
+      sizeY: number;
+    };
   };
   /**
    * Number of stators
@@ -206,6 +228,45 @@ export function analyzeOscillator(
     heatMap.data.flat().reduce((acc, x) => (x === -1 ? acc : acc + x), 0) /
     period;
 
+  let minArea = Infinity;
+  let minBoxInfo: {
+    tick: number;
+    size: { sizeX: number; sizeY: number };
+  } | null = null;
+  let maxBoxInfo: {
+    tick: number;
+    size: { sizeX: number; sizeY: number };
+  } | null = null;
+  let maxArea = -Infinity;
+  let maxSizeX = 0;
+  let maxSizeY = 0;
+  for (const [i, grid] of historiesBitGrid.entries()) {
+    const boundingBoxPhase = grid.getBoundingBox();
+    const size = rectToSize(boundingBoxPhase);
+    if (maxSizeX < size.sizeX) {
+      maxSizeX = size.sizeX;
+    }
+    if (maxSizeY < size.sizeY) {
+      maxSizeY = size.sizeY;
+    }
+    const area = rectToArea(boundingBoxPhase);
+
+    if (area < minArea) {
+      minBoxInfo = {
+        tick: i,
+        size,
+      };
+      minArea = area;
+    }
+    if (area > maxArea) {
+      maxBoxInfo = {
+        tick: i,
+        size,
+      };
+      maxArea = area;
+    }
+  }
+
   return {
     isSpaceship,
     speed,
@@ -217,6 +278,12 @@ export function analyzeOscillator(
       median: median(populations),
     },
     boundingBox: rectToSize(boundingBox),
+    boundingBoxMovingEncloses: {
+      sizeX: maxSizeX,
+      sizeY: maxSizeY,
+    },
+    boundingBoxMaxArea: maxBoxInfo!,
+    boundingBoxMinArea: minBoxInfo!,
     stator: stator,
     rotor: allCount - stator,
     volatility: rotor / (stator + rotor),
