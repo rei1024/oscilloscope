@@ -220,5 +220,8 @@ o$22b2o3bo$21bo$21b2obo$20bo$19b5o$19bo4bo$18b3ob3o$18bob5o$18bo$20bo$
     expect(result.period).toEqual(6);
     expect(result.isSpaceship).toEqual(true);
     expect(result.speed).toEqual({ dx: -1, dy: -2 });
+    expect(result.boundingBoxMovingEncloses).toEqual({ sizeX: 31, sizeY: 79 });
+    expect(result.boundingBoxMaxArea.size).toEqual({ sizeX: 31, sizeY: 79 });
+    expect(result.boundingBoxMinArea.size).toEqual({ sizeX: 30, sizeY: 79 });
   });
 });
