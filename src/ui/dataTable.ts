@@ -19,7 +19,6 @@ function getDataTableRows(data: AnalyzeResult): DataTableRow[] {
 
 function getDataTableRowsForStillLife(data: AnalyzeResult): DataTableRow[] {
   const boundingBoxArea = data.boundingBox.sizeX * data.boundingBox.sizeY;
-  const totalCells = data.stator + data.rotor;
 
   return [
     {
