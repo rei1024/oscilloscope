@@ -13,6 +13,20 @@ const innerCellSize = 6;
 const innerCellOffset = (cellSize - innerCellSize) / 2;
 const gridWidth = 1;
 
+/**
+ * iOS limits canvas size to 8192
+ *
+ * must less than `Math.floor(8192 / cellSize) - safeArea * 2`
+ */
+const MAX_NORMAL_SIZE = 512;
+
+function getIsDot(data: AnalyzeResult) {
+  return (
+    data.boundingBox.sizeX > MAX_NORMAL_SIZE ||
+    data.boundingBox.sizeY > MAX_NORMAL_SIZE
+  );
+}
+
 export class MapCanvasUI {
   private $canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -27,9 +41,13 @@ export class MapCanvasUI {
   }
 
   setup({ data }: { data: AnalyzeResult }) {
+    const isDot = getIsDot(data);
+
+    const cellPixel = isDot ? 1 : cellSize;
+
     const $canvas = this.$canvas;
-    $canvas.width = (data.boundingBox.sizeX + safeArea * 2) * cellSize;
-    $canvas.height = (data.boundingBox.sizeY + safeArea * 2) * cellSize;
+    $canvas.width = (data.boundingBox.sizeX + safeArea * 2) * cellPixel;
+    $canvas.height = (data.boundingBox.sizeY + safeArea * 2) * cellPixel;
     if ($canvas.width / 2 > $canvas.height) {
       $canvas.style.width = "100%";
       $canvas.style.height = "";
@@ -76,16 +94,22 @@ export class MapCanvasUI {
 
     const minValue = mapType === "heat" ? 0 : 1;
 
+    const isDot = getIsDot(data);
+
+    $showGridCheckbox.disabled = isDot;
+
+    const sizePixel = isDot ? 1 : cellSize;
+
     for (const [y, row] of mapData.data.entries()) {
       for (const [x, p] of row.entries()) {
         if (p >= minValue) {
           ctx.beginPath();
           ctx.fillStyle = colorMap.get(p) ?? "";
           ctx.rect(
-            (x - dx + safeArea) * cellSize,
-            (y - dy + safeArea) * cellSize,
-            cellSize,
-            cellSize,
+            (x - dx + safeArea) * sizePixel,
+            (y - dy + safeArea) * sizePixel,
+            sizePixel,
+            sizePixel,
           );
           ctx.fill();
         }
@@ -94,20 +118,25 @@ export class MapCanvasUI {
     ctx.fill();
 
     if ($showAnimationCheckbox.checked) {
+      const innerCellOffsetPixel = isDot ? 1 : innerCellOffset;
+      const innerCellSizePixel = isDot ? 1 : innerCellSize;
       // Alive Cells
       ctx.beginPath();
       ctx.fillStyle = "black";
       histories[gen].forEachAlive((x, y) => {
         ctx.rect(
-          (x - dx + safeArea) * cellSize + innerCellOffset,
-          (y - dy + safeArea) * cellSize + innerCellOffset,
-          innerCellSize,
-          innerCellSize,
+          (x - dx + safeArea) * sizePixel + innerCellOffsetPixel,
+          (y - dy + safeArea) * sizePixel + innerCellOffsetPixel,
+          innerCellSizePixel,
+          innerCellSizePixel,
         );
       });
       ctx.fill();
     }
     // Grid
+    if (isDot) {
+      return;
+    }
     const yMax = data.boundingBox.sizeY + safeArea * 2;
     const xMax = data.boundingBox.sizeX + safeArea * 2;
     if ($showGridCheckbox.checked) {

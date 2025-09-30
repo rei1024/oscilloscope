@@ -11,6 +11,7 @@ import {
   $animFrequency,
   $animFrequencyLabel,
   $colorTable,
+  $showGridCheckbox,
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";
@@ -52,7 +53,9 @@ export class App {
     this.colorTable = new ColorTableUI($colorTable, $hoverInfo);
 
     const update = () => {
-      this.render();
+      if (!this.valve.disabled) {
+        this.render();
+      }
       requestAnimationFrame(update);
     };
 
@@ -106,6 +109,8 @@ export class App {
     this.setupColorMap();
     this.updateFrequency();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
   }
 
   private setupColorMap() {
@@ -172,11 +177,19 @@ export class App {
     this.mapType = mapType;
     this.setupColorMap();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
   }
 
   updateColor(color: ColorType) {
     this.colorType = color;
     this.setupColorMap();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
+  }
+
+  valveEnable(enable: boolean) {
+    this.valve.disabled = !enable;
   }
 }

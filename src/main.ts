@@ -5,11 +5,13 @@ import {
   $animFrequency,
   $canvas,
   $colorSelect,
+  $darkBackgroundCheckbox,
   $exampleOscillators,
   $input,
   $mapTypeSelect,
   $message,
   $outputTable,
+  $showAnimationCheckbox,
 } from "./bind";
 import { setDataTable } from "./ui/dataTable";
 
@@ -18,7 +20,10 @@ import { getMousePositionInElement } from "./ui/getMousePositionInElement";
 import type { ColorType, MapType } from "./ui/core";
 import { setupShowAnimationCheckbox } from "./ui/show-animation-checkbox";
 
-setupShowAnimationCheckbox();
+setupShowAnimationCheckbox(() => {
+  app.valveEnable($showAnimationCheckbox.checked);
+  app.render();
+});
 
 const worker = new MyWorker();
 
@@ -66,6 +71,7 @@ $analyzeButton.addEventListener("click", () => {
 
 $animFrequency.addEventListener("input", () => {
   app.updateFrequency();
+  app.render();
 });
 
 $canvas.addEventListener("mousemove", (e) => {
@@ -148,4 +154,8 @@ $exampleOscillators.addEventListener("change", async () => {
 
 $input.addEventListener("input", () => {
   $exampleOscillators.value = "";
+});
+
+$darkBackgroundCheckbox.addEventListener("change", () => {
+  app.render();
 });
