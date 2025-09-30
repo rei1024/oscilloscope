@@ -12,6 +12,7 @@ import {
   $message,
   $outputTable,
   $showAnimationCheckbox,
+  $showGridCheckbox,
 } from "./bind";
 import { setDataTable } from "./ui/dataTable";
 
@@ -157,5 +158,9 @@ $input.addEventListener("input", () => {
 });
 
 $darkModeCheckbox.addEventListener("change", () => {
+  app.render();
+});
+
+$showGridCheckbox.addEventListener("change", () => {
   app.render();
 });
