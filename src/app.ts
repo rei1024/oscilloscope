@@ -54,7 +54,6 @@ export class App {
   }
 
   render() {
-    console.log("Render", new Date());
     this.frequencyUI.render({
       showAnimationChecked: $showAnimationCheckbox.checked,
     });
