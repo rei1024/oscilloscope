@@ -77,7 +77,11 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
     },
     {
       header: "Bounding Box",
-      content: getBoundingBoxText(data.boundingBox),
+      content:
+        getBoundingBoxText(data.boundingBox) +
+        ", " +
+        `Min: ${getBoundingBoxText(data.boundingBoxMinArea.size)}, ` +
+        ` Max: ${getBoundingBoxText(data.boundingBoxMaxArea.size)}`,
     },
     {
       header: "Cells",
