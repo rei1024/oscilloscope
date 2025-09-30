@@ -15,8 +15,10 @@ const gridWidth = 1;
 
 /**
  * iOS limits canvas size to 8192
+ *
+ * must less than `Math.floor(8192 / cellSize) - safeArea * 2`
  */
-const MAX_NORMAL_SIZE = Math.floor(8192 / cellSize) - safeArea * 2;
+const MAX_NORMAL_SIZE = 512;
 
 function getIsDot(data: AnalyzeResult) {
   return (
