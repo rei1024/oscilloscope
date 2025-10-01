@@ -1,6 +1,7 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
 import { findPeriodUint8 } from "./findPeriod";
 import { BITS, BITS_MINUS_1 } from "./const";
+import { max, min } from "./collection";
 
 // reduce allocation
 let statesAlloc = new Uint8Array();
@@ -31,6 +32,10 @@ export function getMap({
     list: number[];
     countMap: Map<number, number>;
   };
+  heatInfo: {
+    max: number;
+    min: number;
+  };
 } {
   const periodArray = Array(height)
     .fill(0)
@@ -58,6 +63,11 @@ export function getMap({
         .fill(0)
         .map(() => -1),
     );
+
+  // indexed by generations
+  const heatByGeneration: number[] = Array(histories.length)
+    .fill(0)
+    .map(() => 0);
 
   const firstBitGrid = histories[0];
   if (firstBitGrid === undefined) {
@@ -106,6 +116,7 @@ export function getMap({
             const cell = getAlive(array, offset, u);
             if (/* prevCell !== undefined && */ prevCell !== cell) {
               heat++;
+              heatByGeneration[index]++;
             }
             prevCell = cell;
             statesAlloc[index] = cell;
@@ -123,6 +134,7 @@ export function getMap({
             )
           ) {
             heat++;
+            heatByGeneration[0]++;
           }
           heatArrayRow[x] = heat;
           periodArrayRow[x] = findPeriodUint8(statesAlloc);
@@ -156,6 +168,10 @@ export function getMap({
       data: heatArray,
       list: [...heatCountMap.keys()].sort((a, b) => a - b),
       countMap: heatCountMap,
+    },
+    heatInfo: {
+      min: min(heatByGeneration),
+      max: max(heatByGeneration),
     },
   };
 }
