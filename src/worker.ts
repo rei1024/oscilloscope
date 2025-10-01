@@ -3,6 +3,7 @@ import { parseRLE } from "@ca-ts/rle";
 import { parseRule, type GridParameter } from "@ca-ts/rule";
 import { MaxGenerationError } from "./lib/runOscillator";
 import { WorldSizeError } from "./lib/WorldWithHistory";
+import { getErrorMessageForParseRule } from "./lib/rule-error";
 
 export type WorkerRequestMessage = {
   kind: "request-analyze";
@@ -80,7 +81,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     console.error(error);
     return {
       kind: "response-error",
-      message: "Unsupported rule",
+      message: getErrorMessageForParseRule(error),
     };
   }
 
