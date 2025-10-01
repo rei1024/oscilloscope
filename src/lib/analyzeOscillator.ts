@@ -120,6 +120,8 @@ export type AnalyzeResult = {
    * [Heat](https://conwaylife.com/wiki/Heat)
    */
   heat: number;
+  heatMin: number;
+  heatMax: number;
   /**
    * [Temperature](https://conwaylife.com/wiki/Temperature)
    */
@@ -221,7 +223,7 @@ export function analyzeOscillator(
   const width = historiesBitGrid[0]!.getWidth();
   const height = historiesBitGrid[0]!.getHeight();
 
-  const { periodMap, frequencyMap, heatMap } = getMap({
+  const { periodMap, frequencyMap, heatMap, heatInfo } = getMap({
     width,
     height,
     or,
@@ -302,6 +304,8 @@ export function analyzeOscillator(
       minY: boundingBox.minY,
     },
     heat,
+    heatMax: heatInfo.max,
+    heatMin: heatInfo.min,
     temperature: heat / allCount,
     rotorTemperature: heat / rotor,
     periodMap,

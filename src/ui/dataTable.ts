@@ -65,7 +65,8 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
     },
     {
       header: "Heat",
-      content: data.heat.toFixed(2),
+      content:
+        data.heat.toFixed(2) + `, min = ${data.heatMin}, max = ${data.heatMax}`,
     },
     {
       header: "Temperature",
