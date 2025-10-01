@@ -72,6 +72,10 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
       content: data.temperature.toFixed(2),
     },
     {
+      header: "Rotor temperature",
+      content: data.rotorTemperature.toFixed(2),
+    },
+    {
       header: "Population",
       content: `min = ${data.population.min}, max = ${data.population.max}, avg = ${data.population.avg.toFixed(2)}, median = ${data.population.median}`,
     },

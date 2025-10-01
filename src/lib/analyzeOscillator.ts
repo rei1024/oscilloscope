@@ -125,6 +125,10 @@ export type AnalyzeResult = {
    */
   temperature: number;
   /**
+   * Rotor temperature
+   */
+  rotorTemperature: number;
+  /**
    * [Period map](https://conwaylife.com/wiki/Map#Period_map)
    */
   periodMap: {
@@ -299,6 +303,7 @@ export function analyzeOscillator(
     },
     heat,
     temperature: heat / allCount,
+    rotorTemperature: heat / rotor,
     periodMap,
     frequencyMap,
     heatMap,
