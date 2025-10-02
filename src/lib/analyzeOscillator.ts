@@ -2,7 +2,7 @@ import { average, max, median, min } from "./collection";
 import { rectToArea, rectToSize } from "./rect";
 import { BitGrid } from "@ca-ts/algo/bit";
 import { runOscillator, type RunOscillatorConfig } from "./runOscillator";
-import { getMap } from "./getMap";
+import { getMap, type MapData } from "./getMap";
 
 function getOrAndGrid(histories: BitGrid[]) {
   if (histories.length === 0) {
@@ -132,36 +132,22 @@ export type AnalyzeResult = {
   rotorTemperature: number;
   /**
    * [Period map](https://conwaylife.com/wiki/Map#Period_map)
+   *
+   * 0 for the empty cell
    */
-  periodMap: {
-    /**
-     * Period of each cells
-     *
-     * 0 for the empty cell
-     */
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
+  periodMap: MapData<number>;
   /**
    * [Frequency map](https://conwaylife.com/wiki/Map#Frequency_map)
+   *
+   * 0 for the empty cell
    */
-  frequencyMap: {
-    /**
-     * 0 for the empty cell
-     */
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  heatMap: {
-    /**
-     * -1 for the empty cell
-     */
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
+  frequencyMap: MapData<number>;
+  /**
+   * Heat map
+   *
+   *  -1 for the empty cell
+   */
+  heatMap: MapData<number>;
   /**
    * For omnifrequency
    *

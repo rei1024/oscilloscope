@@ -6,6 +6,8 @@ import {
 } from "../bind";
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
 import type { MapType } from "./core";
+import type { MapData } from "../lib/getMap";
+import type { ColorMap } from "../make-color";
 
 const safeArea = 2;
 const cellSize = 10;
@@ -66,12 +68,8 @@ export class MapCanvasUI {
     gen,
   }: {
     data: AnalyzeResult;
-    mapData: {
-      data: number[][];
-      list: number[];
-      countMap: Map<number, number>;
-    };
-    colorMap: Map<number, string>;
+    mapData: MapData<number>;
+    colorMap: ColorMap<number>;
     mapType: MapType;
     histories: BitGrid[];
     gen: number;
@@ -94,19 +92,19 @@ export class MapCanvasUI {
     const dx = data.bitGridData.minX;
     const dy = data.bitGridData.minY;
 
-    const minValue = mapType === "heat" ? 0 : 1;
-
     const isDot = getIsDot(data);
 
     $showGridCheckbox.disabled = isDot;
 
     const sizePixel = isDot ? 1 : cellSize;
 
-    for (const [y, row] of mapData.data.entries()) {
-      for (const [x, p] of row.entries()) {
-        if (p >= minValue) {
+    const colorList = colorMap.colorList;
+
+    for (const [y, row] of mapData.indexData.entries()) {
+      for (const [x, index] of row.entries()) {
+        if (index !== -1) {
           ctx.beginPath();
-          ctx.fillStyle = colorMap.get(p) ?? "";
+          ctx.fillStyle = colorList[index];
           ctx.rect(
             (x - dx + safeArea) * sizePixel,
             (y - dy + safeArea) * sizePixel,
@@ -117,7 +115,6 @@ export class MapCanvasUI {
         }
       }
     }
-    ctx.fill();
 
     if ($showAnimationCheckbox.checked) {
       const innerCellOffsetPixel = isDot ? 1 : innerCellOffset;
@@ -166,11 +163,7 @@ export class MapCanvasUI {
       y: number;
     },
     data: AnalyzeResult | null,
-    mapData: {
-      data: number[][];
-      list: number[];
-      countMap: Map<number, number>;
-    },
+    mapData: MapData<number>,
   ): { cellData: number; index: number } | undefined {
     if (!data) {
       return undefined;

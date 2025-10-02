@@ -14,7 +14,7 @@ import {
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";
-import { makeColorMap } from "./make-color";
+import { ColorMap } from "./make-color";
 import { FrequencyUI } from "./ui/frequency";
 import { MapCanvasUI } from "./ui/map-canvas-ui";
 
@@ -25,7 +25,7 @@ export class App {
   private valve: Valve;
   private mapType: MapType = "period";
   private colorType: ColorType = "hue";
-  private colorMap: Map<number, string> = new Map();
+  private colorMap!: ColorMap<number>;
   private mapCanvasUI: MapCanvasUI;
   private frequencyUI: FrequencyUI;
   private colorTable: ColorTableUI;
@@ -111,7 +111,7 @@ export class App {
     }
     const mapData = this.getMapData();
     const list = mapData.list;
-    const colorMap = makeColorMap({
+    const colorMap = ColorMap.make({
       list,
       style: (
         {

@@ -6,6 +6,20 @@ import { max, min } from "./collection";
 // reduce allocation
 let statesAlloc = new Uint8Array();
 
+export type MapData<T> = {
+  data: T[][];
+  /**
+   * index to a value
+   */
+  list: T[];
+  /**
+   * -1 for background cell
+   */
+  indexData: number[][];
+  valueToIndexMap: Map<T, number>;
+  countMap: Map<T, number>;
+};
+
 export function getMap({
   width,
   height,
@@ -17,21 +31,9 @@ export function getMap({
   or: BitGrid;
   histories: BitGrid[];
 }): {
-  periodMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  frequencyMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  heatMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
+  periodMap: MapData<number>;
+  frequencyMap: MapData<number>;
+  heatMap: MapData<number>;
   heatInfo: {
     max: number;
     min: number;
@@ -144,31 +146,10 @@ export function getMap({
     }
   }
 
-  const periodCountMap = getCountMap(periodArray);
-  periodCountMap.delete(0);
-
-  const frequencyCountMap = getCountMap(frequencyArray);
-  frequencyCountMap.delete(0);
-
-  const heatCountMap = getCountMap(heatArray);
-  heatCountMap.delete(-1);
-
   return {
-    periodMap: {
-      data: periodArray,
-      list: [...periodCountMap.keys()].sort((a, b) => a - b),
-      countMap: periodCountMap,
-    },
-    frequencyMap: {
-      data: frequencyArray,
-      list: [...frequencyCountMap.keys()].sort((a, b) => a - b),
-      countMap: frequencyCountMap,
-    },
-    heatMap: {
-      data: heatArray,
-      list: [...heatCountMap.keys()].sort((a, b) => a - b),
-      countMap: heatCountMap,
-    },
+    periodMap: getMapData(periodArray, 0),
+    frequencyMap: getMapData(frequencyArray, 0),
+    heatMap: getMapData(heatArray, -1),
     heatInfo: {
       min: min(heatByGeneration),
       max: max(heatByGeneration),
@@ -180,6 +161,33 @@ function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
   const value = array[offset]!;
   const alive = (value & (1 << (BITS_MINUS_1 - u))) !== 0 ? 1 : 0;
   return alive;
+}
+
+function getMapData<T>(data: T[][], background: T): MapData<T> {
+  const countMap = getCountMap(data);
+  countMap.delete(background);
+
+  const list = [...countMap.keys()].sort((a, b) =>
+    a > b ? 1 : a === b ? 0 : -1,
+  );
+
+  const valueToIndexMap = new Map<T, number>();
+
+  for (const [i, value] of list.entries()) {
+    valueToIndexMap.set(value, i);
+  }
+
+  const indexData = data.map((row) =>
+    row.map((value) => valueToIndexMap.get(value) ?? -1),
+  );
+
+  return {
+    data,
+    valueToIndexMap,
+    indexData,
+    list,
+    countMap,
+  };
 }
 
 function getCountMap<T>(map: T[][]): Map<T, number> {
