@@ -74,7 +74,7 @@ describe("analyzeOscillator", () => {
       ).to2dArray()?.array,
     ).toEqual([
       [0, 1, 0],
-      [1, 2, 1],
+      [1, 3, 1],
       [0, 1, 0],
     ]);
   });

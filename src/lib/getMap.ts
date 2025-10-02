@@ -88,7 +88,8 @@ export function getMap({
     // reuse array
     statesAlloc = new Uint8Array(histories.length);
 
-    const signatureList: bigint[] = [];
+    // Use a Set for fast O(1) checking of unique signatures
+    const signatureSet = new Set<bigint>();
 
     for (let i = 0; i < height; i++) {
       const rowIndex = i * width;
@@ -149,28 +150,14 @@ export function getMap({
           periodArrayRow[x] = findPeriodUint8(statesAlloc);
           frequencyArrayRow[x] = frequency;
 
-          let found = false;
-          // FIXME: this is too slow
-          outer: for (const otherSignature of signatureList) {
-            for (let shift = 0; shift < lenHistories; shift++) {
-              const rotated = rotateLeftBigInt(
-                otherSignature,
-                BigInt(lenHistories),
-                BigInt(shift),
-              );
-              if (rotated === signature) {
-                signature = rotated;
-                found = true;
-                break outer;
-              }
-            }
-          }
+          const canonicalSignature = getCanonicalSignature(
+            signature,
+            lenHistories,
+          );
 
-          if (!found) {
-            signatureList.push(signature);
-          }
-
-          signatureArrayRow[x] = signature;
+          // Use the canonical form for storage and uniqueness check
+          signatureArrayRow[x] = canonicalSignature;
+          signatureSet.add(canonicalSignature);
         }
       }
     }
@@ -232,4 +219,21 @@ function getCountMap<T>(map: T[][]): Map<T, number> {
   }
 
   return countMap;
+}
+
+function getCanonicalSignature(
+  signature: bigint,
+  lenHistories: number,
+): bigint {
+  let canonical = signature;
+  const len = BigInt(lenHistories);
+
+  // Check all 'lenHistories' possible shifts (0 to lenHistories - 1)
+  for (let shift = 1; shift < lenHistories; shift++) {
+    const rotated = rotateLeftBigInt(signature, len, BigInt(shift));
+    if (rotated < canonical) {
+      canonical = rotated;
+    }
+  }
+  return canonical;
 }

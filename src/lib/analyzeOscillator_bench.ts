@@ -29,7 +29,7 @@ const cells = parseRLE(str)
   .map((x) => x.position);
 
 const start = performance.now();
-for (let i = 0; i < 2; i++) {
+for (let i = 0; i < 25; i++) {
   const result = analyzeOscillator({
     cells,
     rule: {
