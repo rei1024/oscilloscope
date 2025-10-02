@@ -1,9 +1,11 @@
+import type { MapData } from "../lib/getMap";
+import type { ColorMap } from "../make-color";
 import { displayMapTypeLower, displayMapTypeTitle, type MapType } from "./core";
 
-function createColorTable(
+function createColorTable<T>(
   $colorTable: HTMLElement,
-  map: { data: number[][]; list: number[]; countMap: Map<number, number> },
-  colorMap: Map<number, string>,
+  map: MapData<T>,
+  colorMap: ColorMap<T>,
   mapType: MapType,
 ) {
   const rows: HTMLTableRowElement[] = [];
@@ -31,13 +33,18 @@ function createColorTable(
 
   for (const item of list) {
     const row = document.createElement("tr");
-    const color = colorMap.get(item) ?? "";
+    const color = colorMap.map.get(item) ?? "";
     const $color = document.createElement("td");
     $color.style.backgroundColor = color;
     $color.style.width = "40px";
 
     const $detail = document.createElement("td");
-    $detail.textContent = item.toString();
+    $detail.textContent =
+      typeof item === "number"
+        ? item.toString()
+        : (() => {
+            throw new Error("Internal error");
+          })();
     $detail.style.textAlign = "right";
 
     const $count = document.createElement("td");
@@ -61,11 +68,7 @@ export class ColorTableUI {
     this.$hoverInfo = $hoverInfo;
   }
 
-  setup(
-    map: { data: number[][]; list: number[]; countMap: Map<number, number> },
-    colorMap: Map<number, string>,
-    mapType: MapType,
-  ) {
+  setup<T>(map: MapData<T>, colorMap: ColorMap<T>, mapType: MapType) {
     this.rows = createColorTable(this.$colorTable, map, colorMap, mapType);
   }
 

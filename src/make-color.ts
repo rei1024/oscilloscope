@@ -57,13 +57,8 @@ function hueForPeriodColor(
   return `lch(70% 70 ${value * 360})`;
 }
 
-export function makeColorMap({
-  list,
-  style,
-  hasStatorCell,
-  hasFullPeriodCell,
-}: {
-  list: number[];
+type Input<T> = {
+  list: T[];
   style:
     | "gray"
     | "gray-reverse"
@@ -72,7 +67,14 @@ export function makeColorMap({
     | "heat";
   hasStatorCell: boolean;
   hasFullPeriodCell: boolean;
-}): Map<number, string> {
+};
+
+function makeColorMap({
+  list,
+  style,
+  hasStatorCell,
+  hasFullPeriodCell,
+}: Input<number>): Map<number, string> {
   const len = list.length;
   return new Map(
     list.map((x, index) => {
@@ -108,4 +110,20 @@ export function makeColorMap({
       return [x, color];
     }),
   );
+}
+
+export class ColorMap<T> {
+  /**
+   * value to color
+   */
+  public readonly map: ReadonlyMap<T, string>;
+  public readonly colorList: readonly string[];
+  private constructor(map: ReadonlyMap<T, string>) {
+    this.map = map;
+    this.colorList = [...map.values()];
+  }
+
+  static make(input: Input<number>) {
+    return new ColorMap(makeColorMap(input));
+  }
 }

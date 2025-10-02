@@ -7,6 +7,20 @@ import { max, min } from "./collection";
 // reduce allocation
 let statesAlloc = new Uint8Array();
 
+export type MapData<T> = {
+  readonly data: ReadonlyArray<ReadonlyArray<T>>;
+  /**
+   * index to a value
+   */
+  readonly list: T[];
+  /**
+   * -1 for background cell
+   */
+  readonly indexData: number[][];
+  readonly valueToIndexMap: ReadonlyMap<T, number>;
+  readonly countMap: ReadonlyMap<T, number>;
+};
+
 export function getMap({
   width,
   height,
@@ -20,26 +34,10 @@ export function getMap({
   histories: BitGrid[];
   withSignatureMap: boolean;
 }): {
-  periodMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  frequencyMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  heatMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  signatureMap: {
-    data: bigint[][];
-    list: bigint[];
-    countMap: Map<bigint, number>;
-  } | null;
+  periodMap: MapData<number>;
+  frequencyMap: MapData<number>;
+  heatMap: MapData<number>;
+  signatureMap: MapData<bigint> | null;
   heatInfo: {
     max: number;
     min: number;
@@ -184,45 +182,11 @@ export function getMap({
     }
   }
 
-  const periodCountMap = getCountMap(periodArray);
-  periodCountMap.delete(0);
-
-  const frequencyCountMap = getCountMap(frequencyArray);
-  frequencyCountMap.delete(0);
-
-  const heatCountMap = getCountMap(heatArray);
-  heatCountMap.delete(-1);
-
-  const signatureMap = withSignatureMap
-    ? getCountMap(signatureArray)
-    : new Map<bigint, number>();
-  signatureMap.delete(0n);
-
   return {
-    periodMap: {
-      data: periodArray,
-      list: [...periodCountMap.keys()].sort((a, b) => a - b),
-      countMap: periodCountMap,
-    },
-    frequencyMap: {
-      data: frequencyArray,
-      list: [...frequencyCountMap.keys()].sort((a, b) => a - b),
-      countMap: frequencyCountMap,
-    },
-    heatMap: {
-      data: heatArray,
-      list: [...heatCountMap.keys()].sort((a, b) => a - b),
-      countMap: heatCountMap,
-    },
-    signatureMap: withSignatureMap
-      ? {
-          data: signatureArray,
-          list: [...signatureMap.keys()].sort((a, b) =>
-            a > b ? 1 : a === b ? 0 : -1,
-          ),
-          countMap: signatureMap,
-        }
-      : null,
+    periodMap: getMapData(periodArray, 0),
+    frequencyMap: getMapData(frequencyArray, 0),
+    heatMap: getMapData(heatArray, -1),
+    signatureMap: withSignatureMap ? getMapData(signatureArray, 0n) : null,
     heatInfo: {
       min: min(heatByGeneration),
       max: max(heatByGeneration),
@@ -236,7 +200,37 @@ function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
   return alive;
 }
 
-function getCountMap<T>(map: T[][]): Map<T, number> {
+function getMapData<T>(
+  data: ReadonlyArray<ReadonlyArray<T>>,
+  background: T,
+): MapData<T> {
+  const countMap = getCountMap(data);
+  countMap.delete(background);
+
+  const list = [...countMap.keys()].sort((a, b) =>
+    a > b ? 1 : a === b ? 0 : -1,
+  );
+
+  const valueToIndexMap = new Map<T, number>();
+
+  for (const [i, value] of list.entries()) {
+    valueToIndexMap.set(value, i);
+  }
+
+  const indexData = data.map((row) =>
+    row.map((value) => valueToIndexMap.get(value) ?? -1),
+  );
+
+  return {
+    data,
+    valueToIndexMap,
+    indexData,
+    list,
+    countMap,
+  };
+}
+
+function getCountMap<T>(map: ReadonlyArray<ReadonlyArray<T>>): Map<T, number> {
   const countMap = new Map<T, number>();
   for (const row of map) {
     for (const x of row) {

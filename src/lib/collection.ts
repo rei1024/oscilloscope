@@ -2,7 +2,7 @@
  * maximum
  * @throws if empty
  */
-export function max(array: number[]): number {
+export function max(array: readonly number[]): number {
   if (array.length === 0) {
     throw Error("max: length is 0");
   }
@@ -14,7 +14,7 @@ export function max(array: number[]): number {
  * minimum
  * @throws if empty
  */
-export function min(array: number[]): number {
+export function min(array: readonly number[]): number {
   if (array.length === 0) {
     throw Error("min: length is 0");
   }
@@ -26,7 +26,7 @@ export function min(array: number[]): number {
  * average
  * @throws if empty
  */
-export function average(array: number[]): number {
+export function average(array: readonly number[]): number {
   if (array.length === 0) {
     throw Error("average: length is 0");
   }
@@ -38,7 +38,7 @@ export function average(array: number[]): number {
  * median
  * @throws if empty
  */
-export function median(array: number[]): number {
+export function median(array: readonly number[]): number {
   const len = array.length;
   if (len === 0) {
     throw Error("median: length is 0");
