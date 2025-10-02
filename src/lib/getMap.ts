@@ -7,17 +7,17 @@ import { max, min } from "./collection";
 let statesAlloc = new Uint8Array();
 
 export type MapData<T> = {
-  data: T[][];
+  readonly data: ReadonlyArray<ReadonlyArray<T>>;
   /**
    * index to a value
    */
-  list: T[];
+  readonly list: T[];
   /**
    * -1 for background cell
    */
-  indexData: number[][];
-  valueToIndexMap: Map<T, number>;
-  countMap: Map<T, number>;
+  readonly indexData: number[][];
+  readonly valueToIndexMap: ReadonlyMap<T, number>;
+  readonly countMap: ReadonlyMap<T, number>;
 };
 
 export function getMap({
@@ -163,7 +163,10 @@ function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
   return alive;
 }
 
-function getMapData<T>(data: T[][], background: T): MapData<T> {
+function getMapData<T>(
+  data: ReadonlyArray<ReadonlyArray<T>>,
+  background: T,
+): MapData<T> {
   const countMap = getCountMap(data);
   countMap.delete(background);
 
@@ -190,7 +193,7 @@ function getMapData<T>(data: T[][], background: T): MapData<T> {
   };
 }
 
-function getCountMap<T>(map: T[][]): Map<T, number> {
+function getCountMap<T>(map: ReadonlyArray<ReadonlyArray<T>>): Map<T, number> {
   const countMap = new Map<T, number>();
   for (const row of map) {
     for (const x of row) {
