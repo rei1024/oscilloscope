@@ -114,11 +114,20 @@ describe("analyzeOscillator", () => {
       rule: conwayLife,
       maxGeneration: 1000,
     });
-    // expect(
-    //   CACellList.from2dArray(
-    //     result.signatureMap.data.map((row) => row.map((x) => Number(x))),
-    //   ).to2dArray()?.array,
-    // ).toEqual([]); // TODO
+    expect(
+      CACellList.from2dArray(
+        result.signatureMap!.data.map((row) => row.map((x) => Number(x))),
+      ).to2dArray()?.array,
+    ).toEqual([
+      [0, 0, 0, 3, 0, 0, 0, 0],
+      [0, 0, 3, 7, 7, 0, 0, 0],
+      [0, 3, 5, 7, 1, 0, 0, 0],
+      [3, 7, 7, 0, 0, 1, 7, 0],
+      [0, 7, 1, 0, 0, 7, 7, 3],
+      [0, 0, 0, 1, 7, 5, 3, 0],
+      [0, 0, 0, 7, 7, 3, 0, 0],
+      [0, 0, 0, 0, 3, 0, 0, 0],
+    ]);
   });
 
   it("analyze Kok's galaxy", () => {
