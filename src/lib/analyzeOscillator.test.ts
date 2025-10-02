@@ -96,7 +96,7 @@ describe("analyzeOscillator", () => {
 
     expect(
       CACellList.from2dArray(
-        result.signatureMap.data.map((row) => row.map((x) => Number(x))),
+        result.signatureMap!.data.map((row) => row.map((x) => Number(x))),
       ).to2dArray()?.array,
     ).toEqual([
       [0, 1, 0],
