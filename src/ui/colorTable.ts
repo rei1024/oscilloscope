@@ -7,6 +7,7 @@ function createColorTable<T>(
   map: MapData<T>,
   colorMap: ColorMap<T>,
   mapType: MapType,
+  historyLength: number,
 ) {
   const rows: HTMLTableRowElement[] = [];
 
@@ -42,9 +43,11 @@ function createColorTable<T>(
     $detail.textContent =
       typeof item === "number"
         ? item.toString()
-        : (() => {
-            throw new Error("Internal error");
-          })();
+        : typeof item === "bigint"
+          ? item.toString(2).padStart(historyLength, "0")
+          : (() => {
+              throw new Error("Internal error");
+            })();
     $detail.style.textAlign = "right";
 
     const $count = document.createElement("td");
@@ -63,19 +66,32 @@ export class ColorTableUI {
   private $colorTable: HTMLElement;
   private $hoverInfo: HTMLElement;
   private rows: HTMLTableRowElement[] = [];
+  private historyLength: number = 0;
   constructor($colorTable: HTMLElement, $hoverInfo: HTMLElement) {
     this.$colorTable = $colorTable;
     this.$hoverInfo = $hoverInfo;
   }
 
-  setup<T>(map: MapData<T>, colorMap: ColorMap<T>, mapType: MapType) {
-    this.rows = createColorTable(this.$colorTable, map, colorMap, mapType);
+  setup<T>(
+    map: MapData<T>,
+    colorMap: ColorMap<T>,
+    mapType: MapType,
+    historyLength: number,
+  ) {
+    this.rows = createColorTable(
+      this.$colorTable,
+      map,
+      colorMap,
+      mapType,
+      historyLength,
+    );
+    this.historyLength = historyLength;
   }
 
   renderColorTableHighlight(
     data: {
       index: number;
-      cellData: number;
+      cellData: unknown;
     } | null,
     mapType: MapType,
   ) {
@@ -87,7 +103,16 @@ export class ColorTableUI {
       this.rows[data.index].style.backgroundColor = "#0000FF22";
 
       this.$hoverInfo.textContent =
-        "  " + displayMapTypeLower(mapType) + " = " + data.cellData;
+        "  " +
+        displayMapTypeLower(mapType) +
+        " = " +
+        (typeof data.cellData === "number"
+          ? data.cellData.toString()
+          : typeof data.cellData === "bigint"
+            ? data.cellData.toString(2).padStart(this.historyLength, "0")
+            : (() => {
+                throw new Error("Internal error");
+              })());
     } else {
       this.$hoverInfo.textContent = " "; // 崩れないように
     }

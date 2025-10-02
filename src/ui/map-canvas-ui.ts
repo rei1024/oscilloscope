@@ -161,8 +161,8 @@ export class MapCanvasUI {
       y: number;
     },
     data: AnalyzeResult | null,
-    mapData: MapData<number>,
-  ): { cellData: number; index: number } | undefined {
+    mapData: MapData<unknown>,
+  ): { cellData: unknown; index: number } | undefined {
     if (!data) {
       return undefined;
     }

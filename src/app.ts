@@ -63,7 +63,7 @@ export class App {
 
     this.mapCanvasUI.render({
       data: this.data,
-      mapData: this.getMapData(),
+      mapData: this.getMapData()!,
       colorMap: this.colorMap,
       histories: this.histories,
       gen: this.gen,
@@ -98,7 +98,12 @@ export class App {
 
     this.setupColorMap();
     this.updateFrequency();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+    this.colorTable.setup(
+      this.getMapData()!,
+      this.colorMap,
+      this.mapType,
+      this.histories.length,
+    );
 
     this.render();
   }
@@ -108,10 +113,10 @@ export class App {
     if (data == null) {
       return;
     }
-    const mapData = this.getMapData();
+    const mapData = this.getMapData()!;
     const list = mapData.list;
     const colorMap = ColorMap.make({
-      list,
+      list: list as (number | bigint)[],
       style: (
         {
           period:
@@ -119,6 +124,8 @@ export class App {
           frequency:
             this.colorType === "grayscale" ? "gray" : "hue-for-frequency",
           heat: "heat",
+          signature:
+            this.colorType === "grayscale" ? "gray" : "hue-for-frequency",
         } as const
       )[this.mapType],
       hasStatorCell: data.periodMap.list.some((x) => x === 1),
@@ -142,6 +149,9 @@ export class App {
       case "period": {
         return data.periodMap;
       }
+      case "signature": {
+        return data.signatureMap;
+      }
     }
   }
 
@@ -153,7 +163,7 @@ export class App {
     const data = this.mapCanvasUI.getMapIndexAt(
       position,
       this.data,
-      this.getMapData(),
+      this.getMapData()!,
     );
     this.colorTable.renderColorTableHighlight(data ?? null, this.mapType);
   }
@@ -166,7 +176,12 @@ export class App {
     }
     this.mapType = mapType;
     this.setupColorMap();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+    this.colorTable.setup(
+      this.getMapData()!,
+      this.colorMap,
+      this.mapType,
+      this.histories!.length,
+    );
 
     this.render();
   }
@@ -174,7 +189,12 @@ export class App {
   updateColor(color: ColorType) {
     this.colorType = color;
     this.setupColorMap();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+    this.colorTable.setup(
+      this.getMapData()!,
+      this.colorMap,
+      this.mapType,
+      this.histories!.length,
+    );
 
     this.render();
   }
