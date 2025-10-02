@@ -11,6 +11,7 @@ import {
   $animFrequency,
   $animFrequencyLabel,
   $colorTable,
+  $colorSelect,
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";
@@ -104,6 +105,9 @@ export class App {
       this.mapType,
       this.histories.length,
     );
+
+    const $signature = $colorSelect.find((x) => x.value === "signature");
+    $signature!.style.display = data.frequencyMap == null ? "none" : "";
 
     this.render();
   }

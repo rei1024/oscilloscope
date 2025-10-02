@@ -141,7 +141,7 @@ export type AnalyzeResult = {
    *
    * 0 for the empty cell
    */
-  frequencyMap: MapData<number>;
+  frequencyMap: MapData<number> | null;
   /**
    * Heat map
    *
