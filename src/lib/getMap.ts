@@ -182,8 +182,8 @@ function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
   return alive;
 }
 
-function getCountMap(map: number[][]): Map<number, number> {
-  const countMap = new Map<number, number>();
+function getCountMap<T>(map: T[][]): Map<T, number> {
+  const countMap = new Map<T, number>();
   for (const row of map) {
     for (const x of row) {
       const currentCount = countMap.get(x);
