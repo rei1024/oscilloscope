@@ -138,7 +138,7 @@ export type AnalyzeResult = {
     data: bigint[][];
     list: bigint[];
     countMap: Map<bigint, number>;
-  };
+  } | null;
 };
 
 export function bitGridToData(bitGrid: BitGrid): BitGridData {
@@ -199,6 +199,7 @@ export function analyzeOscillator(
     height,
     or,
     histories: historiesBitGrid,
+    withSignatureMap: true,
   });
 
   const heat =

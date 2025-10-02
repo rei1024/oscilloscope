@@ -24,12 +24,12 @@ o3bo8bo4bobo12bobo8bobo$24bo16b2o19bo3bo$15bo3bo3bo17b2o7b2o10bo12b2o$
 2bo6bo7bo3bo$3bobo39b2o7bo9bobo$3bo46bo2bo$2b2o46b2o!
 `;
 
-const cells = parseRLE(str)
+const cells = parseRLE(p15240)
   .cells.filter((x) => x.state === 1)
   .map((x) => x.position);
 
 const start = performance.now();
-for (let i = 0; i < 25; i++) {
+for (let i = 0; i < 1; i++) {
   const result = analyzeOscillator({
     cells,
     rule: {
@@ -44,6 +44,6 @@ for (let i = 0; i < 25; i++) {
 }
 
 const end = performance.now();
-console.log(end - start);
+console.log((end - start).toFixed(3) + " ms");
 
 // npx vite-node src/lib/analyzeOscillator_bench.ts

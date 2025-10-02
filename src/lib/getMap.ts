@@ -11,11 +11,13 @@ export function getMap({
   height,
   or,
   histories,
+  withSignatureMap,
 }: {
   width: number;
   height: number;
   or: BitGrid;
   histories: BitGrid[];
+  withSignatureMap: boolean;
 }): {
   periodMap: {
     data: number[][];
@@ -36,7 +38,7 @@ export function getMap({
     data: bigint[][];
     list: bigint[];
     countMap: Map<bigint, number>;
-  };
+  } | null;
 } {
   const periodArray = Array(height)
     .fill(0)
@@ -91,6 +93,8 @@ export function getMap({
     // Use a Set for fast O(1) checking of unique signatures
     const signatureSet = new Set<bigint>();
 
+    const lenHistories = histories.length;
+
     for (let i = 0; i < height; i++) {
       const rowIndex = i * width;
       const y = i;
@@ -120,7 +124,6 @@ export function getMap({
           let prevCell = firstCell;
           let frequency = 0;
           let signature = 0n;
-          const lenHistories = histories.length;
           for (let index = 0; index < lenHistories; index++) {
             const array = histories[index].asInternalUint32Array();
             const cell = getAlive(array, offset, u);
@@ -129,10 +132,15 @@ export function getMap({
             }
             prevCell = cell;
             statesAlloc[index] = cell;
-            signature <<= 1n;
+            if (withSignatureMap) {
+              signature <<= 1n;
+            }
+
             if (cell !== 0) {
               frequency++;
-              signature |= 1n;
+              if (withSignatureMap) {
+                signature |= 1n;
+              }
             }
           }
 
@@ -146,18 +154,23 @@ export function getMap({
           ) {
             heat++;
           }
+
+          const periodOfCell = findPeriodUint8(statesAlloc);
           heatArrayRow[x] = heat;
-          periodArrayRow[x] = findPeriodUint8(statesAlloc);
+          periodArrayRow[x] = periodOfCell;
           frequencyArrayRow[x] = frequency;
 
-          const canonicalSignature = getCanonicalSignature(
-            signature,
-            lenHistories,
-          );
+          if (withSignatureMap) {
+            const canonicalSignature = getCanonicalSignature(
+              signature,
+              lenHistories,
+              periodOfCell,
+            );
 
-          // Use the canonical form for storage and uniqueness check
-          signatureArrayRow[x] = canonicalSignature;
-          signatureSet.add(canonicalSignature);
+            // Use the canonical form for storage and uniqueness check
+            signatureArrayRow[x] = canonicalSignature;
+            signatureSet.add(canonicalSignature);
+          }
         }
       }
     }
@@ -172,7 +185,9 @@ export function getMap({
   const heatCountMap = getCountMap(heatArray);
   heatCountMap.delete(-1);
 
-  const signatureMap = getCountMap(signatureArray);
+  const signatureMap = withSignatureMap
+    ? getCountMap(signatureArray)
+    : new Map<bigint, number>();
   signatureMap.delete(0n);
 
   return {
@@ -191,11 +206,15 @@ export function getMap({
       list: [...heatCountMap.keys()].sort((a, b) => a - b),
       countMap: heatCountMap,
     },
-    signatureMap: {
-      data: signatureArray,
-      list: [...signatureMap.keys()], // TODO sort
-      countMap: signatureMap,
-    },
+    signatureMap: withSignatureMap
+      ? {
+          data: signatureArray,
+          list: [...signatureMap.keys()].sort((a, b) =>
+            a > b ? 1 : a === b ? 0 : -1,
+          ),
+          countMap: signatureMap,
+        }
+      : null,
   };
 }
 
@@ -224,12 +243,15 @@ function getCountMap<T>(map: T[][]): Map<T, number> {
 function getCanonicalSignature(
   signature: bigint,
   lenHistories: number,
+  periodOfCell: number,
 ): bigint {
   let canonical = signature;
   const len = BigInt(lenHistories);
 
-  // Check all 'lenHistories' possible shifts (0 to lenHistories - 1)
-  for (let shift = 1; shift < lenHistories; shift++) {
+  // We only need to check shifts up to the true period P (since shift P = shift 0).
+  const maxShift = Math.min(periodOfCell, lenHistories);
+
+  for (let shift = 1; shift < maxShift; shift++) {
     const rotated = rotateLeftBigInt(signature, len, BigInt(shift));
     if (rotated < canonical) {
       canonical = rotated;
