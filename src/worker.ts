@@ -2,6 +2,8 @@ import { analyzeOscillator, type AnalyzeResult } from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { parseRule, type GridParameter } from "@ca-ts/rule";
 import { MaxGenerationError } from "./lib/runOscillator";
+import { WorldSizeError } from "./lib/WorldWithHistory";
+import { getErrorMessageForParseRule } from "./lib/rule-error";
 
 export type WorkerRequestMessage = {
   kind: "request-analyze";
@@ -79,7 +81,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     console.error(error);
     return {
       kind: "response-error",
-      message: "Unsupported rule",
+      message: getErrorMessageForParseRule(error),
     };
   }
 
@@ -151,6 +153,13 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     }
   }
 
+  if (rule.type === "hexagonal-int") {
+    return {
+      kind: "response-error",
+      message: `Hexagonal neighborhood isotropic non-totalistic rule is not supported`,
+    };
+  }
+
   if (rule.type === "map") {
     if (rule.neighbors !== "moore") {
       return {
@@ -173,12 +182,14 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       message: "Empty pattern",
     };
   }
+
   const maxGeneration = 50_000;
   try {
     const result = analyzeOscillator({
       cells: cells,
       rule: rule,
       maxGeneration: maxGeneration,
+      maxSize: 8192,
     });
     return { kind: "response-analyzed", data: result };
   } catch (error) {
@@ -187,6 +198,12 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       return {
         kind: "response-error",
         message: `maximum period is ${maxGeneration.toLocaleString()}`,
+      };
+    }
+    if (error instanceof WorldSizeError) {
+      return {
+        kind: "response-error",
+        message: error.message,
       };
     }
     return {

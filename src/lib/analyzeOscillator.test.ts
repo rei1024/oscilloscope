@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { analyzeOscillator } from "./analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { CACellList } from "@ca-ts/pattern";
+import { parseRule } from "@ca-ts/rule";
 
 const conwayLife = {
   type: "outer-totalistic" as const,
@@ -18,6 +19,30 @@ function rleToCells(rle: string) {
 }
 
 describe("analyzeOscillator", () => {
+  it("analyze block", () => {
+    const result = analyzeOscillator({
+      cells: rleToCells(`2o$2o`),
+      rule: conwayLife,
+      maxGeneration: 1,
+    });
+
+    expect(result.period).toEqual(1);
+    expect(result.volatility).toEqual(0);
+    expect(result.stator).toEqual(4);
+    expect(result.rotor).toEqual(0);
+    expect(result.strictVolatility).toEqual(1);
+    expect(result.boundingBox).toEqual({ sizeX: 2, sizeY: 2 });
+    expect(result.population).toEqual({
+      min: 4,
+      max: 4,
+      avg: 4,
+      median: 4,
+    });
+
+    expect(result.heat).toEqual(0);
+    expect(result.temperature).toEqual(0);
+  });
+
   it("analyze blinker", () => {
     const result = analyzeOscillator({
       cells: rleToCells(`ooo`),
@@ -40,6 +65,7 @@ describe("analyzeOscillator", () => {
 
     expect(result.heat).toEqual(4);
     expect(result.temperature).toEqual(0.8);
+    expect(result.rotorTemperature).toEqual(1);
 
     // HACK
     expect(
@@ -117,7 +143,10 @@ describe("analyzeOscillator", () => {
     });
 
     expect(result.heat).toEqual(39);
+    expect(result.heatMax).toEqual(84);
+    expect(result.heatMin).toEqual(16);
     expect(result.temperature.toFixed(2)).toEqual("0.34");
+    expect(result.rotorTemperature.toFixed(2)).toEqual("0.34");
   });
 
   it("analyze p60 shuttle", () => {
@@ -171,6 +200,8 @@ o2b2o$10bo15b3o2bo$24bo4bobo$13b2o9bob3obo$13bo11bo2bo$14b3o9b2o2bo$
     expect(result.strictVolatility.toFixed(2)).toEqual("0.72");
     expect(result.boundingBox).toEqual({ sizeX: 32, sizeY: 21 });
     expect(result.heat.toFixed(1)).toEqual("33.5");
+    expect(result.heatMin).toEqual(4);
+    expect(result.heatMax).toEqual(66);
   });
 
   // from https://conwaylife.com/forums/viewtopic.php?p=196346#p196346
@@ -222,5 +253,38 @@ o$22b2o3bo$21bo$21b2obo$20bo$19b5o$19bo4bo$18b3ob3o$18bob5o$18bo$20bo$
     expect(result.period).toEqual(6);
     expect(result.isSpaceship).toEqual(true);
     expect(result.speed).toEqual({ dx: -1, dy: -2 });
+    expect(result.boundingBoxMovingEncloses).toEqual({ sizeX: 31, sizeY: 79 });
+    expect(result.boundingBoxMaxArea.size).toEqual({ sizeX: 31, sizeY: 79 });
+    expect(result.boundingBoxMinArea.size).toEqual({ sizeX: 30, sizeY: 79 });
+  });
+
+  it(`analyze RRO`, () => {
+    // https://conwaylife.com/forums/viewtopic.php?p=61192#p61192
+    const ruleString = `B2ce3aejk4aqrtw5-acr6cen78/S12an3cjqy4-ey5akqry6ekn7e8`;
+    const str = `x = 3, y = 2, rule = B2ce3aejk4aqrtw5-acr6cen78/S12an3cjqy4-ey5akqry6ekn7e8
+2o$obo!`;
+    const rule = parseRule(ruleString);
+    if (rule.type !== "int") {
+      throw new Error("rule");
+    }
+    const result = analyzeOscillator({
+      cells: rleToCells(str),
+      rule,
+      maxGeneration: 32,
+    });
+
+    expect(result.period).toEqual(32);
+    expect(result.volatility).toEqual(1);
+    expect(result.strictVolatility).toEqual(1);
+    expect(result.stator).toEqual(0);
+    expect(result.rotor).toEqual(44);
+
+    expect(result.boundingBox).toEqual({ sizeX: 7, sizeY: 7 });
+    expect(result.boundingBoxMinArea.size).toEqual({ sizeX: 3, sizeY: 2 });
+    expect(result.boundingBoxMaxArea.size).toEqual({ sizeX: 3, sizeY: 6 });
+    expect(result.boundingBoxMovingEncloses).toEqual({
+      sizeX: 6,
+      sizeY: 6,
+    });
   });
 });

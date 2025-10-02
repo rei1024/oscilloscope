@@ -38,6 +38,7 @@ export class App {
           return;
         }
         this.gen = (this.gen + num) % this.histories.length;
+        this.render();
       },
       { frequency: 20 },
     );
@@ -50,13 +51,6 @@ export class App {
     );
 
     this.colorTable = new ColorTableUI($colorTable, $hoverInfo);
-
-    const update = () => {
-      this.render();
-      requestAnimationFrame(update);
-    };
-
-    update();
   }
 
   render() {
@@ -106,10 +100,13 @@ export class App {
     this.setupColorMap();
     this.updateFrequency();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
   }
 
   private setupColorMap() {
-    if (this.data == null) {
+    const data = this.data;
+    if (data == null) {
       return;
     }
     const mapData = this.getMapData();
@@ -125,7 +122,8 @@ export class App {
           heat: "heat",
         } as const
       )[this.mapType],
-      hasStatorCell: this.data.periodMap.list.some((x) => x === 1),
+      hasStatorCell: data.periodMap.list.some((x) => x === 1),
+      hasFullPeriodCell: data.periodMap.list.some((x) => x === data.period),
     });
     this.colorMap = colorMap;
   }
@@ -170,11 +168,19 @@ export class App {
     this.mapType = mapType;
     this.setupColorMap();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
   }
 
   updateColor(color: ColorType) {
     this.colorType = color;
     this.setupColorMap();
     this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+
+    this.render();
+  }
+
+  valveEnable(enable: boolean) {
+    this.valve.disabled = !enable;
   }
 }

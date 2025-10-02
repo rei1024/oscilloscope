@@ -1,7 +1,7 @@
 {
   "name": "oscilloscope",
   "private": true,
-  "version": "1.3.1",
+  "version": "1.4.2",
   "type": "module",
   "repository": {
     "url": "https://github.com/rei1024/oscilloscope"
@@ -21,12 +21,12 @@
     "fmt:check": "prettier --check ."
   },
   "devDependencies": {
-    "@ca-ts/algo": "npm:@jsr/ca-ts__algo@^0.12.0",
+    "@ca-ts/algo": "npm:@jsr/ca-ts__algo@^0.12.1",
     "@ca-ts/rle": "npm:@jsr/ca-ts__rle@^0.11.3",
-    "@ca-ts/rule": "npm:@jsr/ca-ts__rule@^0.14.0",
+    "@ca-ts/rule": "npm:@jsr/ca-ts__rule@^0.16.0",
     "@ca-ts/pattern": "npm:@jsr/ca-ts__pattern@^0.2.0",
     "prettier": "3.6.2",
-    "typescript": "^5.9.2",
+    "typescript": "^5.9.3",
     "vite": "^7.1.7",
     "vitest": "^3.2.4"
   }

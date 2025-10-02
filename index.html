@@ -179,10 +179,10 @@
 
           <label
             style="user-select: none; margin-right: 8px"
-            for="dark-background-checkbox"
+            for="dark-mode-checkbox"
           >
-            <input id="dark-background-checkbox" type="checkbox" />
-            Dark background
+            <input id="dark-mode-checkbox" type="checkbox" />
+            Dark mode
           </label>
         </div>
 
@@ -200,7 +200,7 @@
           <pre
             style="display: inline"
           ><span id="generation" class="tabular-nums"></span></pre>
-          <pre style="display: inline" id="hover-info"><span></span></pre>
+          <pre style="display: inline" id="hover-info"><span>　</span></pre>
         </div>
         <canvas id="canvas"></canvas>
         <details open>
@@ -219,7 +219,7 @@
         padding-left: 24px;
       }
     </style>
-    <footer>
+    <footer style="margin-bottom: 16px">
       <section style="margin-bottom: 20px">
         <h2>Note</h2>
         <ul>
@@ -237,6 +237,7 @@
             spaceship.
           </li>
           <li>The maximum period that can be analyzed is 50,000.</li>
+          <li>The maximum world size is 8192x8192.</li>
         </ul>
       </section>
       <section>
