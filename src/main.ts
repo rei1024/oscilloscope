@@ -13,6 +13,7 @@ import {
   $outputTable,
   $showAnimationCheckbox,
   $showGridCheckbox,
+  $withSignatureMap,
 } from "./bind";
 import { setDataTable } from "./ui/dataTable";
 
@@ -76,7 +77,7 @@ $analyzeButton.addEventListener("click", () => {
     kind: "request-analyze",
     rle: $input.value,
     analyzeConfig: {
-      withSignatureMap: true,
+      withSignatureMap: $withSignatureMap.checked,
     },
   });
 });

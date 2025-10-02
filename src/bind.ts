@@ -14,6 +14,10 @@ export const $mapTypeSelect = [
   ...document.querySelectorAll('[name="map-type-select"]'),
 ] as HTMLInputElement[];
 
+export const $mapSignatureLabel = $(
+  "#map-signature-select-label",
+) as HTMLElement;
+
 export const $colorSelectContainer = $(
   "#color-select-container",
 ) as HTMLElement;
@@ -35,6 +39,9 @@ export const $dataBox = $("#data-box") as HTMLElement;
 export const $outputTable = $("#output-table") as HTMLTableElement;
 
 export const $input = $("#input") as HTMLTextAreaElement;
+
+export const $withSignatureMap = $("#with-signature-map") as HTMLInputElement;
+
 export const $analyzeButton = $("#analyze") as HTMLButtonElement;
 
 export const $exampleOscillators = $(
