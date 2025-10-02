@@ -72,7 +72,13 @@ $analyzeButton.addEventListener("click", () => {
   analyzingDelayTimeoutId = setTimeout(() => {
     $analyzeButton.textContent = "Analyzing";
   }, 200);
-  post({ kind: "request-analyze", rle: $input.value });
+  post({
+    kind: "request-analyze",
+    rle: $input.value,
+    analyzeConfig: {
+      withSignatureMap: true,
+    },
+  });
 });
 
 $animFrequency.addEventListener("input", () => {

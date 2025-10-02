@@ -204,8 +204,13 @@ function getSpeed(
   };
 }
 
+export type AnalyzeOscillatorConfig = {
+  withSignatureMap: boolean;
+};
+
 export function analyzeOscillator(
   runConfig: RunOscillatorConfig,
+  analyzeConfig?: AnalyzeOscillatorConfig,
 ): AnalyzeResult {
   const { world } = runOscillator(runConfig);
 
@@ -233,7 +238,7 @@ export function analyzeOscillator(
     height,
     or,
     histories: historiesBitGrid,
-    withSignatureMap: true,
+    withSignatureMap: analyzeConfig?.withSignatureMap ?? true,
   });
 
   const heat =
