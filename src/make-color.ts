@@ -117,7 +117,7 @@ export class ColorMap<T> {
    * value to color
    */
   public readonly map: ReadonlyMap<T, string>;
-  public readonly colorList: string[];
+  public readonly colorList: readonly string[];
   private constructor(map: ReadonlyMap<T, string>) {
     this.map = map;
     this.colorList = [...map.values()];
