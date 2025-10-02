@@ -98,7 +98,9 @@ export class App {
 
     this.frequencyUI.setup(data);
 
+    // Set before setupColor
     $mapSignatureLabel.style.display = data.signatureMap == null ? "none" : "";
+    // fallback to period map
     if (data.signatureMap == null && this.mapType === "signature") {
       const period = $mapTypeSelect.find((x) => x.value === "period");
       if (period) {
@@ -107,15 +109,8 @@ export class App {
       this.mapType = "period";
     }
 
-    this.setupColorMap();
     this.updateFrequency();
-    this.colorTable.setup(
-      this.getMapData()!,
-      this.colorMap,
-      this.mapType,
-      this.histories.length,
-    );
-
+    this.setupColor();
     this.render();
   }
 
@@ -186,19 +181,21 @@ export class App {
       $colorSelectContainer.style.display = "";
     }
     this.mapType = mapType;
-    this.setupColorMap();
-    this.colorTable.setup(
-      this.getMapData()!,
-      this.colorMap,
-      this.mapType,
-      this.histories!.length,
-    );
-
+    this.setupColor();
     this.render();
   }
 
   updateColor(color: ColorType) {
     this.colorType = color;
+    this.setupColor();
+    this.render();
+  }
+
+  valveEnable(enable: boolean) {
+    this.valve.disabled = !enable;
+  }
+
+  private setupColor() {
     this.setupColorMap();
     this.colorTable.setup(
       this.getMapData()!,
@@ -206,11 +203,5 @@ export class App {
       this.mapType,
       this.histories!.length,
     );
-
-    this.render();
-  }
-
-  valveEnable(enable: boolean) {
-    this.valve.disabled = !enable;
   }
 }
