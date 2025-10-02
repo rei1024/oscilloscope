@@ -63,14 +63,12 @@ export class MapCanvasUI {
     data,
     mapData,
     colorMap,
-    mapType,
     histories,
     gen,
   }: {
     data: AnalyzeResult;
-    mapData: MapData<number>;
-    colorMap: ColorMap<number>;
-    mapType: MapType;
+    mapData: MapData<unknown>;
+    colorMap: ColorMap<unknown>;
     histories: BitGrid[];
     gen: number;
   }) {

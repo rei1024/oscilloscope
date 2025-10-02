@@ -25,7 +25,7 @@ export class App {
   private valve: Valve;
   private mapType: MapType = "period";
   private colorType: ColorType = "hue";
-  private colorMap!: ColorMap<number>;
+  private colorMap!: ColorMap<unknown>;
   private mapCanvasUI: MapCanvasUI;
   private frequencyUI: FrequencyUI;
   private colorTable: ColorTableUI;
@@ -65,7 +65,6 @@ export class App {
       data: this.data,
       mapData: this.getMapData(),
       colorMap: this.colorMap,
-      mapType: this.mapType,
       histories: this.histories,
       gen: this.gen,
     });
