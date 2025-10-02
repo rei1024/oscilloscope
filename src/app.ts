@@ -65,7 +65,7 @@ export class App {
 
     this.mapCanvasUI.render({
       data: this.data,
-      mapData: this.getMapData()!,
+      mapData: this.getMapData(),
       colorMap: this.colorMap,
       histories: this.histories,
       gen: this.gen,
@@ -119,7 +119,7 @@ export class App {
     if (data == null) {
       return;
     }
-    const mapData = this.getMapData()!;
+    const mapData = this.getMapData();
     const list = mapData.list;
     const colorMap = ColorMap.make({
       list: list as (number | bigint)[],
@@ -143,7 +143,7 @@ export class App {
   private getMapData() {
     const data = this.data;
     if (data == null) {
-      throw null;
+      throw new Error("Internal error");
     }
     switch (this.mapType) {
       case "frequency": {
@@ -156,6 +156,9 @@ export class App {
         return data.periodMap;
       }
       case "signature": {
+        if (!data.signatureMap) {
+          throw new Error("Internal error");
+        }
         return data.signatureMap;
       }
     }
@@ -169,7 +172,7 @@ export class App {
     const data = this.mapCanvasUI.getMapIndexAt(
       position,
       this.data,
-      this.getMapData()!,
+      this.getMapData(),
     );
     this.colorTable.renderColorTableHighlight(data ?? null, this.mapType);
   }
@@ -198,7 +201,7 @@ export class App {
   private setupColor() {
     this.setupColorMap();
     this.colorTable.setup(
-      this.getMapData()!,
+      this.getMapData(),
       this.colorMap,
       this.mapType,
       this.histories!.length,
