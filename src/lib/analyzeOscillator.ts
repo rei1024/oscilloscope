@@ -148,6 +148,9 @@ export type AnalyzeResult = {
    *  -1 for the empty cell
    */
   heatMap: MapData<number>;
+  /**
+   * Signature map
+   */
   signatureMap: MapData<bigint> | null;
   /**
    * For omnifrequency
@@ -190,6 +193,9 @@ export type AnalyzeOscillatorConfig = {
   withSignatureMap: boolean;
 };
 
+/**
+ * Analyze an oscillator or a spaceship.
+ */
 export function analyzeOscillator(
   runConfig: RunOscillatorConfig,
   analyzeConfig?: AnalyzeOscillatorConfig,
