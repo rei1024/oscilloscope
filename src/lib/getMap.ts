@@ -100,9 +100,6 @@ export function getMap({
     // reuse array
     statesAlloc = new Uint8Array(histories.length);
 
-    // Use a Set for fast O(1) checking of unique signatures
-    const signatureSet = new Set<bigint>();
-
     const lenHistories = histories.length;
 
     for (let i = 0; i < height; i++) {
@@ -181,7 +178,6 @@ export function getMap({
 
             // Use the canonical form for storage and uniqueness check
             signatureArrayRow[x] = canonicalSignature;
-            signatureSet.add(canonicalSignature);
           }
         }
       }
