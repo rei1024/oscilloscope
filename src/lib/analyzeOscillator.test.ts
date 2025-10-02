@@ -77,7 +77,7 @@ describe("analyzeOscillator", () => {
     ]);
 
     expect(
-      CACellList.from2dArray(result.frequencyMap.data).to2dArray()?.array,
+      CACellList.from2dArray(result.frequencyMap!.data).to2dArray()?.array,
     ).toEqual([
       [0, 1, 0],
       [1, 2, 1],
