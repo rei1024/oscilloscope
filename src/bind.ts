@@ -40,8 +40,6 @@ export const $outputTable = $("#output-table") as HTMLTableElement;
 
 export const $input = $("#input") as HTMLTextAreaElement;
 
-export const $withSignatureMap = $("#with-signature-map") as HTMLInputElement;
-
 export const $analyzeButton = $("#analyze") as HTMLButtonElement;
 
 export const $exampleOscillators = $(

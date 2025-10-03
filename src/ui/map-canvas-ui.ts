@@ -67,7 +67,7 @@ export class MapCanvasUI {
     gen,
   }: {
     data: AnalyzeResult;
-    mapData: MapData<unknown>;
+    mapData: MapData<unknown> | null;
     colorMap: ColorMap<unknown>;
     histories: BitGrid[];
     gen: number;
@@ -78,6 +78,10 @@ export class MapCanvasUI {
     } else {
       ctx.resetTransform();
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
+
+    if (mapData == null) {
+      return;
     }
 
     const isDarkMode = $darkModeCheckbox.checked;

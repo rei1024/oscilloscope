@@ -5,7 +5,6 @@ import {
   $animFrequency,
   $canvas,
   $colorSelect,
-  $darkModeCheckbox,
   $exampleOscillators,
   $input,
   $mapTypeSelect,
@@ -13,7 +12,6 @@ import {
   $outputTable,
   $showAnimationCheckbox,
   $showGridCheckbox,
-  $withSignatureMap,
 } from "./bind";
 import { setDataTable } from "./ui/dataTable";
 
@@ -36,7 +34,7 @@ const worker = new MyWorker();
 
 const app = new App($canvas);
 
-function post(req: WorkerRequestMessage) {
+export function post(req: WorkerRequestMessage) {
   worker.postMessage(req);
 }
 
@@ -53,15 +51,27 @@ worker.addEventListener("message", (e) => {
     clearTimeout(analyzingDelayTimeoutId);
   }
   $analyzeButton.textContent = "Analyze";
-  if (message.kind === "response-error") {
-    $message.style.display = "block";
-    $message.textContent = "Error: " + message.message;
-    $message.style.backgroundColor = "#fecaca";
-  } else {
-    $outputTable.style.display = "block";
-    const data = message.data;
-    setDataTable($outputTable, data);
-    app.setup(data);
+  switch (message.kind) {
+    case "response-error": {
+      $message.style.display = "block";
+      $message.textContent = "Error: " + message.message;
+      $message.style.backgroundColor = "#fecaca";
+      break;
+    }
+    case "response-analyzed": {
+      $outputTable.style.display = "block";
+      const data = message.data;
+      setDataTable($outputTable, data);
+      app.setup(data);
+      break;
+    }
+    case "response-signature": {
+      app.onSignatureMap(message.signature);
+      break;
+    }
+    default: {
+      throw new Error("Internal");
+    }
   }
 });
 
@@ -76,9 +86,7 @@ $analyzeButton.addEventListener("click", () => {
   post({
     kind: "request-analyze",
     rle: $input.value,
-    analyzeConfig: {
-      withSignatureMap: $withSignatureMap.checked,
-    },
+    analyzeConfig: {},
   });
 });
 

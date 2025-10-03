@@ -11,18 +11,20 @@ import {
   $animFrequency,
   $animFrequencyLabel,
   $colorTable,
-  $mapTypeSelect,
-  $mapSignatureLabel,
+  $analyzeButton,
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";
 import { ColorMap } from "./make-color";
 import { FrequencyUI } from "./ui/frequency";
 import { MapCanvasUI } from "./ui/map-canvas-ui";
+import type { MapData } from "./lib/getMap";
+import { post } from "./main";
 
 export class App {
   private data: AnalyzeResult | null = null;
   private histories: BitGrid[] | null = null;
+  private signatureMap: MapData<bigint> | null = null;
   private gen = 0;
   private valve: Valve;
   private mapType: MapType = "period";
@@ -31,6 +33,8 @@ export class App {
   private mapCanvasUI: MapCanvasUI;
   private frequencyUI: FrequencyUI;
   private colorTable: ColorTableUI;
+  private analyzeButtonChangeId: number | undefined;
+  private signatureMapCreating = false;
 
   constructor($canvas: HTMLCanvasElement) {
     this.mapCanvasUI = new MapCanvasUI($canvas);
@@ -85,6 +89,7 @@ export class App {
   }
 
   setup(data: AnalyzeResult) {
+    this.signatureMap = null;
     // Do not show map for spaceship
     $mapBox.style.display = data.isSpaceship ? "none" : "";
 
@@ -98,20 +103,53 @@ export class App {
 
     this.frequencyUI.setup(data);
 
-    // Set before setupColor
-    $mapSignatureLabel.style.display = data.signatureMap == null ? "none" : "";
-    // fallback to period map
-    if (data.signatureMap == null && this.mapType === "signature") {
-      const period = $mapTypeSelect.find((x) => x.value === "period");
-      if (period) {
-        period.checked = true;
-      }
-      this.mapType = "period";
+    if (this.mapType === "signature" && this.signatureMap == null) {
+      this.analyzeSignature();
     }
 
     this.updateFrequency();
     this.setupColor();
     this.render();
+  }
+
+  private analyzeSignature() {
+    if (!this.data) {
+      return;
+    }
+    if (this.signatureMap) {
+      return;
+    }
+    $analyzeButton.disabled = true;
+    this.analyzeButtonChangeId = setTimeout(() => {
+      $analyzeButton.textContent = "Creating signature map...";
+    }, 200);
+
+    if (this.signatureMapCreating) {
+      return;
+    }
+
+    this.signatureMapCreating = true;
+
+    post({
+      kind: "request-signature",
+      data: {
+        width: this.data.bitGridData.width,
+        height: this.data.bitGridData.height,
+        or: this.data.bitGridData.or,
+        periodMapArray: this.data.periodMap.data,
+        histories: this.data.histories,
+      },
+    });
+  }
+
+  onSignatureMap(signatureMap: MapData<bigint>) {
+    this.signatureMapCreating = false;
+    $analyzeButton.disabled = false;
+    clearTimeout(this.analyzeButtonChangeId);
+    $analyzeButton.textContent = "Analyze";
+    this.signatureMap = signatureMap;
+    this.render();
+    this.setupColor();
   }
 
   private setupColorMap() {
@@ -120,6 +158,9 @@ export class App {
       return;
     }
     const mapData = this.getMapData();
+    if (!mapData) {
+      return;
+    }
     const list = mapData.list;
     const colorMap = ColorMap.make({
       list: list as (number | bigint)[],
@@ -156,10 +197,10 @@ export class App {
         return data.periodMap;
       }
       case "signature": {
-        if (!data.signatureMap) {
-          throw new Error("Internal error");
+        if (!this.signatureMap) {
+          return null;
         }
-        return data.signatureMap;
+        return this.signatureMap;
       }
     }
   }
@@ -172,7 +213,7 @@ export class App {
     const data = this.mapCanvasUI.getMapIndexAt(
       position,
       this.data,
-      this.getMapData(),
+      this.getMapData()!,
     );
     this.colorTable.renderColorTableHighlight(data ?? null, this.mapType);
   }
@@ -182,6 +223,9 @@ export class App {
       $colorSelectContainer.style.display = "none";
     } else {
       $colorSelectContainer.style.display = "";
+    }
+    if (mapType === "signature" && this.signatureMap == null) {
+      this.analyzeSignature();
     }
     this.mapType = mapType;
     this.setupColor();
