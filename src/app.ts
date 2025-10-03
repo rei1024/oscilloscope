@@ -148,8 +148,8 @@ export class App {
     clearTimeout(this.analyzeButtonChangeId);
     $analyzeButton.textContent = "Analyze";
     this.signatureMap = signatureMap;
-    this.render();
     this.setupColor();
+    this.render();
   }
 
   private setupColorMap() {
