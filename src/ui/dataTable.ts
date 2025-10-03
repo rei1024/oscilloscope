@@ -222,7 +222,7 @@ export function setDataTable($table: HTMLTableElement, data: AnalyzeResult) {
   $table.textContent = "";
 
   const rows = getDataTableRows(data);
-  console.log(rows);
+
   // Build table rows from data.
   for (const row of rows) {
     const $tr = $table.insertRow();

@@ -62,7 +62,6 @@ worker.addEventListener("message", (e) => {
       $message.style.display = "none";
       $outputTable.style.display = "block";
       const data = message.data;
-      console.log("Analtzed", data);
       setDataTable($outputTable, data);
       app.setup(data);
       break;
