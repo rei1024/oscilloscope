@@ -7,6 +7,7 @@ function createColorTable<T>(
   map: MapData<T>,
   colorMap: ColorMap<T>,
   mapType: MapType,
+  historyLength: number,
 ) {
   const rows: HTMLTableRowElement[] = [];
 
@@ -39,12 +40,19 @@ function createColorTable<T>(
     $color.style.width = "40px";
 
     const $detail = document.createElement("td");
+    if (mapType === "signature") {
+      $detail.style.maxWidth = "500px";
+      $detail.style.overflow = "hidden";
+      $detail.style.textOverflow = "ellipsis";
+    }
     $detail.textContent =
       typeof item === "number"
         ? item.toString()
-        : (() => {
-            throw new Error("Internal error");
-          })();
+        : typeof item === "bigint"
+          ? showSignature(item, historyLength)
+          : (() => {
+              throw new Error("Internal error");
+            })();
     $detail.style.textAlign = "right";
 
     const $count = document.createElement("td");
@@ -63,19 +71,32 @@ export class ColorTableUI {
   private $colorTable: HTMLElement;
   private $hoverInfo: HTMLElement;
   private rows: HTMLTableRowElement[] = [];
+  private historyLength: number = 0;
   constructor($colorTable: HTMLElement, $hoverInfo: HTMLElement) {
     this.$colorTable = $colorTable;
     this.$hoverInfo = $hoverInfo;
   }
 
-  setup<T>(map: MapData<T>, colorMap: ColorMap<T>, mapType: MapType) {
-    this.rows = createColorTable(this.$colorTable, map, colorMap, mapType);
+  setup<T>(
+    map: MapData<T>,
+    colorMap: ColorMap<T>,
+    mapType: MapType,
+    historyLength: number,
+  ) {
+    this.rows = createColorTable(
+      this.$colorTable,
+      map,
+      colorMap,
+      mapType,
+      historyLength,
+    );
+    this.historyLength = historyLength;
   }
 
   renderColorTableHighlight(
     data: {
       index: number;
-      cellData: number;
+      cellData: unknown;
     } | null,
     mapType: MapType,
   ) {
@@ -86,10 +107,28 @@ export class ColorTableUI {
     if (data != undefined) {
       this.rows[data.index].style.backgroundColor = "#0000FF22";
 
+      this.$hoverInfo.style.overflow = "hidden";
+      this.$hoverInfo.style.maxWidth = "500px";
+      this.$hoverInfo.style.textOverflow = "ellipsis";
+
       this.$hoverInfo.textContent =
-        "  " + displayMapTypeLower(mapType) + " = " + data.cellData;
+        "  " +
+        displayMapTypeLower(mapType) +
+        " = " +
+        (typeof data.cellData === "number"
+          ? data.cellData.toString()
+          : typeof data.cellData === "bigint"
+            ? showSignature(data.cellData, this.historyLength)
+            : (() => {
+                throw new Error("Internal error");
+              })());
     } else {
       this.$hoverInfo.textContent = " "; // 崩れないように
     }
   }
+}
+
+function showSignature(n: bigint, historyLength: number) {
+  const str = n.toString(2).padStart(historyLength, "0");
+  return str;
 }

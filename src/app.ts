@@ -11,6 +11,8 @@ import {
   $animFrequency,
   $animFrequencyLabel,
   $colorTable,
+  $mapTypeSelect,
+  $mapSignatureLabel,
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";
@@ -96,10 +98,19 @@ export class App {
 
     this.frequencyUI.setup(data);
 
-    this.setupColorMap();
-    this.updateFrequency();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+    // Set before setupColor
+    $mapSignatureLabel.style.display = data.signatureMap == null ? "none" : "";
+    // fallback to period map
+    if (data.signatureMap == null && this.mapType === "signature") {
+      const period = $mapTypeSelect.find((x) => x.value === "period");
+      if (period) {
+        period.checked = true;
+      }
+      this.mapType = "period";
+    }
 
+    this.updateFrequency();
+    this.setupColor();
     this.render();
   }
 
@@ -111,7 +122,7 @@ export class App {
     const mapData = this.getMapData();
     const list = mapData.list;
     const colorMap = ColorMap.make({
-      list,
+      list: list as (number | bigint)[],
       style: (
         {
           period:
@@ -119,6 +130,8 @@ export class App {
           frequency:
             this.colorType === "grayscale" ? "gray" : "hue-for-frequency",
           heat: "heat",
+          signature:
+            this.colorType === "grayscale" ? "gray" : "hue-for-frequency",
         } as const
       )[this.mapType],
       hasStatorCell: data.periodMap.list.some((x) => x === 1),
@@ -130,7 +143,7 @@ export class App {
   private getMapData() {
     const data = this.data;
     if (data == null) {
-      throw null;
+      throw new Error("Internal error");
     }
     switch (this.mapType) {
       case "frequency": {
@@ -141,6 +154,12 @@ export class App {
       }
       case "period": {
         return data.periodMap;
+      }
+      case "signature": {
+        if (!data.signatureMap) {
+          throw new Error("Internal error");
+        }
+        return data.signatureMap;
       }
     }
   }
@@ -165,21 +184,27 @@ export class App {
       $colorSelectContainer.style.display = "";
     }
     this.mapType = mapType;
-    this.setupColorMap();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
-
+    this.setupColor();
     this.render();
   }
 
   updateColor(color: ColorType) {
     this.colorType = color;
-    this.setupColorMap();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
-
+    this.setupColor();
     this.render();
   }
 
   valveEnable(enable: boolean) {
     this.valve.disabled = !enable;
+  }
+
+  private setupColor() {
+    this.setupColorMap();
+    this.colorTable.setup(
+      this.getMapData(),
+      this.colorMap,
+      this.mapType,
+      this.histories!.length,
+    );
   }
 }

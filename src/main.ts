@@ -13,6 +13,7 @@ import {
   $outputTable,
   $showAnimationCheckbox,
   $showGridCheckbox,
+  $withSignatureMap,
 } from "./bind";
 import { setDataTable } from "./ui/dataTable";
 
@@ -72,7 +73,13 @@ $analyzeButton.addEventListener("click", () => {
   analyzingDelayTimeoutId = setTimeout(() => {
     $analyzeButton.textContent = "Analyzing";
   }, 200);
-  post({ kind: "request-analyze", rle: $input.value });
+  post({
+    kind: "request-analyze",
+    rle: $input.value,
+    analyzeConfig: {
+      withSignatureMap: $withSignatureMap.checked,
+    },
+  });
 });
 
 $animFrequency.addEventListener("input", () => {

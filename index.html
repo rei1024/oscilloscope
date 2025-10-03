@@ -78,6 +78,15 @@
         <select id="example-oscillators">
           <option value="">(Example)</option>
         </select>
+        <div>
+          <details>
+            <summary>Config</summary>
+            <label>
+              <input id="with-signature-map" type="checkbox" checked />
+              With signature map (uncheck to improve performance)
+            </label>
+          </details>
+        </div>
       </div>
 
       <button class="btn" id="analyze">Analyze</button>
@@ -124,6 +133,19 @@
                 type="radio"
               />
               Heat
+            </label>
+            <label
+              id="map-signature-select-label"
+              for="map-signature-select"
+              style="user-select: none; margin-right: 8px"
+            >
+              <input
+                id="map-signature-select"
+                value="signature"
+                name="map-type-select"
+                type="radio"
+              />
+              Signature
             </label>
           </div>
 
@@ -200,7 +222,7 @@
           <pre
             style="display: inline"
           ><span id="generation" class="tabular-nums"></span></pre>
-          <pre style="display: inline" id="hover-info"><span>　</span></pre>
+          <pre id="hover-info"><span>　</span></pre>
         </div>
         <canvas id="canvas"></canvas>
         <details open>

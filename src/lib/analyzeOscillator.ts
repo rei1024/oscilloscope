@@ -149,6 +149,10 @@ export type AnalyzeResult = {
    */
   heatMap: MapData<number>;
   /**
+   * Signature map
+   */
+  signatureMap: MapData<bigint> | null;
+  /**
    * For omnifrequency
    *
    * [The Omnifrequency Project | Forum](https://conwaylife.com/forums/viewtopic.php?f=2&t=7026)
@@ -185,8 +189,16 @@ function getSpeed(
   };
 }
 
+export type AnalyzeOscillatorConfig = {
+  withSignatureMap: boolean;
+};
+
+/**
+ * Analyze an oscillator or a spaceship.
+ */
 export function analyzeOscillator(
   runConfig: RunOscillatorConfig,
+  analyzeConfig?: AnalyzeOscillatorConfig,
 ): AnalyzeResult {
   const { world } = runOscillator(runConfig);
 
@@ -209,11 +221,12 @@ export function analyzeOscillator(
   const width = historiesBitGrid[0]!.getWidth();
   const height = historiesBitGrid[0]!.getHeight();
 
-  const { periodMap, frequencyMap, heatMap, heatInfo } = getMap({
+  const { periodMap, frequencyMap, heatMap, heatInfo, signatureMap } = getMap({
     width,
     height,
     or,
     histories: historiesBitGrid,
+    withSignatureMap: analyzeConfig?.withSignatureMap ?? true,
   });
 
   const heat =
@@ -297,6 +310,7 @@ export function analyzeOscillator(
     periodMap,
     frequencyMap,
     heatMap,
+    signatureMap,
     missingFrequencies: getMissingFrequencies(frequencyMap.list, period),
   };
 }

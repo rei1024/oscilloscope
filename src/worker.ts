@@ -1,4 +1,8 @@
-import { analyzeOscillator, type AnalyzeResult } from "./lib/analyzeOscillator";
+import {
+  analyzeOscillator,
+  type AnalyzeOscillatorConfig,
+  type AnalyzeResult,
+} from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { parseRule, type GridParameter } from "@ca-ts/rule";
 import { MaxGenerationError } from "./lib/runOscillator";
@@ -8,6 +12,7 @@ import { getErrorMessageForParseRule } from "./lib/rule-error";
 export type WorkerRequestMessage = {
   kind: "request-analyze";
   rle: string;
+  analyzeConfig: AnalyzeOscillatorConfig;
 };
 
 export type WorkerResponseMessage =
@@ -185,12 +190,15 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
 
   const maxGeneration = 50_000;
   try {
-    const result = analyzeOscillator({
-      cells: cells,
-      rule: rule,
-      maxGeneration: maxGeneration,
-      maxSize: 8192,
-    });
+    const result = analyzeOscillator(
+      {
+        cells: cells,
+        rule: rule,
+        maxGeneration: maxGeneration,
+        maxSize: 8192,
+      },
+      data.analyzeConfig,
+    );
     return { kind: "response-analyzed", data: result };
   } catch (error) {
     console.error(error);

@@ -1,6 +1,7 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
 import { findPeriodUint8 } from "./findPeriod";
 import { BITS, BITS_MINUS_1 } from "./const";
+import { rotateLeftBigInt } from "../util/rotate";
 import { max, min } from "./collection";
 
 // reduce allocation
@@ -25,15 +26,18 @@ export function getMap({
   height,
   or,
   histories,
+  withSignatureMap,
 }: {
   width: number;
   height: number;
   or: BitGrid;
   histories: BitGrid[];
+  withSignatureMap: boolean;
 }): {
   periodMap: MapData<number>;
   frequencyMap: MapData<number>;
   heatMap: MapData<number>;
+  signatureMap: MapData<bigint> | null;
   heatInfo: {
     max: number;
     min: number;
@@ -66,6 +70,15 @@ export function getMap({
         .map(() => -1),
     );
 
+  const signatureArray = Array(height)
+    .fill(0)
+    .map(() => 0)
+    .map(() =>
+      Array(width)
+        .fill(0)
+        .map(() => 0n),
+    );
+
   // indexed by generations
   const heatByGeneration: number[] = Array(histories.length)
     .fill(0)
@@ -85,6 +98,8 @@ export function getMap({
     // reuse array
     statesAlloc = new Uint8Array(histories.length);
 
+    const lenHistories = histories.length;
+
     for (let i = 0; i < height; i++) {
       const rowIndex = i * width;
       const y = i;
@@ -92,6 +107,7 @@ export function getMap({
       const heatArrayRow = heatArray[y];
       const periodArrayRow = periodArray[y];
       const frequencyArrayRow = frequencyArray[y];
+      const signatureArrayRow = signatureArray[y];
 
       for (let j = 0; j < width; j++) {
         const offset = rowIndex + j;
@@ -112,7 +128,7 @@ export function getMap({
           const firstCell = getAlive(firstBitGridUint32Array, offset, u);
           let prevCell = firstCell;
           let frequency = 0;
-          const lenHistories = histories.length;
+          let signature = 0n;
           for (let index = 0; index < lenHistories; index++) {
             const array = histories[index].asInternalUint32Array();
             const cell = getAlive(array, offset, u);
@@ -122,8 +138,15 @@ export function getMap({
             }
             prevCell = cell;
             statesAlloc[index] = cell;
+            if (withSignatureMap) {
+              signature <<= 1n;
+            }
+
             if (cell !== 0) {
               frequency++;
+              if (withSignatureMap) {
+                signature |= 1n;
+              }
             }
           }
 
@@ -138,9 +161,22 @@ export function getMap({
             heat++;
             heatByGeneration[0]++;
           }
+
+          const periodOfCell = findPeriodUint8(statesAlloc);
           heatArrayRow[x] = heat;
-          periodArrayRow[x] = findPeriodUint8(statesAlloc);
+          periodArrayRow[x] = periodOfCell;
           frequencyArrayRow[x] = frequency;
+
+          if (withSignatureMap) {
+            const canonicalSignature = getCanonicalSignature(
+              signature,
+              lenHistories,
+              periodOfCell,
+            );
+
+            // Use the canonical form for storage and uniqueness check
+            signatureArrayRow[x] = canonicalSignature;
+          }
         }
       }
     }
@@ -150,6 +186,7 @@ export function getMap({
     periodMap: getMapData(periodArray, 0),
     frequencyMap: getMapData(frequencyArray, 0),
     heatMap: getMapData(heatArray, -1),
+    signatureMap: withSignatureMap ? getMapData(signatureArray, 0n) : null,
     heatInfo: {
       min: min(heatByGeneration),
       max: max(heatByGeneration),
@@ -207,4 +244,24 @@ function getCountMap<T>(map: ReadonlyArray<ReadonlyArray<T>>): Map<T, number> {
   }
 
   return countMap;
+}
+
+function getCanonicalSignature(
+  signature: bigint,
+  lenHistories: number,
+  periodOfCell: number,
+): bigint {
+  let canonical = signature;
+  const len = BigInt(lenHistories);
+
+  // We only need to check shifts up to the true period P (since shift P = shift 0).
+  const maxShift = Math.min(periodOfCell, lenHistories);
+
+  for (let shift = 1; shift < maxShift; shift++) {
+    const rotated = rotateLeftBigInt(signature, len, BigInt(shift));
+    if (rotated < canonical) {
+      canonical = rotated;
+    }
+  }
+  return canonical;
 }

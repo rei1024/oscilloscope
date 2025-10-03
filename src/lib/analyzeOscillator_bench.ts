@@ -29,7 +29,7 @@ const cells = parseRLE(p15240)
   .map((x) => x.position);
 
 const start = performance.now();
-for (let i = 0; i < 2; i++) {
+for (let i = 0; i < 1; i++) {
   const result = analyzeOscillator({
     cells,
     rule: {
@@ -44,6 +44,6 @@ for (let i = 0; i < 2; i++) {
 }
 
 const end = performance.now();
-console.log(end - start);
+console.log((end - start).toFixed(3) + " ms");
 
 // npx vite-node src/lib/analyzeOscillator_bench.ts

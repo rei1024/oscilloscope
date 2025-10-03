@@ -69,12 +69,12 @@ type Input<T> = {
   hasFullPeriodCell: boolean;
 };
 
-function makeColorMap({
+function makeColorMap<T>({
   list,
   style,
   hasStatorCell,
   hasFullPeriodCell,
-}: Input<number>): Map<number, string> {
+}: Input<T>): Map<T, string> {
   const len = list.length;
   return new Map(
     list.map((x, index) => {
@@ -123,7 +123,7 @@ export class ColorMap<T> {
     this.colorList = [...map.values()];
   }
 
-  static make(input: Input<number>) {
+  static make<T>(input: Input<T>) {
     return new ColorMap(makeColorMap(input));
   }
 }
