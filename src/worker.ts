@@ -1,24 +1,43 @@
 import {
   analyzeOscillator,
+  bitGridFromData,
   type AnalyzeOscillatorConfig,
   type AnalyzeResult,
+  type BitGridData,
 } from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { parseRule, type GridParameter } from "@ca-ts/rule";
 import { MaxGenerationError } from "./lib/runOscillator";
 import { WorldSizeError } from "./lib/WorldWithHistory";
 import { getErrorMessageForParseRule } from "./lib/rule-error";
+import type { MapData } from "./lib/getMap";
+import { getSignatureMap } from "./lib/getSignatureMap";
 
-export type WorkerRequestMessage = {
-  kind: "request-analyze";
-  rle: string;
-  analyzeConfig: AnalyzeOscillatorConfig;
-};
+export type WorkerRequestMessage =
+  | {
+      kind: "request-analyze";
+      rle: string;
+      analyzeConfig: AnalyzeOscillatorConfig;
+    }
+  | {
+      kind: "request-signature";
+      data: {
+        width: number;
+        height: number;
+        or: BitGridData;
+        histories: BitGridData[];
+        periodMapArray: ReadonlyArray<ReadonlyArray<number>>;
+      };
+    };
 
 export type WorkerResponseMessage =
   | {
       kind: "response-analyzed";
       data: AnalyzeResult;
+    }
+  | {
+      kind: "response-signature";
+      signature: MapData<bigint>;
     }
   | {
       kind: "response-error";
@@ -42,7 +61,27 @@ function isInfiniteGrid(
   return false;
 }
 
+function handleSignature(
+  data: WorkerRequestMessage & { kind: "request-signature" },
+): WorkerResponseMessage {
+  const { width, height, or, histories, periodMapArray } = data.data;
+  const map = getSignatureMap({
+    width,
+    height,
+    or: bitGridFromData(or),
+    histories: histories.map((h) => bitGridFromData(h)),
+    periodMapArray,
+  });
+  return {
+    kind: "response-signature",
+    signature: map.signatureMap,
+  };
+}
+
 function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
+  if (data.kind === "request-signature") {
+    return handleSignature(data);
+  }
   let rle;
   let rule: ReturnType<typeof parseRule> | "LifeHistory";
   if (data.rle.trim() === "") {

@@ -1,8 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { analyzeOscillator } from "./analyzeOscillator";
+import {
+  analyzeOscillator,
+  bitGridFromData,
+  bitGridToData,
+} from "./analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { CACellList } from "@ca-ts/pattern";
 import { parseRule } from "@ca-ts/rule";
+import { getSignatureMap } from "./getSignatureMap";
 
 const conwayLife = {
   type: "outer-totalistic" as const,
@@ -94,9 +99,16 @@ describe("analyzeOscillator", () => {
       [-1, 2, -1],
     ]);
 
+    const signatureMap = getSignatureMap({
+      width: result.bitGridData.width,
+      height: result.bitGridData.height,
+      or: bitGridFromData(result.bitGridData.or),
+      periodMapArray: result.periodMap.data,
+      histories: result.histories.map((h) => bitGridFromData(h)),
+    });
     expect(
       CACellList.from2dArray(
-        result.signatureMap!.data.map((row) => row.map((x) => Number(x))),
+        signatureMap.signatureMap.data.map((row) => row.map((x) => Number(x))),
       ).to2dArray()?.array,
     ).toEqual([
       [0, 1, 0],
@@ -114,9 +126,18 @@ describe("analyzeOscillator", () => {
       rule: conwayLife,
       maxGeneration: 1000,
     });
+
+    const signatureMap = getSignatureMap({
+      width: result.bitGridData.width,
+      height: result.bitGridData.height,
+      or: bitGridFromData(result.bitGridData.or),
+      periodMapArray: result.periodMap.data,
+      histories: result.histories.map((h) => bitGridFromData(h)),
+    });
+
     expect(
       CACellList.from2dArray(
-        result.signatureMap!.data.map((row) => row.map((x) => Number(x))),
+        signatureMap.signatureMap.data.map((row) => row.map((x) => Number(x))),
       ).to2dArray()?.array,
     ).toEqual([
       [0, 0, 0, 3, 0, 0, 0, 0],

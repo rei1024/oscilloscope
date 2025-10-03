@@ -78,11 +78,16 @@ export class ColorTableUI {
   }
 
   setup<T>(
-    map: MapData<T>,
+    map: MapData<T> | null,
     colorMap: ColorMap<T>,
     mapType: MapType,
     historyLength: number,
   ) {
+    if (map == null) {
+      this.rows = [];
+      this.$colorTable.replaceChildren();
+      return;
+    }
     this.rows = createColorTable(
       this.$colorTable,
       map,

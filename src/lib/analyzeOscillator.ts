@@ -27,7 +27,7 @@ function getOrAndGrid(histories: BitGrid[]) {
   };
 }
 
-type BitGridData = {
+export type BitGridData = {
   uint32: Uint32Array;
   width32: number;
   height: number;
@@ -149,10 +149,6 @@ export type AnalyzeResult = {
    */
   heatMap: MapData<number>;
   /**
-   * Signature map
-   */
-  signatureMap: MapData<bigint> | null;
-  /**
    * For omnifrequency
    *
    * [The Omnifrequency Project | Forum](https://conwaylife.com/forums/viewtopic.php?f=2&t=7026)
@@ -189,9 +185,7 @@ function getSpeed(
   };
 }
 
-export type AnalyzeOscillatorConfig = {
-  withSignatureMap: boolean;
-};
+export type AnalyzeOscillatorConfig = {};
 
 /**
  * Analyze an oscillator or a spaceship.
@@ -221,12 +215,11 @@ export function analyzeOscillator(
   const width = historiesBitGrid[0]!.getWidth();
   const height = historiesBitGrid[0]!.getHeight();
 
-  const { periodMap, frequencyMap, heatMap, heatInfo, signatureMap } = getMap({
+  const { periodMap, frequencyMap, heatMap, heatInfo } = getMap({
     width,
     height,
     or,
     histories: historiesBitGrid,
-    withSignatureMap: analyzeConfig?.withSignatureMap ?? true,
   });
 
   const heat =
@@ -310,7 +303,6 @@ export function analyzeOscillator(
     periodMap,
     frequencyMap,
     heatMap,
-    signatureMap,
     missingFrequencies: getMissingFrequencies(frequencyMap.list, period),
   };
 }
