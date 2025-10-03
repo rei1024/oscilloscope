@@ -34,6 +34,7 @@ export class App {
   private frequencyUI: FrequencyUI;
   private colorTable: ColorTableUI;
   private analyzeButtonChangeId: number | undefined;
+  private signatureMapCreating = false;
 
   constructor($canvas: HTMLCanvasElement) {
     this.mapCanvasUI = new MapCanvasUI($canvas);
@@ -115,10 +116,19 @@ export class App {
     if (!this.data) {
       return;
     }
+    if (this.signatureMap) {
+      return;
+    }
     $analyzeButton.disabled = true;
     this.analyzeButtonChangeId = setTimeout(() => {
       $analyzeButton.textContent = "Creating signature map...";
     }, 200);
+
+    if (this.signatureMapCreating) {
+      return;
+    }
+
+    this.signatureMapCreating = true;
 
     post({
       kind: "request-signature",
@@ -133,6 +143,7 @@ export class App {
   }
 
   onSignatureMap(signatureMap: MapData<bigint>) {
+    this.signatureMapCreating = false;
     $analyzeButton.disabled = false;
     clearTimeout(this.analyzeButtonChangeId);
     $analyzeButton.textContent = "Analyze";
