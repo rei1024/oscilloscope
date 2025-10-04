@@ -54,7 +54,13 @@ export class WorldWithHistory {
       height: boundingRect.height + 16,
     });
     if (rule.type === "outer-totalistic") {
-      this.bitWorld.setRule(rule.transition);
+      if (rule.neighborhood == null) {
+        this.bitWorld.setRule(rule.transition);
+      } else if (rule.neighborhood === "von-neumann") {
+        this.bitWorld.setVonNeumannOTRule(rule.transition);
+      } else {
+        throw new Error("Unsupported rule");
+      }
     } else if (rule.type === "int") {
       this.bitWorld.setINTRule(rule.transition);
     } else if (rule.type === "map") {

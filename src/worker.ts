@@ -136,30 +136,15 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Generations is not supported",
       };
     }
-    const unsupportedNeighborhoods = [
-      "hexagonal",
-      "von-neumann",
-      "triangular",
-    ] as const;
-    if (
-      rule.neighborhood &&
-      unsupportedNeighborhoods.includes(rule.neighborhood)
-    ) {
+    if (rule.neighborhood != null && rule.neighborhood !== "von-neumann") {
       return {
         kind: "response-error",
         message: `${
           {
             hexagonal: "Hexagonal",
-            "von-neumann": "von Neumann",
             triangular: "Triangular",
           }[rule.neighborhood]
         } neighborhood is not supported`,
-      };
-    }
-    if (rule.neighborhood != undefined) {
-      return {
-        kind: "response-error",
-        message: "Unsupported neighborhood",
       };
     }
     if (rule.transition.birth.includes(0)) {
