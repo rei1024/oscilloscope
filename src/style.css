@@ -96,12 +96,12 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
-#output-table th,
-#output-table td {
+#data-table th,
+#data-table td {
   padding: 4px;
 }
 
-#output-table th {
+#data-table th {
   text-align: right;
 }
 

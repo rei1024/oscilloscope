@@ -9,11 +9,10 @@ import {
   $input,
   $mapTypeSelect,
   $message,
-  $outputTable,
+  $dataTable,
   $showAnimationCheckbox,
   $showGridCheckbox,
 } from "./bind";
-import { setDataTable } from "./ui/dataTable";
 
 import { App } from "./app";
 import { getMousePositionInElement } from "./ui/getMousePositionInElement";
@@ -42,27 +41,20 @@ let analyzingDelayTimeoutId: number | null = null;
 
 worker.addEventListener("message", (e) => {
   const message = e.data as WorkerResponseMessage;
-  $message.textContent = "";
 
   $analyzeButton.disabled = false;
   if (analyzingDelayTimeoutId) {
     clearTimeout(analyzingDelayTimeoutId);
   }
+
   $analyzeButton.textContent = "Analyze";
   switch (message.kind) {
     case "response-error": {
-      $message.style.display = "none";
-      $outputTable.style.display = "none";
-      $message.style.display = "block";
-      $message.textContent = "Error: " + message.message;
-      $message.style.backgroundColor = "#fecaca";
+      app.onError(message);
       break;
     }
     case "response-analyzed": {
-      $message.style.display = "none";
-      $outputTable.style.display = "block";
       const data = message.data;
-      setDataTable($outputTable, data);
       app.setup(data);
       break;
     }
