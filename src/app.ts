@@ -12,6 +12,8 @@ import {
   $animFrequencyLabel,
   $colorTable,
   $analyzeButton,
+  $dataTable,
+  $message,
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";
@@ -20,6 +22,8 @@ import { FrequencyUI } from "./ui/frequency";
 import { MapCanvasUI } from "./ui/map-canvas-ui";
 import type { MapData } from "./lib/getMap";
 import { post } from "./main";
+import { DataTableUI } from "./ui/dataTable";
+import type { WorkerResponseMessage } from "./worker";
 
 export class App {
   private data: AnalyzeResult | null = null;
@@ -33,6 +37,7 @@ export class App {
   private mapCanvasUI: MapCanvasUI;
   private frequencyUI: FrequencyUI;
   private colorTable: ColorTableUI;
+  private dataTable: DataTableUI;
   private analyzeButtonChangeId: number | undefined;
   private signatureMapCreating = false;
 
@@ -57,6 +62,7 @@ export class App {
     );
 
     this.colorTable = new ColorTableUI($colorTable, $hoverInfo);
+    this.dataTable = new DataTableUI($dataTable);
   }
 
   render() {
@@ -88,7 +94,18 @@ export class App {
     }
   }
 
+  onError(data: WorkerResponseMessage & { kind: "response-error" }) {
+    $message.style.display = "none";
+    $dataTable.style.display = "none";
+    $message.style.display = "block";
+    $message.textContent = "Error: " + data.message;
+    $message.style.backgroundColor = "#fecaca";
+  }
+
   setup(data: AnalyzeResult) {
+    $message.style.display = "none";
+    $message.textContent = "";
+
     this.signatureMap = null;
     // Do not show map for spaceship
     $mapBox.style.display = data.isSpaceship ? "none" : "";
@@ -100,6 +117,9 @@ export class App {
     this.data = data;
     this.histories = data.histories.map((h) => bitGridFromData(h));
     this.gen = 0;
+
+    $dataTable.style.display = "block";
+    this.dataTable.render(data);
 
     this.frequencyUI.setup(data);
 

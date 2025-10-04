@@ -36,7 +36,7 @@ export const $darkModeCheckbox = $("#dark-mode-checkbox") as HTMLInputElement;
 
 export const $dataBox = $("#data-box") as HTMLElement;
 
-export const $outputTable = $("#output-table") as HTMLTableElement;
+export const $dataTable = $("#data-table") as HTMLTableElement;
 
 export const $input = $("#input") as HTMLTextAreaElement;
 

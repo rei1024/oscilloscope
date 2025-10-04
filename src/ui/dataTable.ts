@@ -217,7 +217,7 @@ function stringifyFraction2(num0: number, num1: number, den: number) {
  * @param $table The target HTMLTableElement to update.
  * @param data Analysis result data.
  */
-export function setDataTable($table: HTMLTableElement, data: AnalyzeResult) {
+function setDataTable($table: HTMLTableElement, data: AnalyzeResult) {
   // Clear existing table content.
   $table.textContent = "";
 
@@ -244,5 +244,16 @@ export function setDataTable($table: HTMLTableElement, data: AnalyzeResult) {
     // Content cell (td)
     const $td = $tr.insertCell();
     $td.textContent = row.content;
+  }
+}
+
+export class DataTableUI {
+  private $table: HTMLTableElement;
+  constructor($table: HTMLTableElement) {
+    this.$table = $table;
+  }
+
+  render(data: AnalyzeResult) {
+    setDataTable(this.$table, data);
   }
 }
