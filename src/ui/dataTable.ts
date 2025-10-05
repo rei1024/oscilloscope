@@ -48,6 +48,10 @@ function getDataTableRowsForStillLife(data: AnalyzeResult): DataTableRow[] {
         (data.boundingBox.sizeX * data.boundingBox.sizeY)
       ).toFixed(2),
     },
+    {
+      header: "Time",
+      content: formatTime(data),
+    },
   ];
 }
 
@@ -105,7 +109,15 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
       content: isOmnifrequent(data),
       url: "https://conwaylife.com/forums/viewtopic.php?f=2&t=7026",
     },
+    {
+      header: "Time",
+      content: formatTime(data),
+    },
   ];
+}
+
+function formatTime(data: AnalyzeResult) {
+  return `Run: ${(Math.floor(data.performance.runningTimeMilliseconds) / 1000).toString()}s, Stats and Map: ${(Math.floor(data.performance.calclationTimeMilliseconds) / 1000).toString()}s`;
 }
 
 function isOmnifrequent(data: AnalyzeResult): string {
@@ -189,6 +201,10 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
                 Math.abs(speed.dy),
                 data.period,
               ),
+    },
+    {
+      header: "Time",
+      content: formatTime(data),
     },
   ];
 }

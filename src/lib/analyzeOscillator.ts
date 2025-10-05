@@ -154,6 +154,10 @@ export type AnalyzeResult = {
    * [The Omnifrequency Project | Forum](https://conwaylife.com/forums/viewtopic.php?f=2&t=7026)
    */
   missingFrequencies: number[];
+  performance: {
+    runningTimeMilliseconds: number;
+    calclationTimeMilliseconds: number;
+  };
 };
 
 export function bitGridToData(bitGrid: BitGrid): BitGridData {
@@ -194,7 +198,13 @@ export function analyzeOscillator(
   runConfig: RunOscillatorConfig,
   analyzeConfig?: AnalyzeOscillatorConfig,
 ): AnalyzeResult {
+  const runStart = performance.now();
+
   const { world } = runOscillator(runConfig);
+
+  const runEnd = performance.now();
+
+  const dataStart = performance.now();
 
   const period = world.getGen();
   const historiesBitGrid = world.histories.map((h) => h.bitGrid);
@@ -265,16 +275,21 @@ export function analyzeOscillator(
     }
   }
 
+  const missingFrequencies = getMissingFrequencies(frequencyMap.list, period);
+  const population = {
+    max: max(populations),
+    min: min(populations),
+    avg: average(populations),
+    median: median(populations),
+  };
+
+  const dataEnd = performance.now();
+
   return {
     isSpaceship,
     speed,
     period,
-    population: {
-      max: max(populations),
-      min: min(populations),
-      avg: average(populations),
-      median: median(populations),
-    },
+    population,
     boundingBox: rectToSize(boundingBox),
     boundingBoxMovingEncloses: {
       sizeX: maxSizeX,
@@ -303,7 +318,11 @@ export function analyzeOscillator(
     periodMap,
     frequencyMap,
     heatMap,
-    missingFrequencies: getMissingFrequencies(frequencyMap.list, period),
+    missingFrequencies,
+    performance: {
+      runningTimeMilliseconds: runEnd - runStart,
+      calclationTimeMilliseconds: dataEnd - dataStart,
+    },
   };
 }
 
