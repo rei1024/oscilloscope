@@ -2,16 +2,15 @@ import type { BitGrid } from "@ca-ts/algo/bit";
 import { BITS } from "./const";
 import { rotateLeftBigInt } from "../util/rotate";
 import { getAlive, getMapData, type MapData } from "./getMap";
+import type { Size } from "./rect";
 
 export function getSignatureMap({
-  width,
-  height,
+  size,
   or,
   histories,
   periodMapArray,
 }: {
-  width: number;
-  height: number;
+  size: Size;
   or: BitGrid;
   histories: BitGrid[];
   periodMapArray: ReadonlyArray<ReadonlyArray<number>>;
@@ -20,11 +19,11 @@ export function getSignatureMap({
   signatureTimeMilliseconds: number;
 } {
   const startTime = performance.now();
-  const signatureArray = Array(height)
+  const signatureArray = Array(size.height)
     .fill(0)
     .map(() => 0)
     .map(() =>
-      Array(width)
+      Array(size.width)
         .fill(0)
         .map(() => 0n),
     );

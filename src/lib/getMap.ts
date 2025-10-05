@@ -2,6 +2,7 @@ import type { BitGrid } from "@ca-ts/algo/bit";
 import { findPeriodUint8 } from "./findPeriod";
 import { BITS, BITS_MINUS_1 } from "./const";
 import { max, min } from "./collection";
+import type { Size } from "./rect";
 
 // reduce allocation
 let statesAlloc = new Uint8Array();
@@ -21,13 +22,11 @@ export type MapData<T> = {
 };
 
 export function getMap({
-  width,
-  height,
+  size,
   or,
   histories,
 }: {
-  width: number;
-  height: number;
+  size: Size;
   or: BitGrid;
   histories: BitGrid[];
 }): {
@@ -39,6 +38,7 @@ export function getMap({
     min: number;
   };
 } {
+  const { width, height } = size;
   const periodArray = Array(height)
     .fill(0)
     .map(() => 0)

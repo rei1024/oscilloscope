@@ -1,5 +1,5 @@
 import { average, max, median, min } from "./collection";
-import { rectToArea, rectToSize } from "./rect";
+import { rectToArea, rectToSize, type Size } from "./rect";
 import { BitGrid } from "@ca-ts/algo/bit";
 import { runOscillator, type RunOscillatorConfig } from "./runOscillator";
 import { getMap, type MapData } from "./getMap";
@@ -65,31 +65,19 @@ export type AnalyzeResult = {
   /**
    * Bounding box
    */
-  boundingBox: {
-    sizeX: number;
-    sizeY: number;
-  };
+  boundingBox: Size;
   /**
    * The bounding box that encloses all phases
    */
-  boundingBoxMovingEncloses: {
-    sizeX: number;
-    sizeY: number;
-  };
+  boundingBoxMovingEncloses: Size;
   boundingBoxMinArea: {
     // FIXME: different from LifeViewer?
     tick: number;
-    size: {
-      sizeX: number;
-      sizeY: number;
-    };
+    size: Size;
   };
   boundingBoxMaxArea: {
     tick: number;
-    size: {
-      sizeX: number;
-      sizeY: number;
-    };
+    size: Size;
   };
   /**
    * Number of stators
@@ -109,8 +97,7 @@ export type AnalyzeResult = {
   strictVolatility: number;
   histories: BitGridData[];
   bitGridData: {
-    width: number;
-    height: number;
+    size: Size;
     minX: number;
     minY: number;
     or: BitGridData;
@@ -222,12 +209,10 @@ export function analyzeOscillator(
 
   const isSpaceship = speed.dx !== 0 || speed.dy !== 0;
 
-  const width = historiesBitGrid[0]!.getWidth();
-  const height = historiesBitGrid[0]!.getHeight();
+  const size = historiesBitGrid[0]!.getSize();
 
   const { periodMap, frequencyMap, heatMap, heatInfo } = getMap({
-    width,
-    height,
+    size,
     or,
     histories: historiesBitGrid,
   });
@@ -239,11 +224,11 @@ export function analyzeOscillator(
   let minArea = Infinity;
   let minBoxInfo: {
     tick: number;
-    size: { sizeX: number; sizeY: number };
+    size: Size;
   } | null = null;
   let maxBoxInfo: {
     tick: number;
-    size: { sizeX: number; sizeY: number };
+    size: Size;
   } | null = null;
   let maxArea = -Infinity;
   let maxSizeX = 0;
@@ -251,11 +236,11 @@ export function analyzeOscillator(
   for (const [i, grid] of historiesBitGrid.entries()) {
     const boundingBoxPhase = grid.getBoundingBox();
     const size = rectToSize(boundingBoxPhase);
-    if (maxSizeX < size.sizeX) {
-      maxSizeX = size.sizeX;
+    if (maxSizeX < size.width) {
+      maxSizeX = size.width;
     }
-    if (maxSizeY < size.sizeY) {
-      maxSizeY = size.sizeY;
+    if (maxSizeY < size.height) {
+      maxSizeY = size.height;
     }
     const area = rectToArea(boundingBoxPhase);
 
@@ -292,8 +277,8 @@ export function analyzeOscillator(
     population,
     boundingBox: rectToSize(boundingBox),
     boundingBoxMovingEncloses: {
-      sizeX: maxSizeX,
-      sizeY: maxSizeY,
+      width: maxSizeX,
+      height: maxSizeY,
     },
     boundingBoxMaxArea: maxBoxInfo!,
     boundingBoxMinArea: minBoxInfo!,
@@ -305,8 +290,7 @@ export function analyzeOscillator(
     bitGridData: {
       or: bitGridToData(or),
       and: bitGridToData(and),
-      width,
-      height,
+      size,
       minX: boundingBox.minX,
       minY: boundingBox.minY,
     },
