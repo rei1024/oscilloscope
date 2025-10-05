@@ -133,7 +133,11 @@ export class ColorTableUI {
   }
 }
 
+const MAX_SIGNATURE_LENGTH = 100;
 function showSignature(n: bigint, historyLength: number) {
-  const str = n.toString(2).padStart(historyLength, "0");
+  const str = n
+    .toString(2)
+    .padStart(historyLength, "0")
+    .slice(0, MAX_SIGNATURE_LENGTH);
   return str;
 }
