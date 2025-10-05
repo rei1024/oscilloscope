@@ -96,12 +96,12 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
-#data-table th,
-#data-table td {
+.common-table th,
+.common-table td {
   padding: 4px;
 }
 
-#data-table th {
+.common-table th {
   text-align: right;
 }
 

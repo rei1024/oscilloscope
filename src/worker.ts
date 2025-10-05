@@ -30,15 +30,18 @@ export type WorkerRequestMessage =
       };
     };
 
+export type WorkerResponseMessageSignature = {
+  kind: "response-signature";
+  signatureTimeMilliseconds: number;
+  signature: MapData<bigint>;
+};
+
 export type WorkerResponseMessage =
   | {
       kind: "response-analyzed";
       data: AnalyzeResult;
     }
-  | {
-      kind: "response-signature";
-      signature: MapData<bigint>;
-    }
+  | WorkerResponseMessageSignature
   | {
       kind: "response-error";
       message: string;
@@ -74,6 +77,7 @@ function handleSignature(
   });
   return {
     kind: "response-signature",
+    signatureTimeMilliseconds: map.signatureTimeMilliseconds,
     signature: map.signatureMap,
   };
 }
