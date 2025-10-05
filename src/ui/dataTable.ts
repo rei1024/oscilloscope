@@ -255,7 +255,6 @@ function setDataTable($table: HTMLTableElement, data: AnalyzeResult) {
       summary.style.cursor = "pointer";
       const detailsText = document.createElement("span");
       detailsText.textContent = row.details;
-      details.textContent = row.details;
       details.append(summary, detailsText);
       $td.append(contentDiv, details);
     } else {
