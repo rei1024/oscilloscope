@@ -5,6 +5,7 @@ type DataTableRow = {
   header: string;
   content: string;
   url?: string;
+  details?: string;
 };
 
 function getDataTableRows(data: AnalyzeResult): DataTableRow[] {
@@ -104,6 +105,11 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
       header: "Is omnifrequent",
       content: isOmnifrequent(data),
       url: "https://conwaylife.com/forums/viewtopic.php?f=2&t=7026",
+      ...(data.missingFrequencies.length === 0
+        ? {}
+        : {
+            details: `missing ${compactRanges(data.missingFrequencies).join(", ")}`,
+          }),
     },
   ];
 }
@@ -113,7 +119,7 @@ function isOmnifrequent(data: AnalyzeResult): string {
   if (missingFrequencies.length === 0) {
     return "Yes";
   }
-  return `No (has ${data.frequencyMap.list.length}/${data.period}, missing ${compactRanges(missingFrequencies).join(", ")})`;
+  return `No (has ${data.frequencyMap.list.length}/${data.period})`;
 }
 
 /**
@@ -243,7 +249,16 @@ function setDataTable($table: HTMLTableElement, data: AnalyzeResult) {
 
     // Content cell (td)
     const $td = $tr.insertCell();
-    $td.textContent = row.content;
+
+    if (row.details) {
+      const contentDiv = document.createElement("div");
+      contentDiv.textContent = row.content;
+      const details = document.createElement("details");
+      details.textContent = row.details;
+      $td.append(contentDiv, details);
+    } else {
+      $td.textContent = row.content;
+    }
   }
 }
 

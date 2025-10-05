@@ -21,7 +21,6 @@ import { type ColorType, type MapType } from "./ui/core";
 import { ColorMap } from "./make-color";
 import { FrequencyUI } from "./ui/frequency";
 import { MapCanvasUI } from "./ui/map-canvas-ui";
-import type { MapData } from "./lib/getMap";
 import { post } from "./main";
 import { DataTableUI } from "./ui/dataTable";
 import type {
