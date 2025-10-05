@@ -59,7 +59,7 @@ worker.addEventListener("message", (e) => {
       break;
     }
     case "response-signature": {
-      app.onSignatureMap(message.signature);
+      app.onSignatureMap(message);
       break;
     }
     default: {

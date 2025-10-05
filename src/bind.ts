@@ -38,6 +38,9 @@ export const $dataBox = $("#data-box") as HTMLElement;
 
 export const $dataTable = $("#data-table") as HTMLTableElement;
 
+export const $metaBox = $("#meta-box") as HTMLElement;
+export const $metaTable = $("#meta-table") as HTMLTableElement;
+
 export const $input = $("#input") as HTMLTextAreaElement;
 
 export const $analyzeButton = $("#analyze") as HTMLButtonElement;

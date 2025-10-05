@@ -17,7 +17,9 @@ export function getSignatureMap({
   periodMapArray: ReadonlyArray<ReadonlyArray<number>>;
 }): {
   signatureMap: MapData<bigint>;
+  signatureTimeMilliseconds: number;
 } {
+  const startTime = performance.now();
   const signatureArray = Array(height)
     .fill(0)
     .map(() => 0)
@@ -86,8 +88,11 @@ export function getSignatureMap({
     }
   }
 
+  const endTime = performance.now();
+
   return {
     signatureMap: getMapData(signatureArray, 0n),
+    signatureTimeMilliseconds: endTime - startTime,
   };
 }
 

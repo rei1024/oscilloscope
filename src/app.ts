@@ -14,6 +14,7 @@ import {
   $analyzeButton,
   $dataTable,
   $message,
+  $metaTable,
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";
@@ -23,12 +24,16 @@ import { MapCanvasUI } from "./ui/map-canvas-ui";
 import type { MapData } from "./lib/getMap";
 import { post } from "./main";
 import { DataTableUI } from "./ui/dataTable";
-import type { WorkerResponseMessage } from "./worker";
+import type {
+  WorkerResponseMessage,
+  WorkerResponseMessageSignature,
+} from "./worker";
+import { MetaTableUI } from "./ui/metaTable";
 
 export class App {
   private data: AnalyzeResult | null = null;
   private histories: BitGrid[] | null = null;
-  private signatureMap: MapData<bigint> | null = null;
+  private signatureData: WorkerResponseMessageSignature | null = null;
   private gen = 0;
   private valve: Valve;
   private mapType: MapType = "period";
@@ -38,6 +43,7 @@ export class App {
   private frequencyUI: FrequencyUI;
   private colorTable: ColorTableUI;
   private dataTable: DataTableUI;
+  private metaTable: MetaTableUI;
   private analyzeButtonChangeId: number | undefined;
   private signatureMapCreating = false;
 
@@ -63,6 +69,7 @@ export class App {
 
     this.colorTable = new ColorTableUI($colorTable, $hoverInfo);
     this.dataTable = new DataTableUI($dataTable);
+    this.metaTable = new MetaTableUI($metaTable);
   }
 
   render() {
@@ -97,6 +104,7 @@ export class App {
   onError(data: WorkerResponseMessage & { kind: "response-error" }) {
     $message.style.display = "none";
     $dataTable.style.display = "none";
+    $metaTable.style.display = "none";
     $message.style.display = "block";
     $message.textContent = "Error: " + data.message;
     $message.style.backgroundColor = "#fecaca";
@@ -106,7 +114,7 @@ export class App {
     $message.style.display = "none";
     $message.textContent = "";
 
-    this.signatureMap = null;
+    this.signatureData = null;
     // Do not show map for spaceship
     $mapBox.style.display = data.isSpaceship ? "none" : "";
 
@@ -121,9 +129,11 @@ export class App {
     $dataTable.style.display = "block";
     this.dataTable.render(data);
 
+    this.metaTable.render(data, this.signatureData);
+
     this.frequencyUI.setup(data);
 
-    if (this.mapType === "signature" && this.signatureMap == null) {
+    if (this.mapType === "signature" && this.signatureData == null) {
       this.analyzeSignature();
     }
 
@@ -136,7 +146,7 @@ export class App {
     if (!this.data) {
       return;
     }
-    if (this.signatureMap) {
+    if (this.signatureData) {
       return;
     }
     $analyzeButton.disabled = true;
@@ -162,13 +172,17 @@ export class App {
     });
   }
 
-  onSignatureMap(signatureMap: MapData<bigint>) {
+  onSignatureMap(response: WorkerResponseMessageSignature) {
     this.signatureMapCreating = false;
     $analyzeButton.disabled = false;
     clearTimeout(this.analyzeButtonChangeId);
     $analyzeButton.textContent = "Analyze";
-    this.signatureMap = signatureMap;
+    this.signatureData = response;
     this.setupColor();
+    if (this.data) {
+      this.metaTable.render(this.data, this.signatureData);
+    }
+
     this.render();
   }
 
@@ -217,10 +231,10 @@ export class App {
         return data.periodMap;
       }
       case "signature": {
-        if (!this.signatureMap) {
+        if (!this.signatureData) {
           return null;
         }
-        return this.signatureMap;
+        return this.signatureData.signature;
       }
     }
   }
@@ -244,7 +258,7 @@ export class App {
     } else {
       $colorSelectContainer.style.display = "";
     }
-    if (mapType === "signature" && this.signatureMap == null) {
+    if (mapType === "signature" && this.signatureData == null) {
       this.analyzeSignature();
     }
     this.mapType = mapType;
