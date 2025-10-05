@@ -36,7 +36,8 @@ function createColorTable<T>(
     const row = document.createElement("tr");
     const color = colorMap.map.get(item) ?? "";
     const $color = document.createElement("td");
-    $color.style.backgroundColor = color;
+    // Add !important because Samsung's dark mode overrides the colors.
+    $color.style.setProperty("background-color", color, "important");
     $color.style.width = "40px";
 
     const $detail = document.createElement("td");
