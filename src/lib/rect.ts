@@ -5,14 +5,19 @@ export interface Rect {
   maxY: number;
 }
 
-export function rectToSize({ minX, minY, maxX, maxY }: Rect) {
+export type Size = {
+  width: number;
+  height: number;
+};
+
+export function rectToSize({ minX, minY, maxX, maxY }: Rect): Size {
   return {
-    sizeX: maxX - minX + 1,
-    sizeY: maxY - minY + 1,
+    width: maxX - minX + 1,
+    height: maxY - minY + 1,
   };
 }
 
 export function rectToArea(rect: Rect): number {
-  const { sizeX, sizeY } = rectToSize(rect);
-  return sizeX * sizeY;
+  const { width, height } = rectToSize(rect);
+  return width * height;
 }

@@ -5,7 +5,6 @@ import {
   $showGridCheckbox,
 } from "../bind";
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
-import type { MapType } from "./core";
 import type { MapData } from "../lib/getMap";
 import type { ColorMap } from "../make-color";
 
@@ -24,8 +23,8 @@ const MAX_NORMAL_SIZE = 512;
 
 function getIsDot(data: AnalyzeResult) {
   return (
-    data.boundingBox.sizeX > MAX_NORMAL_SIZE ||
-    data.boundingBox.sizeY > MAX_NORMAL_SIZE
+    data.boundingBox.width > MAX_NORMAL_SIZE ||
+    data.boundingBox.height > MAX_NORMAL_SIZE
   );
 }
 
@@ -48,8 +47,8 @@ export class MapCanvasUI {
     const cellPixel = isDot ? 1 : cellSize;
 
     const $canvas = this.$canvas;
-    $canvas.width = (data.boundingBox.sizeX + safeArea * 2) * cellPixel;
-    $canvas.height = (data.boundingBox.sizeY + safeArea * 2) * cellPixel;
+    $canvas.width = (data.boundingBox.width + safeArea * 2) * cellPixel;
+    $canvas.height = (data.boundingBox.height + safeArea * 2) * cellPixel;
     if ($canvas.width / 2 > $canvas.height) {
       $canvas.style.width = "100%";
       $canvas.style.height = "";
@@ -138,8 +137,8 @@ export class MapCanvasUI {
     if (isDot) {
       return;
     }
-    const yMax = data.boundingBox.sizeY + safeArea * 2;
-    const xMax = data.boundingBox.sizeX + safeArea * 2;
+    const yMax = data.boundingBox.height + safeArea * 2;
+    const xMax = data.boundingBox.width + safeArea * 2;
     if ($showGridCheckbox.checked) {
       ctx.beginPath();
       for (let y = 0; y < yMax; y++) {
@@ -177,14 +176,14 @@ export class MapCanvasUI {
       dx +
       Math.floor(
         (pixelPosition.x / this.$canvas.clientWidth) *
-          (data.boundingBox.sizeX + safeArea * 2),
+          (data.boundingBox.width + safeArea * 2),
       );
     const y =
       -safeArea +
       dy +
       Math.floor(
         (pixelPosition.y / this.$canvas.clientHeight) *
-          (data.boundingBox.sizeY + safeArea * 2),
+          (data.boundingBox.height + safeArea * 2),
       );
 
     if (y < 0 || y >= mapData.data.length) {

@@ -12,6 +12,7 @@ import { WorldSizeError } from "./lib/WorldWithHistory";
 import { getErrorMessageForParseRule } from "./lib/rule-error";
 import type { MapData } from "./lib/getMap";
 import { getSignatureMap } from "./lib/getSignatureMap";
+import type { Size } from "./lib/rect";
 
 export type WorkerRequestMessage =
   | {
@@ -22,8 +23,7 @@ export type WorkerRequestMessage =
   | {
       kind: "request-signature";
       data: {
-        width: number;
-        height: number;
+        size: Size;
         or: BitGridData;
         histories: BitGridData[];
         periodMapArray: ReadonlyArray<ReadonlyArray<number>>;
@@ -67,10 +67,9 @@ function isInfiniteGrid(
 function handleSignature(
   data: WorkerRequestMessage & { kind: "request-signature" },
 ): WorkerResponseMessage {
-  const { width, height, or, histories, periodMapArray } = data.data;
+  const { size, or, histories, periodMapArray } = data.data;
   const map = getSignatureMap({
-    width,
-    height,
+    size,
     or: bitGridFromData(or),
     histories: histories.map((h) => bitGridFromData(h)),
     periodMapArray,

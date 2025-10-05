@@ -162,8 +162,7 @@ export class App {
     post({
       kind: "request-signature",
       data: {
-        width: this.data.bitGridData.width,
-        height: this.data.bitGridData.height,
+        size: this.data.bitGridData.size,
         or: this.data.bitGridData.or,
         periodMapArray: this.data.periodMap.data,
         histories: this.data.histories,

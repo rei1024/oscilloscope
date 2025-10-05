@@ -36,7 +36,7 @@ describe("analyzeOscillator", () => {
     expect(result.stator).toEqual(4);
     expect(result.rotor).toEqual(0);
     expect(result.strictVolatility).toEqual(1);
-    expect(result.boundingBox).toEqual({ sizeX: 2, sizeY: 2 });
+    expect(result.boundingBox).toEqual({ width: 2, height: 2 });
     expect(result.population).toEqual({
       min: 4,
       max: 4,
@@ -60,7 +60,7 @@ describe("analyzeOscillator", () => {
     expect(result.stator).toEqual(1);
     expect(result.rotor).toEqual(4);
     expect(result.strictVolatility).toEqual(0.8);
-    expect(result.boundingBox).toEqual({ sizeX: 3, sizeY: 3 });
+    expect(result.boundingBox).toEqual({ width: 3, height: 3 });
     expect(result.population).toEqual({
       min: 3,
       max: 3,
@@ -100,8 +100,7 @@ describe("analyzeOscillator", () => {
     ]);
 
     const signatureMap = getSignatureMap({
-      width: result.bitGridData.width,
-      height: result.bitGridData.height,
+      size: result.bitGridData.size,
       or: bitGridFromData(result.bitGridData.or),
       periodMapArray: result.periodMap.data,
       histories: result.histories.map((h) => bitGridFromData(h)),
@@ -128,8 +127,7 @@ describe("analyzeOscillator", () => {
     });
 
     const signatureMap = getSignatureMap({
-      width: result.bitGridData.width,
-      height: result.bitGridData.height,
+      size: result.bitGridData.size,
       or: bitGridFromData(result.bitGridData.or),
       periodMapArray: result.periodMap.data,
       histories: result.histories.map((h) => bitGridFromData(h)),
@@ -164,7 +162,7 @@ describe("analyzeOscillator", () => {
     expect(result.stator).toEqual(0);
     expect(result.rotor).toEqual(116);
     expect(result.strictVolatility).toEqual(1);
-    expect(result.boundingBox).toEqual({ sizeX: 13, sizeY: 13 });
+    expect(result.boundingBox).toEqual({ width: 13, height: 13 });
     expect(result.population).toEqual({
       min: 28,
       max: 64,
@@ -195,7 +193,7 @@ x = 35, y = 7, rule = B3/S23
     expect(result.period).toEqual(60);
     expect(result.volatility).toEqual(1);
     expect(result.strictVolatility.toFixed(2)).toEqual("0.30");
-    expect(result.boundingBox).toEqual({ sizeX: 41, sizeY: 13 });
+    expect(result.boundingBox).toEqual({ width: 41, height: 13 });
     expect(result.population).toEqual({
       min: 29,
       max: 85,
@@ -228,7 +226,7 @@ o2b2o$10bo15b3o2bo$24bo4bobo$13b2o9bob3obo$13bo11bo2bo$14b3o9b2o2bo$
     expect(result.period).toEqual(19);
     expect(result.volatility.toFixed(2)).toEqual("0.72");
     expect(result.strictVolatility.toFixed(2)).toEqual("0.72");
-    expect(result.boundingBox).toEqual({ sizeX: 32, sizeY: 21 });
+    expect(result.boundingBox).toEqual({ width: 32, height: 21 });
     expect(result.heat.toFixed(1)).toEqual("33.5");
     expect(result.heatMin).toEqual(4);
     expect(result.heatMax).toEqual(66);
@@ -255,7 +253,7 @@ o$2o59b2o$b2o57b2o4$b2o57b2o$2o59b2o$2bo57bo$b2o57b2o$3bo55bo22$25bo
     expect(result.period).toEqual(661);
     expect(result.isSpaceship).toEqual(false);
     expect(result.volatility.toFixed(3)).toEqual("1.000");
-    expect(result.boundingBox).toEqual({ sizeX: 99, sizeY: 99 });
+    expect(result.boundingBox).toEqual({ width: 99, height: 99 });
   });
 
   it("analyze Sir Robin", () => {
@@ -283,9 +281,9 @@ o$22b2o3bo$21bo$21b2obo$20bo$19b5o$19bo4bo$18b3ob3o$18bob5o$18bo$20bo$
     expect(result.period).toEqual(6);
     expect(result.isSpaceship).toEqual(true);
     expect(result.speed).toEqual({ dx: -1, dy: -2 });
-    expect(result.boundingBoxMovingEncloses).toEqual({ sizeX: 31, sizeY: 79 });
-    expect(result.boundingBoxMaxArea.size).toEqual({ sizeX: 31, sizeY: 79 });
-    expect(result.boundingBoxMinArea.size).toEqual({ sizeX: 30, sizeY: 79 });
+    expect(result.boundingBoxMovingEncloses).toEqual({ width: 31, height: 79 });
+    expect(result.boundingBoxMaxArea.size).toEqual({ width: 31, height: 79 });
+    expect(result.boundingBoxMinArea.size).toEqual({ width: 30, height: 79 });
   });
 
   it(`analyze RRO`, () => {
@@ -309,12 +307,12 @@ o$22b2o3bo$21bo$21b2obo$20bo$19b5o$19bo4bo$18b3ob3o$18bob5o$18bo$20bo$
     expect(result.stator).toEqual(0);
     expect(result.rotor).toEqual(44);
 
-    expect(result.boundingBox).toEqual({ sizeX: 7, sizeY: 7 });
-    expect(result.boundingBoxMinArea.size).toEqual({ sizeX: 3, sizeY: 2 });
-    expect(result.boundingBoxMaxArea.size).toEqual({ sizeX: 3, sizeY: 6 });
+    expect(result.boundingBox).toEqual({ width: 7, height: 7 });
+    expect(result.boundingBoxMinArea.size).toEqual({ width: 3, height: 2 });
+    expect(result.boundingBoxMaxArea.size).toEqual({ width: 3, height: 6 });
     expect(result.boundingBoxMovingEncloses).toEqual({
-      sizeX: 6,
-      sizeY: 6,
+      width: 6,
+      height: 6,
     });
   });
 });

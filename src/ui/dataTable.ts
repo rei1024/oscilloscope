@@ -1,4 +1,5 @@
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
+import type { Size } from "../lib/rect";
 import { MathExtra } from "../util/math";
 
 type DataTableRow = {
@@ -18,14 +19,8 @@ function getDataTableRows(data: AnalyzeResult): DataTableRow[] {
   }
 }
 
-function getBoundingBoxText({
-  sizeX,
-  sizeY,
-}: {
-  sizeX: number;
-  sizeY: number;
-}) {
-  return `${sizeX} x ${sizeY} = ${sizeX * sizeY}`;
+function getBoundingBoxText({ width, height }: Size) {
+  return `${width} x ${height} = ${width * height}`;
 }
 
 function getDataTableRowsForStillLife(data: AnalyzeResult): DataTableRow[] {
@@ -46,7 +41,7 @@ function getDataTableRowsForStillLife(data: AnalyzeResult): DataTableRow[] {
       header: "Density",
       content: (
         data.population.min /
-        (data.boundingBox.sizeX * data.boundingBox.sizeY)
+        (data.boundingBox.width * data.boundingBox.height)
       ).toFixed(2),
     },
   ];
@@ -254,7 +249,13 @@ function setDataTable($table: HTMLTableElement, data: AnalyzeResult) {
       const contentDiv = document.createElement("div");
       contentDiv.textContent = row.content;
       const details = document.createElement("details");
-      details.textContent = row.details;
+      const summary = document.createElement("summary");
+      summary.textContent = "Details";
+      summary.style.userSelect = "none";
+      summary.style.cursor = "pointer";
+      const detailsText = document.createElement("span");
+      detailsText.textContent = row.details;
+      details.append(summary, detailsText);
       $td.append(contentDiv, details);
     } else {
       $td.textContent = row.content;
