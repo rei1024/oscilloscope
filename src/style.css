@@ -87,8 +87,11 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
-#color-table :where(th, td) {
+#color-table :where(th) {
   padding-inline: 8px;
+}
+
+#color-table :where(th, td) {
   border-bottom: 0.5px solid #eeeeee;
 }
 

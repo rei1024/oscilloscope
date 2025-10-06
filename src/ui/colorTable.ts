@@ -39,7 +39,7 @@ function createColorTable<T>(
 
     // using canvas because Samsung dark mode changes the colors for background-color
     const canvas = document.createElement("canvas");
-    canvas.width = 2;
+    canvas.width = 3;
     canvas.height = 1;
     canvas.style.width = "100%";
     canvas.style.height = "100%";
@@ -49,10 +49,10 @@ function createColorTable<T>(
       throw new Error("Error");
     }
     ctx.fillStyle = color;
-    ctx.fillRect(0, 0, 2, 1);
+    ctx.fillRect(0, 0, 3, 1);
     $color.append(canvas);
 
-    $color.style.width = "20px";
+    $color.style.width = "18px";
 
     const $detail = document.createElement("td");
     if (mapType === "signature") {
