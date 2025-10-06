@@ -8,8 +8,6 @@ import {
   $exampleOscillators,
   $input,
   $mapTypeSelect,
-  $message,
-  $dataTable,
   $showAnimationCheckbox,
   $showGridCheckbox,
 } from "./bind";
