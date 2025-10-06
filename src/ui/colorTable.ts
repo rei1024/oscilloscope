@@ -36,9 +36,23 @@ function createColorTable<T>(
     const row = document.createElement("tr");
     const color = colorMap.map.get(item) ?? "";
     const $color = document.createElement("td");
-    // Add !important because Samsung's dark mode overrides the colors.
-    $color.style.setProperty("background-color", color, "important");
-    $color.style.width = "40px";
+
+    // using canvas because Samsung dark mode changes the colors for background-color
+    const canvas = document.createElement("canvas");
+    canvas.width = 3;
+    canvas.height = 1;
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.objectFit = "fill";
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Error");
+    }
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, 3, 1);
+    $color.append(canvas);
+
+    $color.style.width = "18px";
 
     const $detail = document.createElement("td");
     if (mapType === "signature") {
