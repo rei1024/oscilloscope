@@ -196,6 +196,9 @@ export class App {
     if (!mapData) {
       return;
     }
+    if (this.mapType === "none") {
+      return;
+    }
     const list = mapData.list;
     const colorMap = ColorMap.make({
       list: list as (number | bigint)[],
@@ -237,6 +240,9 @@ export class App {
         }
         return this.signatureData.signature;
       }
+      case "none": {
+        return null;
+      }
     }
   }
 
@@ -254,7 +260,7 @@ export class App {
   }
 
   updateMapType(mapType: MapType) {
-    if (mapType === "heat") {
+    if (mapType === "heat" || mapType === "none") {
       $colorSelectContainer.style.display = "none";
     } else {
       $colorSelectContainer.style.display = "";

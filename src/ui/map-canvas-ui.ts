@@ -79,19 +79,11 @@ export class MapCanvasUI {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
 
-    if (mapData == null) {
-      return;
-    }
-
     const isDarkMode = $darkModeCheckbox.checked;
 
     // Background
     ctx.fillStyle = isDarkMode ? "black" : "white";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    // Map
-    const dx = data.bitGridData.minX;
-    const dy = data.bitGridData.minY;
 
     const isDot = getIsDot(data);
 
@@ -99,30 +91,20 @@ export class MapCanvasUI {
 
     const sizePixel = isDot ? 1 : cellSize;
 
-    const colorList = colorMap.colorList;
+    const dx = data.bitGridData.minX;
+    const dy = data.bitGridData.minY;
 
-    for (const [y, row] of mapData.indexData.entries()) {
-      for (const [x, index] of row.entries()) {
-        if (index !== -1) {
-          ctx.beginPath();
-          ctx.fillStyle = colorList[index];
-          ctx.rect(
-            (x - dx + safeArea) * sizePixel,
-            (y - dy + safeArea) * sizePixel,
-            sizePixel,
-            sizePixel,
-          );
-          ctx.fill();
-        }
-      }
-    }
+    // Map
+    this.renderMap({ data, mapData, colorMap });
 
+    // Alive Cells
     if ($showAnimationCheckbox.checked) {
+      const isCellWhite = isDarkMode && mapData == null;
+
       const innerCellOffsetPixel = isDot ? 1 : innerCellOffset;
       const innerCellSizePixel = isDot ? 1 : innerCellSize;
-      // Alive Cells
       ctx.beginPath();
-      ctx.fillStyle = "black";
+      ctx.fillStyle = isCellWhite ? "white" : "black";
       histories[gen].forEachAlive((x, y) => {
         ctx.rect(
           (x - dx + safeArea) * sizePixel + innerCellOffsetPixel,
@@ -155,6 +137,44 @@ export class MapCanvasUI {
         }
       }
       ctx.fill();
+    }
+  }
+
+  private renderMap({
+    data,
+    mapData,
+    colorMap,
+  }: {
+    data: AnalyzeResult;
+    mapData: MapData<unknown> | null;
+    colorMap: ColorMap<unknown>;
+  }) {
+    if (mapData == null) {
+      return;
+    }
+    const isDot = getIsDot(data);
+    const sizePixel = isDot ? 1 : cellSize;
+
+    // Map
+    const dx = data.bitGridData.minX;
+    const dy = data.bitGridData.minY;
+
+    const colorList = colorMap.colorList;
+    const ctx = this.ctx;
+    for (const [y, row] of mapData.indexData.entries()) {
+      for (const [x, index] of row.entries()) {
+        if (index !== -1) {
+          ctx.beginPath();
+          ctx.fillStyle = colorList[index];
+          ctx.rect(
+            (x - dx + safeArea) * sizePixel,
+            (y - dy + safeArea) * sizePixel,
+            sizePixel,
+            sizePixel,
+          );
+          ctx.fill();
+        }
+      }
     }
   }
 
