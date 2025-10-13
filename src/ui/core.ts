@@ -1,4 +1,4 @@
-export type MapType = "period" | "frequency" | "heat" | "signature";
+export type MapType = "period" | "frequency" | "heat" | "signature" | "none";
 
 /**
  * 表示用
@@ -16,6 +16,7 @@ export function displayMapTypeTitle(mapType: MapType): string {
     frequency: "Frequency",
     heat: "Heat",
     signature: "Signature",
+    none: "None",
   }[mapType];
 }
 
