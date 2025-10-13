@@ -53,6 +53,9 @@ export class App {
         if (!this.histories || num <= 0) {
           return;
         }
+        if (!$showAnimationCheckbox.checked) {
+          return;
+        }
         this.gen = (this.gen + num) % this.histories.length;
         this.render();
       },
