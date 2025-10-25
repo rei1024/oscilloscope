@@ -1,3 +1,4 @@
+import { $colorTableDetails } from "../bind";
 import type { MapData } from "../lib/getMap";
 import type { ColorMap } from "../make-color";
 import { displayMapTypeLower, displayMapTypeTitle, type MapType } from "./core";
@@ -107,10 +108,12 @@ export class ColorTableUI {
     historyLength: number,
   ) {
     if (map == null) {
+      $colorTableDetails.style.display = "none";
       this.rows = [];
       this.$colorTable.replaceChildren();
       return;
     }
+    $colorTableDetails.style.display = "";
     this.rows = createColorTable(
       this.$colorTable,
       map,

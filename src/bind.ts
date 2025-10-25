@@ -61,4 +61,6 @@ export const $animFrequencyLabel = $(
 
 export const $generation = $("#generation") as HTMLElement;
 
+export const $colorTableDetails = $("#color-table-details") as HTMLElement;
+
 export const $colorTable = $("#color-table") as HTMLTableElement;
