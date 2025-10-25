@@ -1,4 +1,5 @@
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
+import { getDirectionName } from "../lib/direction";
 import type { Size } from "../lib/rect";
 import { MathExtra } from "../util/math";
 
@@ -148,6 +149,15 @@ function compactRanges(arr: number[]): string[] {
 // Do not show Heat, Temperature, Bounding Box, Cells, Volatility, Strict volatility
 function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
   const speed = data.speed;
+
+  const directionName = getDirectionName(speed.dx, speed.dy);
+  const direction =
+    speed.dx === 0 || speed.dy === 0
+      ? "Orthogonal"
+      : Math.abs(speed.dx) === Math.abs(speed.dy)
+        ? "Diagonal"
+        : "Oblique" + (directionName ? ` ${directionName}` : "");
+
   return [
     {
       header: "Type",
@@ -171,12 +181,7 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
     },
     {
       header: "Direction",
-      content:
-        speed.dx === 0 || speed.dy === 0
-          ? "Orthogonal"
-          : Math.abs(speed.dx) === Math.abs(speed.dy)
-            ? "Diagonal"
-            : "Oblique",
+      content: direction,
     },
     {
       header: "Speed",
