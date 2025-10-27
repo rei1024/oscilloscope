@@ -1,7 +1,7 @@
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
 import { getDirectionName } from "../lib/direction";
+import { formatSpeed } from "../lib/formatSpeed";
 import type { Size } from "../lib/rect";
-import { MathExtra } from "../util/math";
 
 type DataTableRow = {
   header: string;
@@ -158,6 +158,14 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
         ? "Diagonal"
         : "Oblique" + (directionName ? ` ${directionName}` : "");
 
+  const speedDisplay = formatSpeed(speed.dx, speed.dy, data.period, true);
+  const unsimplifiedSpeedDisppay = formatSpeed(
+    speed.dx,
+    speed.dy,
+    data.period,
+    false,
+  );
+
   return [
     {
       header: "Type",
@@ -186,36 +194,12 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
     {
       header: "Speed",
       content:
-        speed.dx === 0 || speed.dy === 0
-          ? stringifyFraction(Math.abs(speed.dx + speed.dy), data.period)
-          : Math.abs(speed.dx) === Math.abs(speed.dy)
-            ? stringifyFraction(Math.abs(speed.dx), data.period)
-            : stringifyFraction2(
-                Math.abs(speed.dx),
-                Math.abs(speed.dy),
-                data.period,
-              ),
+        speedDisplay +
+        (speedDisplay === unsimplifiedSpeedDisppay
+          ? ""
+          : ` (Unsimplified: ${unsimplifiedSpeedDisppay})`),
     },
   ];
-}
-
-function stringifyFraction(num: number, den: number) {
-  const divideBy = MathExtra.gcd(num, den);
-  const numSimple = Math.floor(num / divideBy);
-  const denSimple = Math.floor(den / divideBy);
-
-  return `${numSimple === 1 ? "" : numSimple}c${denSimple === 1 ? "" : `/${denSimple}`}`;
-}
-
-function stringifyFraction2(num0: number, num1: number, den: number) {
-  const num01GCD = MathExtra.gcd(num0, num1);
-  const divideBy = MathExtra.gcd(num01GCD, den);
-  const num0Simple = Math.floor(num0 / divideBy);
-  const num1Simple = Math.floor(num1 / divideBy);
-  const denSimple = Math.floor(den / divideBy);
-
-  // (2,1)c/6
-  return `(${num0Simple},${num1Simple})c${denSimple === 1 ? "" : `/${denSimple}`}`;
 }
 
 /**

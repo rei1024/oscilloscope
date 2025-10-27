@@ -1,7 +1,7 @@
 {
   "name": "oscilloscope",
   "private": true,
-  "version": "1.5.3",
+  "version": "1.5.4",
   "type": "module",
   "repository": {
     "url": "https://github.com/rei1024/oscilloscope"
