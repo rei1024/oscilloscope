@@ -1,5 +1,6 @@
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
 import { getDirectionName } from "../lib/direction";
+import { formatSpeed } from "../lib/formatSpeed";
 import type { Size } from "../lib/rect";
 import { MathExtra } from "../util/math";
 
@@ -186,60 +187,12 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
     {
       header: "Speed",
       content:
-        printSpeed(speed.dx, speed.dy, data.period, true) +
+        formatSpeed(speed.dx, speed.dy, data.period, true) +
         " (Unsimplified: " +
-        printSpeed(speed.dx, speed.dy, data.period, false) +
+        formatSpeed(speed.dx, speed.dy, data.period, false) +
         ")",
     },
   ];
-}
-
-function printSpeed(dx: number, dy: number, period: number, simplify: boolean) {
-  dx = Math.abs(dx);
-  dy = Math.abs(dy);
-
-  if (dx === 0 || dy === 0) {
-    if (simplify) {
-      return stringifyFraction(Math.abs(dx + dy), period);
-    } else {
-      return `${dx + dy}c${showDivIfNotOne(period)}`;
-    }
-  } else if (dx === dy) {
-    if (simplify) {
-      return stringifyFraction(dx, period);
-    } else {
-      return `${dx}c${showDivIfNotOne(period)}`;
-    }
-  } else {
-    if (simplify) {
-      return stringifyFraction2(dx, dy, period);
-    } else {
-      return `(${dx},${dy})c${showDivIfNotOne(period)}`;
-    }
-  }
-}
-
-function showDivIfNotOne(den: number) {
-  return den === 1 ? "" : `/${den}`;
-}
-
-function stringifyFraction(num: number, den: number) {
-  const divideBy = MathExtra.gcd(num, den);
-  const numSimple = Math.floor(num / divideBy);
-  const denSimple = Math.floor(den / divideBy);
-
-  return `${numSimple === 1 ? "" : numSimple}c${denSimple === 1 ? "" : `/${denSimple}`}`;
-}
-
-function stringifyFraction2(num0: number, num1: number, den: number) {
-  const num01GCD = MathExtra.gcd(num0, num1);
-  const divideBy = MathExtra.gcd(num01GCD, den);
-  const num0Simple = Math.floor(num0 / divideBy);
-  const num1Simple = Math.floor(num1 / divideBy);
-  const denSimple = Math.floor(den / divideBy);
-
-  // (2,1)c/6
-  return `(${num0Simple},${num1Simple})c${denSimple === 1 ? "" : `/${denSimple}`}`;
 }
 
 /**
