@@ -2,7 +2,6 @@ import type { AnalyzeResult } from "../lib/analyzeOscillator";
 import { getDirectionName } from "../lib/direction";
 import { formatSpeed } from "../lib/formatSpeed";
 import type { Size } from "../lib/rect";
-import { MathExtra } from "../util/math";
 
 type DataTableRow = {
   header: string;
