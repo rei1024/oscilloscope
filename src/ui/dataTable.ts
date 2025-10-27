@@ -158,6 +158,14 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
         ? "Diagonal"
         : "Oblique" + (directionName ? ` ${directionName}` : "");
 
+  const speedDisplay = formatSpeed(speed.dx, speed.dy, data.period, true);
+  const unsimplifiedSpeedDisppay = formatSpeed(
+    speed.dx,
+    speed.dy,
+    data.period,
+    false,
+  );
+
   return [
     {
       header: "Type",
@@ -186,10 +194,10 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
     {
       header: "Speed",
       content:
-        formatSpeed(speed.dx, speed.dy, data.period, true) +
-        " (Unsimplified: " +
-        formatSpeed(speed.dx, speed.dy, data.period, false) +
-        ")",
+        speedDisplay +
+        (speedDisplay === unsimplifiedSpeedDisppay
+          ? ""
+          : ` (Unsimplified: ${unsimplifiedSpeedDisppay})`),
     },
   ];
 }
