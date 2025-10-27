@@ -186,17 +186,41 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
     {
       header: "Speed",
       content:
-        speed.dx === 0 || speed.dy === 0
-          ? stringifyFraction(Math.abs(speed.dx + speed.dy), data.period)
-          : Math.abs(speed.dx) === Math.abs(speed.dy)
-            ? stringifyFraction(Math.abs(speed.dx), data.period)
-            : stringifyFraction2(
-                Math.abs(speed.dx),
-                Math.abs(speed.dy),
-                data.period,
-              ),
+        printSpeed(speed.dx, speed.dy, data.period, true) +
+        " (Unsimplified: " +
+        printSpeed(speed.dx, speed.dy, data.period, false) +
+        ")",
     },
   ];
+}
+
+function printSpeed(dx: number, dy: number, period: number, simplify: boolean) {
+  dx = Math.abs(dx);
+  dy = Math.abs(dy);
+
+  if (dx === 0 || dy === 0) {
+    if (simplify) {
+      return stringifyFraction(Math.abs(dx + dy), period);
+    } else {
+      return `${dx + dy}c${showDivIfNotOne(period)}`;
+    }
+  } else if (dx === dy) {
+    if (simplify) {
+      return stringifyFraction(dx, period);
+    } else {
+      return `${dx}c${showDivIfNotOne(period)}`;
+    }
+  } else {
+    if (simplify) {
+      return stringifyFraction2(dx, dy, period);
+    } else {
+      return `(${dx},${dy})c${showDivIfNotOne(period)}`;
+    }
+  }
+}
+
+function showDivIfNotOne(den: number) {
+  return den === 1 ? "" : `/${den}`;
 }
 
 function stringifyFraction(num: number, den: number) {
