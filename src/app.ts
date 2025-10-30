@@ -135,7 +135,12 @@ export class App {
 
     this.frequencyUI.setup(data);
 
-    if (this.mapType === "signature" && this.signatureData == null) {
+    if (
+      // Only analyze if not spaceship
+      !data.isSpaceship &&
+      this.mapType === "signature" &&
+      this.signatureData == null
+    ) {
       this.analyzeSignature();
     }
 
