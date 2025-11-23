@@ -44,6 +44,7 @@ export function getSignatureMap({
       const rowIndex = i * width;
       const y = i;
       const signatureArrayRow = signatureArray[y];
+      const periodMapRow = periodMapArray[y];
 
       for (let j = 0; j < width; j++) {
         const offset = rowIndex + j;
@@ -72,7 +73,7 @@ export function getSignatureMap({
             }
           }
 
-          const periodOfCell = periodMapArray[y][x];
+          const periodOfCell = periodMapRow[x];
 
           const canonicalSignature = getCanonicalSignature(
             signature,
