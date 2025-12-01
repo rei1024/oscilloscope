@@ -9,6 +9,11 @@ export function formatSpeed(
   dx = Math.abs(dx);
   dy = Math.abs(dy);
 
+  // decending order
+  if (dy > dx) {
+    [dx, dy] = [dy, dx];
+  }
+
   if (dx === 0 || dy === 0) {
     if (simplify) {
       return stringifyFraction(dx + dy, period);

@@ -11,8 +11,8 @@ describe("formatSpeed", () => {
     expect(formatSpeed(0, 2, 6, true)).toEqual("c/3");
     expect(formatSpeed(1, 1, 6, true)).toEqual("c/6");
     expect(formatSpeed(3, 3, 6, true)).toEqual("c/2");
-    expect(formatSpeed(2, 3, 6, true)).toEqual("(2,3)c/6");
-    expect(formatSpeed(-2, 3, 6, true)).toEqual("(2,3)c/6");
+    expect(formatSpeed(2, 3, 6, true)).toEqual("(3,2)c/6");
+    expect(formatSpeed(-2, 3, 6, true)).toEqual("(3,2)c/6");
     expect(formatSpeed(3, -2, 6, true)).toEqual("(3,2)c/6");
   });
 });
