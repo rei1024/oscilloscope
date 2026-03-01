@@ -25,9 +25,9 @@
     "@ca-ts/rle": "npm:@jsr/ca-ts__rle@^0.11.3",
     "@ca-ts/rule": "npm:@jsr/ca-ts__rule@^0.16.2",
     "@ca-ts/pattern": "npm:@jsr/ca-ts__pattern@^0.3.0",
-    "prettier": "3.6.2",
+    "prettier": "3.8.1",
     "typescript": "^5.9.3",
-    "vite": "^7.2.4",
-    "vitest": "^4.0.13"
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
   }
 }
