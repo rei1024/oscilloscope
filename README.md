@@ -8,7 +8,7 @@ Oscilloscope is an oscillator analyzer for cellular automata.
 
 ## Development
 
-- Node.js v22
+- Node.js v24
 
 Install dependencies
 
