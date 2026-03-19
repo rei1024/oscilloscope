@@ -9,7 +9,7 @@ export default {
     port: 5174,
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
         changelog: resolve(__dirname, "pages/changelog/index.html"),
