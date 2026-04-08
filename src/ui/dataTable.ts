@@ -128,11 +128,11 @@ function compactRanges(arr: number[]): string[] {
     return [];
   }
   const result = [];
-  let start = arr[0];
-  let end = arr[0];
+  let start = arr[0]!;
+  let end = arr[0]!;
 
   for (let i = 1; i < len; i++) {
-    const item = arr[i];
+    const item = arr[i]!;
     if (item === end + 1) {
       end = item;
     } else {

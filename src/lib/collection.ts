@@ -48,8 +48,8 @@ export function median(array: readonly number[]): number {
 
   if (len % 2 === 0) {
     const idx = (len >> 1) - 1;
-    return (sorted[idx] + sorted[idx + 1]) / 2;
+    return (sorted[idx]! + sorted[idx + 1]!) / 2;
   } else {
-    return sorted[len >> 1];
+    return sorted[len >> 1]!;
   }
 }

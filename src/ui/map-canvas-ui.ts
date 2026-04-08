@@ -105,7 +105,7 @@ export class MapCanvasUI {
       const innerCellSizePixel = isDot ? 1 : innerCellSize;
       ctx.beginPath();
       ctx.fillStyle = isCellWhite ? "white" : "black";
-      histories[gen].forEachAlive((x, y) => {
+      histories[gen]!.forEachAlive((x, y) => {
         ctx.rect(
           (x - dx + safeArea) * sizePixel + innerCellOffsetPixel,
           (y - dy + safeArea) * sizePixel + innerCellOffsetPixel,
@@ -165,7 +165,7 @@ export class MapCanvasUI {
       for (const [x, index] of row.entries()) {
         if (index !== -1) {
           ctx.beginPath();
-          ctx.fillStyle = colorList[index];
+          ctx.fillStyle = colorList[index]!;
           ctx.rect(
             (x - dx + safeArea) * sizePixel,
             (y - dy + safeArea) * sizePixel,
@@ -210,7 +210,7 @@ export class MapCanvasUI {
       return undefined;
     }
 
-    const cellData = mapData.data[y][x];
+    const cellData = mapData.data[y]![x];
     if (cellData === undefined) {
       return undefined;
     }

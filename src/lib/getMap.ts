@@ -91,9 +91,9 @@ export function getMap({
       const rowIndex = i * width;
       const y = i;
 
-      const heatArrayRow = heatArray[y];
-      const periodArrayRow = periodArray[y];
-      const frequencyArrayRow = frequencyArray[y];
+      const heatArrayRow = heatArray[y]!;
+      const periodArrayRow = periodArray[y]!;
+      const frequencyArrayRow = frequencyArray[y]!;
 
       for (let j = 0; j < width; j++) {
         const offset = rowIndex + j;
@@ -115,11 +115,11 @@ export function getMap({
           let prevCell = firstCell;
           let frequency = 0;
           for (let index = 0; index < lenHistories; index++) {
-            const array = histories[index].asInternalUint32Array();
+            const array = histories[index]!.asInternalUint32Array();
             const cell = getAlive(array, offset, u);
             if (/* prevCell !== undefined && */ prevCell !== cell) {
               heat++;
-              heatByGeneration[index]++;
+              heatByGeneration[index]!++;
             }
             prevCell = cell;
             statesAlloc[index] = cell;
@@ -138,7 +138,7 @@ export function getMap({
             )
           ) {
             heat++;
-            heatByGeneration[0]++;
+            heatByGeneration[0]!++;
           }
 
           const periodOfCell = findPeriodUint8(statesAlloc);

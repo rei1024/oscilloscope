@@ -43,8 +43,8 @@ export function getSignatureMap({
     for (let i = 0; i < height; i++) {
       const rowIndex = i * width;
       const y = i;
-      const signatureArrayRow = signatureArray[y];
-      const periodMapRow = periodMapArray[y];
+      const signatureArrayRow = signatureArray[y]!;
+      const periodMapRow = periodMapArray[y]!;
 
       for (let j = 0; j < width; j++) {
         const offset = rowIndex + j;
@@ -63,7 +63,7 @@ export function getSignatureMap({
 
           let signature = 0n;
           for (let index = 0; index < lenHistories; index++) {
-            const array = histories[index].asInternalUint32Array();
+            const array = histories[index]!.asInternalUint32Array();
             const cell = getAlive(array, offset, u);
 
             signature <<= 1n;
@@ -73,7 +73,7 @@ export function getSignatureMap({
             }
           }
 
-          const periodOfCell = periodMapRow[x];
+          const periodOfCell = periodMapRow[x]!;
 
           const canonicalSignature = getCanonicalSignature(
             signature,

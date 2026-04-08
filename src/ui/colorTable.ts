@@ -136,7 +136,7 @@ export class ColorTableUI {
     }
 
     if (data != undefined) {
-      this.rows[data.index].style.backgroundColor = "#0000FF22";
+      this.rows[data.index]!.style.backgroundColor = "#0000FF22";
 
       this.$hoverInfo.style.overflow = "hidden";
       this.$hoverInfo.style.maxWidth = "500px";

@@ -29,5 +29,5 @@ export function stringToRGB(string: string): [r: number, g: number, b: number] {
 
   // RGB値を返す (透明度は除外)
   // 例: [113, 91, 255]
-  return [data[0], data[1], data[2]];
+  return [data[0]!, data[1]!, data[2]!];
 }

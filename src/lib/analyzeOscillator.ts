@@ -3,17 +3,20 @@ import { rectToArea, rectToSize, type Size } from "./rect";
 import { BitGrid } from "@ca-ts/algo/bit";
 import { runOscillator, type RunOscillatorConfig } from "./runOscillator";
 import { getMap, type MapData } from "./getMap";
+import { throwError } from "./error";
 
 function getOrAndGrid(histories: BitGrid[]) {
   if (histories.length === 0) {
     throw Error("Error");
   }
 
-  const orGrid = histories[0].clone();
+  const firstHistory = histories[0] ?? throwError();
+
+  const orGrid = firstHistory.clone();
   orGrid.clear();
   // orは空白から開始
 
-  const andGrid = histories[0].clone();
+  const andGrid = firstHistory.clone();
   // andは1つ目の状態
 
   for (const bitGird of histories) {
