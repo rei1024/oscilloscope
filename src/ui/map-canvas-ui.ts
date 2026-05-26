@@ -34,7 +34,7 @@ export class MapCanvasUI {
 
   constructor($canvas: HTMLCanvasElement) {
     this.$canvas = $canvas;
-    const ctx = this.$canvas.getContext("2d", { colorSpace: "display-p3" });
+    const ctx = this.$canvas.getContext("2d");
     if (ctx == null) {
       throw Error("Context");
     }

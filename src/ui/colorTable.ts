@@ -88,7 +88,7 @@ function createColorTable<T>(
     $count.style.textAlign = "right";
 
     const $colorText = document.createElement("td");
-    const [r, g, b] = stringToRGB(color, "display-p3");
+    const [r, g, b] = stringToRGB(color);
     $colorText.textContent =
       "#" +
       [r, g, b]
