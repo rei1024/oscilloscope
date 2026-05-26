@@ -1,11 +1,15 @@
 import { stringToRGB } from "../util/string-to-rgb";
+import { $colorTableDetails } from "../bind";
+import type { MapData } from "../lib/getMap";
+import type { ColorMap } from "../make-color";
 import { displayMapTypeLower, displayMapTypeTitle, type MapType } from "./core";
 
-function createColorTable(
+function createColorTable<T>(
   $colorTable: HTMLElement,
-  map: { data: number[][]; list: number[]; countMap: Map<number, number> },
-  colorMap: Map<number, string>,
+  map: MapData<T>,
+  colorMap: ColorMap<T>,
   mapType: MapType,
+  historyLength: number,
 ) {
   const rows: HTMLTableRowElement[] = [];
 
@@ -33,15 +37,50 @@ function createColorTable(
     $colorTable.append(trHead);
   }
 
+  // using canvas because Samsung dark mode changes the colors for background-color
+  // large number of canvases can cause rendering issues.
+  const USE_CANVAS = list.length <= 100;
+
   for (const item of list) {
     const row = document.createElement("tr");
-    const color = colorMap.get(item) ?? "";
+    const color = colorMap.map.get(item) ?? "";
     const $color = document.createElement("td");
-    $color.style.backgroundColor = color;
-    $color.style.width = "40px";
+
+    if (USE_CANVAS) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 3;
+      canvas.height = 1;
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.style.objectFit = "fill";
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        throw new Error("Error");
+      }
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 3, 1);
+      $color.append(canvas);
+
+      $color.style.width = "18px";
+    } else {
+      $color.style.setProperty("background-color", color, "important");
+      $color.style.width = "40px";
+    }
 
     const $detail = document.createElement("td");
-    $detail.textContent = item.toString();
+    if (mapType === "signature") {
+      $detail.style.maxWidth = "500px";
+      $detail.style.overflow = "hidden";
+      $detail.style.textOverflow = "ellipsis";
+    }
+    $detail.textContent =
+      typeof item === "number"
+        ? item.toString()
+        : typeof item === "bigint"
+          ? showSignature(item, historyLength)
+          : (() => {
+              throw new Error("Internal error");
+            })();
     $detail.style.textAlign = "right";
 
     const $count = document.createElement("td");
@@ -68,23 +107,39 @@ export class ColorTableUI {
   private $colorTable: HTMLElement;
   private $hoverInfo: HTMLElement;
   private rows: HTMLTableRowElement[] = [];
+  private historyLength: number = 0;
   constructor($colorTable: HTMLElement, $hoverInfo: HTMLElement) {
     this.$colorTable = $colorTable;
     this.$hoverInfo = $hoverInfo;
   }
 
-  setup(
-    map: { data: number[][]; list: number[]; countMap: Map<number, number> },
-    colorMap: Map<number, string>,
+  setup<T>(
+    map: MapData<T> | null,
+    colorMap: ColorMap<T>,
     mapType: MapType,
+    historyLength: number,
   ) {
-    this.rows = createColorTable(this.$colorTable, map, colorMap, mapType);
+    if (map == null) {
+      $colorTableDetails.style.display = "none";
+      this.rows = [];
+      this.$colorTable.replaceChildren();
+      return;
+    }
+    $colorTableDetails.style.display = "";
+    this.rows = createColorTable(
+      this.$colorTable,
+      map,
+      colorMap,
+      mapType,
+      historyLength,
+    );
+    this.historyLength = historyLength;
   }
 
   renderColorTableHighlight(
     data: {
       index: number;
-      cellData: number;
+      cellData: unknown;
     } | null,
     mapType: MapType,
   ) {
@@ -93,12 +148,34 @@ export class ColorTableUI {
     }
 
     if (data != undefined) {
-      this.rows[data.index].style.backgroundColor = "#0000FF22";
+      this.rows[data.index]!.style.backgroundColor = "#0000FF22";
+
+      this.$hoverInfo.style.overflow = "hidden";
+      this.$hoverInfo.style.maxWidth = "500px";
+      this.$hoverInfo.style.textOverflow = "ellipsis";
 
       this.$hoverInfo.textContent =
-        "  " + displayMapTypeLower(mapType) + " = " + data.cellData;
+        "  " +
+        displayMapTypeLower(mapType) +
+        " = " +
+        (typeof data.cellData === "number"
+          ? data.cellData.toString()
+          : typeof data.cellData === "bigint"
+            ? showSignature(data.cellData, this.historyLength)
+            : (() => {
+                throw new Error("Internal error");
+              })());
     } else {
       this.$hoverInfo.textContent = " "; // 崩れないように
     }
   }
+}
+
+const MAX_SIGNATURE_LENGTH = 100;
+function showSignature(n: bigint, historyLength: number) {
+  const str = n
+    .toString(2)
+    .padStart(historyLength, "0")
+    .slice(0, MAX_SIGNATURE_LENGTH);
+  return str;
 }

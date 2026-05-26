@@ -1,37 +1,44 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
 import { findPeriodUint8 } from "./findPeriod";
 import { BITS, BITS_MINUS_1 } from "./const";
+import { max, min } from "./collection";
+import type { Size } from "./rect";
 
 // reduce allocation
 let statesAlloc = new Uint8Array();
 
+export type MapData<T> = {
+  readonly data: ReadonlyArray<ReadonlyArray<T>>;
+  /**
+   * index to a value
+   */
+  readonly list: T[];
+  /**
+   * -1 for background cell
+   */
+  readonly indexData: number[][];
+  readonly valueToIndexMap: ReadonlyMap<T, number>;
+  readonly countMap: ReadonlyMap<T, number>;
+};
+
 export function getMap({
-  width,
-  height,
+  size,
   or,
   histories,
 }: {
-  width: number;
-  height: number;
+  size: Size;
   or: BitGrid;
   histories: BitGrid[];
 }): {
-  periodMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  frequencyMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  heatMap: {
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
+  periodMap: MapData<number>;
+  frequencyMap: MapData<number>;
+  heatMap: MapData<number>;
+  heatInfo: {
+    max: number;
+    min: number;
   };
 } {
+  const { width, height } = size;
   const periodArray = Array(height)
     .fill(0)
     .map(() => 0)
@@ -59,6 +66,11 @@ export function getMap({
         .map(() => -1),
     );
 
+  // indexed by generations
+  const heatByGeneration: number[] = Array(histories.length)
+    .fill(0)
+    .map(() => 0);
+
   const firstBitGrid = histories[0];
   if (firstBitGrid === undefined) {
     throw new Error("no history");
@@ -73,13 +85,15 @@ export function getMap({
     // reuse array
     statesAlloc = new Uint8Array(histories.length);
 
+    const lenHistories = histories.length;
+
     for (let i = 0; i < height; i++) {
       const rowIndex = i * width;
       const y = i;
 
-      const heatArrayRow = heatArray[y];
-      const periodArrayRow = periodArray[y];
-      const frequencyArrayRow = frequencyArray[y];
+      const heatArrayRow = heatArray[y]!;
+      const periodArrayRow = periodArray[y]!;
+      const frequencyArrayRow = frequencyArray[y]!;
 
       for (let j = 0; j < width; j++) {
         const offset = rowIndex + j;
@@ -100,15 +114,16 @@ export function getMap({
           const firstCell = getAlive(firstBitGridUint32Array, offset, u);
           let prevCell = firstCell;
           let frequency = 0;
-          const lenHistories = histories.length;
           for (let index = 0; index < lenHistories; index++) {
-            const array = histories[index].asInternalUint32Array();
+            const array = histories[index]!.asInternalUint32Array();
             const cell = getAlive(array, offset, u);
             if (/* prevCell !== undefined && */ prevCell !== cell) {
               heat++;
+              heatByGeneration[index]!++;
             }
             prevCell = cell;
             statesAlloc[index] = cell;
+
             if (cell !== 0) {
               frequency++;
             }
@@ -123,51 +138,69 @@ export function getMap({
             )
           ) {
             heat++;
+            heatByGeneration[0]!++;
           }
+
+          const periodOfCell = findPeriodUint8(statesAlloc);
           heatArrayRow[x] = heat;
-          periodArrayRow[x] = findPeriodUint8(statesAlloc);
+          periodArrayRow[x] = periodOfCell;
           frequencyArrayRow[x] = frequency;
         }
       }
     }
   }
 
-  const periodCountMap = getCountMap(periodArray);
-  periodCountMap.delete(0);
-
-  const frequencyCountMap = getCountMap(frequencyArray);
-  frequencyCountMap.delete(0);
-
-  const heatCountMap = getCountMap(heatArray);
-  heatCountMap.delete(-1);
-
   return {
-    periodMap: {
-      data: periodArray,
-      list: [...periodCountMap.keys()].sort((a, b) => a - b),
-      countMap: periodCountMap,
-    },
-    frequencyMap: {
-      data: frequencyArray,
-      list: [...frequencyCountMap.keys()].sort((a, b) => a - b),
-      countMap: frequencyCountMap,
-    },
-    heatMap: {
-      data: heatArray,
-      list: [...heatCountMap.keys()].sort((a, b) => a - b),
-      countMap: heatCountMap,
+    periodMap: getMapData(periodArray, 0),
+    frequencyMap: getMapData(frequencyArray, 0),
+    heatMap: getMapData(heatArray, -1),
+    heatInfo: {
+      min: min(heatByGeneration),
+      max: max(heatByGeneration),
     },
   };
 }
 
-function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
+export function getAlive(array: Uint32Array, offset: number, u: number): 0 | 1 {
   const value = array[offset]!;
   const alive = (value & (1 << (BITS_MINUS_1 - u))) !== 0 ? 1 : 0;
   return alive;
 }
 
-function getCountMap(map: number[][]): Map<number, number> {
-  const countMap = new Map<number, number>();
+export function getMapData<T>(
+  data: ReadonlyArray<ReadonlyArray<T>>,
+  background: T,
+): MapData<T> {
+  const countMap = getCountMap(data);
+  countMap.delete(background);
+
+  const list = [...countMap.keys()].sort((a, b) =>
+    a > b ? 1 : a === b ? 0 : -1,
+  );
+
+  const valueToIndexMap = new Map<T, number>();
+
+  for (const [i, value] of list.entries()) {
+    valueToIndexMap.set(value, i);
+  }
+
+  const indexData = data.map((row) =>
+    row.map((value) => valueToIndexMap.get(value) ?? -1),
+  );
+
+  return {
+    data,
+    valueToIndexMap,
+    indexData,
+    list,
+    countMap,
+  };
+}
+
+export function getCountMap<T>(
+  map: ReadonlyArray<ReadonlyArray<T>>,
+): Map<T, number> {
+  const countMap = new Map<T, number>();
   for (const row of map) {
     for (const x of row) {
       const currentCount = countMap.get(x);

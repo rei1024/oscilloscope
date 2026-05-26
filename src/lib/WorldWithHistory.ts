@@ -8,19 +8,29 @@ interface HistoryEntry {
   bitGrid: BitGrid;
 }
 
+export class WorldSizeError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "WorldSizeError";
+  }
+}
+
 export class WorldWithHistory {
   private bitWorld: BitWorld;
   private gen = 0;
   private initialBitGrid: BitGrid;
   public histories: HistoryEntry[] = [];
   private lastBitGrid: BitGrid | undefined;
+  private maxSize: number | undefined;
 
   constructor({
     cells,
     rule,
+    maxSize,
   }: {
     cells: { x: number; y: number }[];
     rule: OuterTotalisticRule | INTRule | MAPRule;
+    maxSize?: number | undefined;
   }) {
     const cellList = CACellList.fromCells(
       cells.map((c) => ({ position: c, state: 1 })),
@@ -31,12 +41,26 @@ export class WorldWithHistory {
     if (boundingRect == undefined) {
       throw new Error("Invalid cells");
     }
+
+    if (maxSize) {
+      if (boundingRect.width > maxSize || boundingRect.height > maxSize) {
+        throw new WorldSizeError(`Maximum world size is ${maxSize}x${maxSize}`);
+      }
+    }
+    this.maxSize = maxSize;
+
     this.bitWorld = BitWorld.make({
       width: boundingRect.width + 16,
       height: boundingRect.height + 16,
     });
     if (rule.type === "outer-totalistic") {
-      this.bitWorld.setRule(rule.transition);
+      if (rule.neighborhood == null) {
+        this.bitWorld.setRule(rule.transition);
+      } else if (rule.neighborhood === "von-neumann") {
+        this.bitWorld.setVonNeumannOTRule(rule.transition);
+      } else {
+        throw new Error("Unsupported rule");
+      }
     } else if (rule.type === "int") {
       this.bitWorld.setINTRule(rule.transition);
     } else if (rule.type === "map") {
@@ -115,6 +139,16 @@ export class WorldWithHistory {
         ...h,
         bitGrid: h.bitGrid.expanded(config),
       }));
+    }
+
+    const maxSize = this.maxSize;
+    if (maxSize) {
+      if (
+        bitWorld.bitGrid.getWidth() > maxSize ||
+        bitWorld.bitGrid.getHeight() > maxSize
+      ) {
+        throw new WorldSizeError(`Maximum world size is ${maxSize}x${maxSize}`);
+      }
     }
   }
 

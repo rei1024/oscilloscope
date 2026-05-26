@@ -1,11 +1,39 @@
-import { analyzeOscillator, type AnalyzeResult } from "./lib/analyzeOscillator";
+import {
+  analyzeOscillator,
+  bitGridFromData,
+  type AnalyzeOscillatorConfig,
+  type AnalyzeResult,
+  type BitGridData,
+} from "./lib/analyzeOscillator";
 import { parseRLE } from "@ca-ts/rle";
 import { parseRule, type GridParameter } from "@ca-ts/rule";
 import { MaxGenerationError } from "./lib/runOscillator";
+import { WorldSizeError } from "./lib/WorldWithHistory";
+import { getErrorMessageForParseRule } from "./lib/rule-error";
+import type { MapData } from "./lib/getMap";
+import { getSignatureMap } from "./lib/getSignatureMap";
+import type { Size } from "./lib/rect";
 
-export type WorkerRequestMessage = {
-  kind: "request-analyze";
-  rle: string;
+export type WorkerRequestMessage =
+  | {
+      kind: "request-analyze";
+      rle: string;
+      analyzeConfig: AnalyzeOscillatorConfig;
+    }
+  | {
+      kind: "request-signature";
+      data: {
+        size: Size;
+        or: BitGridData;
+        histories: BitGridData[];
+        periodMapArray: ReadonlyArray<ReadonlyArray<number>>;
+      };
+    };
+
+export type WorkerResponseMessageSignature = {
+  kind: "response-signature";
+  signatureTimeMilliseconds: number;
+  signature: MapData<bigint>;
 };
 
 export type WorkerResponseMessage =
@@ -13,6 +41,7 @@ export type WorkerResponseMessage =
       kind: "response-analyzed";
       data: AnalyzeResult;
     }
+  | WorkerResponseMessageSignature
   | {
       kind: "response-error";
       message: string;
@@ -35,7 +64,27 @@ function isInfiniteGrid(
   return false;
 }
 
+function handleSignature(
+  data: WorkerRequestMessage & { kind: "request-signature" },
+): WorkerResponseMessage {
+  const { size, or, histories, periodMapArray } = data.data;
+  const map = getSignatureMap({
+    size,
+    or: bitGridFromData(or),
+    histories: histories.map((h) => bitGridFromData(h)),
+    periodMapArray,
+  });
+  return {
+    kind: "response-signature",
+    signatureTimeMilliseconds: map.signatureTimeMilliseconds,
+    signature: map.signatureMap,
+  };
+}
+
 function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
+  if (data.kind === "request-signature") {
+    return handleSignature(data);
+  }
   let rle;
   let rule: ReturnType<typeof parseRule> | "LifeHistory";
   if (data.rle.trim() === "") {
@@ -79,7 +128,7 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
     console.error(error);
     return {
       kind: "response-error",
-      message: "Unsupported rule",
+      message: getErrorMessageForParseRule(error),
     };
   }
 
@@ -90,30 +139,15 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
         message: "Generations is not supported",
       };
     }
-    const unsupportedNeighborhoods = [
-      "hexagonal",
-      "von-neumann",
-      "triangular",
-    ] as const;
-    if (
-      rule.neighborhood &&
-      unsupportedNeighborhoods.includes(rule.neighborhood)
-    ) {
+    if (rule.neighborhood != null && rule.neighborhood !== "von-neumann") {
       return {
         kind: "response-error",
         message: `${
           {
             hexagonal: "Hexagonal",
-            "von-neumann": "von Neumann",
             triangular: "Triangular",
           }[rule.neighborhood]
         } neighborhood is not supported`,
-      };
-    }
-    if (rule.neighborhood != undefined) {
-      return {
-        kind: "response-error",
-        message: "Unsupported neighborhood",
       };
     }
     if (rule.transition.birth.includes(0)) {
@@ -180,13 +214,18 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       message: "Empty pattern",
     };
   }
+
   const maxGeneration = 50_000;
   try {
-    const result = analyzeOscillator({
-      cells: cells,
-      rule: rule,
-      maxGeneration: maxGeneration,
-    });
+    const result = analyzeOscillator(
+      {
+        cells: cells,
+        rule: rule,
+        maxGeneration: maxGeneration,
+        maxSize: 8192,
+      },
+      data.analyzeConfig,
+    );
     return { kind: "response-analyzed", data: result };
   } catch (error) {
     console.error(error);
@@ -194,6 +233,12 @@ function handleRequest(data: WorkerRequestMessage): WorkerResponseMessage {
       return {
         kind: "response-error",
         message: `maximum period is ${maxGeneration.toLocaleString()}`,
+      };
+    }
+    if (error instanceof WorldSizeError) {
+      return {
+        kind: "response-error",
+        message: error.message,
       };
     }
     return {

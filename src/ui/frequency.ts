@@ -1,4 +1,5 @@
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
+import { throwError } from "../lib/error";
 import type { Valve } from "./valve";
 
 const frequencyList = [
@@ -44,6 +45,6 @@ export class FrequencyUI {
   }
 
   getFrequency() {
-    return frequencyList[parseInt(this.$input.value, 10)];
+    return frequencyList[parseInt(this.$input.value, 10)] ?? throwError();
   }
 }

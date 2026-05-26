@@ -1,19 +1,22 @@
 import { average, max, median, min } from "./collection";
-import { rectToSize } from "./rect";
+import { rectToArea, rectToSize, type Size } from "./rect";
 import { BitGrid } from "@ca-ts/algo/bit";
 import { runOscillator, type RunOscillatorConfig } from "./runOscillator";
-import { getMap } from "./getMap";
+import { getMap, type MapData } from "./getMap";
+import { throwError } from "./error";
 
 function getOrAndGrid(histories: BitGrid[]) {
   if (histories.length === 0) {
     throw Error("Error");
   }
 
-  const orGrid = histories[0].clone();
+  const firstHistory = histories[0] ?? throwError();
+
+  const orGrid = firstHistory.clone();
   orGrid.clear();
   // orは空白から開始
 
-  const andGrid = histories[0].clone();
+  const andGrid = firstHistory.clone();
   // andは1つ目の状態
 
   for (const bitGird of histories) {
@@ -27,7 +30,7 @@ function getOrAndGrid(histories: BitGrid[]) {
   };
 }
 
-type BitGridData = {
+export type BitGridData = {
   uint32: Uint32Array;
   width32: number;
   height: number;
@@ -65,9 +68,19 @@ export type AnalyzeResult = {
   /**
    * Bounding box
    */
-  boundingBox: {
-    sizeX: number;
-    sizeY: number;
+  boundingBox: Size;
+  /**
+   * The bounding box that encloses all phases
+   */
+  boundingBoxMovingEncloses: Size;
+  boundingBoxMinArea: {
+    // FIXME: different from LifeViewer?
+    tick: number;
+    size: Size;
+  };
+  boundingBoxMaxArea: {
+    tick: number;
+    size: Size;
   };
   /**
    * Number of stators
@@ -87,8 +100,7 @@ export type AnalyzeResult = {
   strictVolatility: number;
   histories: BitGridData[];
   bitGridData: {
-    width: number;
-    height: number;
+    size: Size;
     minX: number;
     minY: number;
     or: BitGridData;
@@ -98,41 +110,43 @@ export type AnalyzeResult = {
    * [Heat](https://conwaylife.com/wiki/Heat)
    */
   heat: number;
+  heatMin: number;
+  heatMax: number;
   /**
    * [Temperature](https://conwaylife.com/wiki/Temperature)
    */
   temperature: number;
   /**
-   * [Period map](https://conwaylife.com/wiki/Map#Period_map)
+   * Rotor temperature
    */
-  periodMap: {
-    /**
-     * Period of each cells
-     *
-     * 0 for the empty cell
-     */
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
+  rotorTemperature: number;
+  /**
+   * [Period map](https://conwaylife.com/wiki/Map#Period_map)
+   *
+   * 0 for the empty cell
+   */
+  periodMap: MapData<number>;
   /**
    * [Frequency map](https://conwaylife.com/wiki/Map#Frequency_map)
+   *
+   * 0 for the empty cell
    */
-  frequencyMap: {
-    /**
-     * 0 for the empty cell
-     */
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
-  };
-  heatMap: {
-    /**
-     * -1 for the empty cell
-     */
-    data: number[][];
-    list: number[];
-    countMap: Map<number, number>;
+  frequencyMap: MapData<number>;
+  /**
+   * Heat map
+   *
+   *  -1 for the empty cell
+   */
+  heatMap: MapData<number>;
+  /**
+   * For omnifrequency
+   *
+   * [The Omnifrequency Project | Forum](https://conwaylife.com/forums/viewtopic.php?f=2&t=7026)
+   */
+  missingFrequencies: number[];
+  performance: {
+    runningTimeMilliseconds: number;
+    calclationTimeMilliseconds: number;
   };
 };
 
@@ -165,10 +179,22 @@ function getSpeed(
   };
 }
 
+export type AnalyzeOscillatorConfig = {};
+
+/**
+ * Analyze an oscillator or a spaceship.
+ */
 export function analyzeOscillator(
   runConfig: RunOscillatorConfig,
+  analyzeConfig?: AnalyzeOscillatorConfig,
 ): AnalyzeResult {
+  const runStart = performance.now();
+
   const { world } = runOscillator(runConfig);
+
+  const runEnd = performance.now();
+
+  const dataStart = performance.now();
 
   const period = world.getGen();
   const historiesBitGrid = world.histories.map((h) => h.bitGrid);
@@ -186,12 +212,10 @@ export function analyzeOscillator(
 
   const isSpaceship = speed.dx !== 0 || speed.dy !== 0;
 
-  const width = historiesBitGrid[0]!.getWidth();
-  const height = historiesBitGrid[0]!.getHeight();
+  const size = historiesBitGrid[0]!.getSize();
 
-  const { periodMap, frequencyMap, heatMap } = getMap({
-    width,
-    height,
+  const { periodMap, frequencyMap, heatMap, heatInfo } = getMap({
+    size,
     or,
     histories: historiesBitGrid,
   });
@@ -200,17 +224,67 @@ export function analyzeOscillator(
     heatMap.data.flat().reduce((acc, x) => (x === -1 ? acc : acc + x), 0) /
     period;
 
+  let minArea = Infinity;
+  let minBoxInfo: {
+    tick: number;
+    size: Size;
+  } | null = null;
+  let maxBoxInfo: {
+    tick: number;
+    size: Size;
+  } | null = null;
+  let maxArea = -Infinity;
+  let maxSizeX = 0;
+  let maxSizeY = 0;
+  for (const [i, grid] of historiesBitGrid.entries()) {
+    const boundingBoxPhase = grid.getBoundingBox();
+    const size = rectToSize(boundingBoxPhase);
+    if (maxSizeX < size.width) {
+      maxSizeX = size.width;
+    }
+    if (maxSizeY < size.height) {
+      maxSizeY = size.height;
+    }
+    const area = rectToArea(boundingBoxPhase);
+
+    if (area < minArea) {
+      minBoxInfo = {
+        tick: i,
+        size,
+      };
+      minArea = area;
+    }
+    if (area > maxArea) {
+      maxBoxInfo = {
+        tick: i,
+        size,
+      };
+      maxArea = area;
+    }
+  }
+
+  const missingFrequencies = getMissingFrequencies(frequencyMap.list, period);
+  const population = {
+    max: max(populations),
+    min: min(populations),
+    avg: average(populations),
+    median: median(populations),
+  };
+
+  const dataEnd = performance.now();
+
   return {
     isSpaceship,
     speed,
     period,
-    population: {
-      max: max(populations),
-      min: min(populations),
-      avg: average(populations),
-      median: median(populations),
-    },
+    population,
     boundingBox: rectToSize(boundingBox),
+    boundingBoxMovingEncloses: {
+      width: maxSizeX,
+      height: maxSizeY,
+    },
+    boundingBoxMaxArea: maxBoxInfo!,
+    boundingBoxMinArea: minBoxInfo!,
     stator: stator,
     rotor: allCount - stator,
     volatility: rotor / (stator + rotor),
@@ -219,15 +293,40 @@ export function analyzeOscillator(
     bitGridData: {
       or: bitGridToData(or),
       and: bitGridToData(and),
-      width,
-      height,
+      size,
       minX: boundingBox.minX,
       minY: boundingBox.minY,
     },
     heat,
+    heatMax: heatInfo.max,
+    heatMin: heatInfo.min,
     temperature: heat / allCount,
+    rotorTemperature: heat / rotor,
     periodMap,
     frequencyMap,
     heatMap,
+    missingFrequencies,
+    performance: {
+      runningTimeMilliseconds: runEnd - runStart,
+      calclationTimeMilliseconds: dataEnd - dataStart,
+    },
   };
+}
+
+function getMissingFrequencies(
+  frequencyList: number[],
+  period: number,
+): number[] {
+  if (frequencyList.length === period) {
+    return [];
+  }
+
+  const set = new Set(frequencyList);
+
+  const missingFrequencies = Array(period)
+    .fill(0)
+    .map((_, i) => i + 1)
+    .filter((f) => !set.has(f));
+
+  return missingFrequencies;
 }

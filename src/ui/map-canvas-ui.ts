@@ -1,17 +1,32 @@
 import type { BitGrid } from "@ca-ts/algo/bit";
 import {
-  $darkBackgroundCheckbox,
+  $darkModeCheckbox,
   $showAnimationCheckbox,
   $showGridCheckbox,
 } from "../bind";
 import type { AnalyzeResult } from "../lib/analyzeOscillator";
-import type { MapType } from "./core";
+import type { MapData } from "../lib/getMap";
+import type { ColorMap } from "../make-color";
 
 const safeArea = 2;
 const cellSize = 10;
 const innerCellSize = 6;
 const innerCellOffset = (cellSize - innerCellSize) / 2;
 const gridWidth = 1;
+
+/**
+ * iOS limits canvas size to 8192
+ *
+ * must less than `Math.floor(8192 / cellSize) - safeArea * 2`
+ */
+const MAX_NORMAL_SIZE = 512;
+
+function getIsDot(data: AnalyzeResult) {
+  return (
+    data.boundingBox.width > MAX_NORMAL_SIZE ||
+    data.boundingBox.height > MAX_NORMAL_SIZE
+  );
+}
 
 export class MapCanvasUI {
   private $canvas: HTMLCanvasElement;
@@ -27,9 +42,13 @@ export class MapCanvasUI {
   }
 
   setup({ data }: { data: AnalyzeResult }) {
+    const isDot = getIsDot(data);
+
+    const cellPixel = isDot ? 1 : cellSize;
+
     const $canvas = this.$canvas;
-    $canvas.width = (data.boundingBox.sizeX + safeArea * 2) * cellSize;
-    $canvas.height = (data.boundingBox.sizeY + safeArea * 2) * cellSize;
+    $canvas.width = (data.boundingBox.width + safeArea * 2) * cellPixel;
+    $canvas.height = (data.boundingBox.height + safeArea * 2) * cellPixel;
     if ($canvas.width / 2 > $canvas.height) {
       $canvas.style.width = "100%";
       $canvas.style.height = "";
@@ -43,18 +62,12 @@ export class MapCanvasUI {
     data,
     mapData,
     colorMap,
-    mapType,
     histories,
     gen,
   }: {
     data: AnalyzeResult;
-    mapData: {
-      data: number[][];
-      list: number[];
-      countMap: Map<number, number>;
-    };
-    colorMap: Map<number, string>;
-    mapType: MapType;
+    mapData: MapData<unknown> | null;
+    colorMap: ColorMap<unknown>;
     histories: BitGrid[];
     gen: number;
   }) {
@@ -66,57 +79,55 @@ export class MapCanvasUI {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
 
+    const isDarkMode = $darkModeCheckbox.checked;
+
     // Background
-    ctx.fillStyle = $darkBackgroundCheckbox.checked ? "black" : "white";
+    ctx.fillStyle = isDarkMode ? "black" : "white";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    // Map
+    const isDot = getIsDot(data);
+
+    $showGridCheckbox.disabled = isDot;
+
+    const sizePixel = isDot ? 1 : cellSize;
+
     const dx = data.bitGridData.minX;
     const dy = data.bitGridData.minY;
 
-    const minValue = mapType === "heat" ? 0 : 1;
+    // Map
+    this.renderMap({ data, mapData, colorMap });
 
-    for (const [y, row] of mapData.data.entries()) {
-      for (const [x, p] of row.entries()) {
-        if (p >= minValue) {
-          ctx.beginPath();
-          ctx.fillStyle = colorMap.get(p) ?? "";
-          ctx.rect(
-            (x - dx + safeArea) * cellSize,
-            (y - dy + safeArea) * cellSize,
-            cellSize,
-            cellSize,
-          );
-          ctx.fill();
-        }
-      }
-    }
-    ctx.fill();
-
+    // Alive Cells
     if ($showAnimationCheckbox.checked) {
-      // Alive Cells
+      const isCellWhite = isDarkMode && mapData == null;
+
+      const innerCellOffsetPixel = isDot ? 1 : innerCellOffset;
+      const innerCellSizePixel = isDot ? 1 : innerCellSize;
       ctx.beginPath();
-      ctx.fillStyle = "black";
-      histories[gen].forEachAlive((x, y) => {
+      ctx.fillStyle = isCellWhite ? "white" : "black";
+      histories[gen]!.forEachAlive((x, y) => {
         ctx.rect(
-          (x - dx + safeArea) * cellSize + innerCellOffset,
-          (y - dy + safeArea) * cellSize + innerCellOffset,
-          innerCellSize,
-          innerCellSize,
+          (x - dx + safeArea) * sizePixel + innerCellOffsetPixel,
+          (y - dy + safeArea) * sizePixel + innerCellOffsetPixel,
+          innerCellSizePixel,
+          innerCellSizePixel,
         );
       });
       ctx.fill();
     }
     // Grid
-    const yMax = data.boundingBox.sizeY + safeArea * 2;
-    const xMax = data.boundingBox.sizeX + safeArea * 2;
+    if (isDot) {
+      return;
+    }
+    const yMax = data.boundingBox.height + safeArea * 2;
+    const xMax = data.boundingBox.width + safeArea * 2;
     if ($showGridCheckbox.checked) {
       ctx.beginPath();
       for (let y = 0; y < yMax; y++) {
         const posY = y * cellSize;
         for (let x = 0; x < xMax; x++) {
           const posX = x * cellSize;
-          ctx.strokeStyle = "#dddddd";
+          ctx.strokeStyle = isDarkMode ? "#444444" : "#dddddd";
           ctx.strokeRect(
             posX + gridWidth / 2,
             posY + gridWidth / 2,
@@ -129,18 +140,52 @@ export class MapCanvasUI {
     }
   }
 
+  private renderMap({
+    data,
+    mapData,
+    colorMap,
+  }: {
+    data: AnalyzeResult;
+    mapData: MapData<unknown> | null;
+    colorMap: ColorMap<unknown>;
+  }) {
+    if (mapData == null) {
+      return;
+    }
+    const isDot = getIsDot(data);
+    const sizePixel = isDot ? 1 : cellSize;
+
+    // Map
+    const dx = data.bitGridData.minX;
+    const dy = data.bitGridData.minY;
+
+    const colorList = colorMap.colorList;
+    const ctx = this.ctx;
+    for (const [y, row] of mapData.indexData.entries()) {
+      for (const [x, index] of row.entries()) {
+        if (index !== -1) {
+          ctx.beginPath();
+          ctx.fillStyle = colorList[index]!;
+          ctx.rect(
+            (x - dx + safeArea) * sizePixel,
+            (y - dy + safeArea) * sizePixel,
+            sizePixel,
+            sizePixel,
+          );
+          ctx.fill();
+        }
+      }
+    }
+  }
+
   getMapIndexAt(
     pixelPosition: {
       x: number;
       y: number;
     },
     data: AnalyzeResult | null,
-    mapData: {
-      data: number[][];
-      list: number[];
-      countMap: Map<number, number>;
-    },
-  ): { cellData: number; index: number } | undefined {
+    mapData: MapData<unknown>,
+  ): { cellData: unknown; index: number } | undefined {
     if (!data) {
       return undefined;
     }
@@ -151,21 +196,21 @@ export class MapCanvasUI {
       dx +
       Math.floor(
         (pixelPosition.x / this.$canvas.clientWidth) *
-          (data.boundingBox.sizeX + safeArea * 2),
+          (data.boundingBox.width + safeArea * 2),
       );
     const y =
       -safeArea +
       dy +
       Math.floor(
         (pixelPosition.y / this.$canvas.clientHeight) *
-          (data.boundingBox.sizeY + safeArea * 2),
+          (data.boundingBox.height + safeArea * 2),
       );
 
     if (y < 0 || y >= mapData.data.length) {
       return undefined;
     }
 
-    const cellData = mapData.data[y][x];
+    const cellData = mapData.data[y]![x];
     if (cellData === undefined) {
       return undefined;
     }

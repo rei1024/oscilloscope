@@ -11,24 +11,40 @@ import {
   $animFrequency,
   $animFrequencyLabel,
   $colorTable,
+  $analyzeButton,
+  $dataTable,
+  $message,
+  $metaTable,
 } from "./bind";
 import { ColorTableUI } from "./ui/colorTable";
 import { type ColorType, type MapType } from "./ui/core";
-import { makeColorMap } from "./make-color";
+import { ColorMap } from "./make-color";
 import { FrequencyUI } from "./ui/frequency";
 import { MapCanvasUI } from "./ui/map-canvas-ui";
+import { post } from "./main";
+import { DataTableUI } from "./ui/dataTable";
+import type {
+  WorkerResponseMessage,
+  WorkerResponseMessageSignature,
+} from "./worker";
+import { MetaTableUI } from "./ui/metaTable";
 
 export class App {
   private data: AnalyzeResult | null = null;
   private histories: BitGrid[] | null = null;
+  private signatureData: WorkerResponseMessageSignature | null = null;
   private gen = 0;
   private valve: Valve;
   private mapType: MapType = "period";
   private colorType: ColorType = "hue";
-  private colorMap: Map<number, string> = new Map();
+  private colorMap!: ColorMap<unknown>;
   private mapCanvasUI: MapCanvasUI;
   private frequencyUI: FrequencyUI;
   private colorTable: ColorTableUI;
+  private dataTable: DataTableUI;
+  private metaTable: MetaTableUI;
+  private analyzeButtonChangeId: number | undefined;
+  private signatureMapCreating = false;
 
   constructor($canvas: HTMLCanvasElement) {
     this.mapCanvasUI = new MapCanvasUI($canvas);
@@ -37,7 +53,11 @@ export class App {
         if (!this.histories || num <= 0) {
           return;
         }
+        if (!$showAnimationCheckbox.checked) {
+          return;
+        }
         this.gen = (this.gen + num) % this.histories.length;
+        this.render();
       },
       { frequency: 20 },
     );
@@ -50,13 +70,8 @@ export class App {
     );
 
     this.colorTable = new ColorTableUI($colorTable, $hoverInfo);
-
-    const update = () => {
-      this.render();
-      requestAnimationFrame(update);
-    };
-
-    update();
+    this.dataTable = new DataTableUI($dataTable);
+    this.metaTable = new MetaTableUI($metaTable);
   }
 
   render() {
@@ -71,7 +86,6 @@ export class App {
       data: this.data,
       mapData: this.getMapData(),
       colorMap: this.colorMap,
-      mapType: this.mapType,
       histories: this.histories,
       gen: this.gen,
     });
@@ -89,7 +103,20 @@ export class App {
     }
   }
 
+  onError(data: WorkerResponseMessage & { kind: "response-error" }) {
+    $message.style.display = "none";
+    $dataTable.style.display = "none";
+    $metaTable.style.display = "none";
+    $message.style.display = "block";
+    $message.textContent = "Error: " + data.message;
+    $message.style.backgroundColor = "#fecaca";
+  }
+
   setup(data: AnalyzeResult) {
+    $message.style.display = "none";
+    $message.textContent = "";
+
+    this.signatureData = null;
     // Do not show map for spaceship
     $mapBox.style.display = data.isSpaceship ? "none" : "";
 
@@ -101,11 +128,68 @@ export class App {
     this.histories = data.histories.map((h) => bitGridFromData(h));
     this.gen = 0;
 
+    $dataTable.style.display = "block";
+    this.dataTable.render(data);
+
+    this.metaTable.render(data, this.signatureData);
+
     this.frequencyUI.setup(data);
 
-    this.setupColorMap();
+    if (
+      // Only analyze if not spaceship
+      !data.isSpaceship &&
+      this.mapType === "signature" &&
+      this.signatureData == null
+    ) {
+      this.analyzeSignature();
+    }
+
     this.updateFrequency();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+    this.setupColor();
+    this.render();
+  }
+
+  private analyzeSignature() {
+    if (!this.data) {
+      return;
+    }
+    if (this.signatureData) {
+      return;
+    }
+    $analyzeButton.disabled = true;
+    this.analyzeButtonChangeId = setTimeout(() => {
+      $analyzeButton.textContent = "Creating signature map...";
+    }, 200);
+
+    if (this.signatureMapCreating) {
+      return;
+    }
+
+    this.signatureMapCreating = true;
+
+    post({
+      kind: "request-signature",
+      data: {
+        size: this.data.bitGridData.size,
+        or: this.data.bitGridData.or,
+        periodMapArray: this.data.periodMap.data,
+        histories: this.data.histories,
+      },
+    });
+  }
+
+  onSignatureMap(response: WorkerResponseMessageSignature) {
+    this.signatureMapCreating = false;
+    $analyzeButton.disabled = false;
+    clearTimeout(this.analyzeButtonChangeId);
+    $analyzeButton.textContent = "Analyze";
+    this.signatureData = response;
+    this.setupColor();
+    if (this.data) {
+      this.metaTable.render(this.data, this.signatureData);
+    }
+
+    this.render();
   }
 
   private setupColorMap() {
@@ -114,9 +198,15 @@ export class App {
       return;
     }
     const mapData = this.getMapData();
+    if (!mapData) {
+      return;
+    }
+    if (this.mapType === "none") {
+      return;
+    }
     const list = mapData.list;
-    const colorMap = makeColorMap({
-      list,
+    const colorMap = ColorMap.make({
+      list: list as (number | bigint)[],
       style: (
         {
           period:
@@ -124,6 +214,8 @@ export class App {
           frequency:
             this.colorType === "grayscale" ? "gray" : "hue-for-frequency",
           heat: "heat",
+          signature:
+            this.colorType === "grayscale" ? "gray" : "hue-for-frequency",
         } as const
       )[this.mapType],
       hasStatorCell: data.periodMap.list.some((x) => x === 1),
@@ -135,7 +227,7 @@ export class App {
   private getMapData() {
     const data = this.data;
     if (data == null) {
-      throw null;
+      throw new Error("Internal error");
     }
     switch (this.mapType) {
       case "frequency": {
@@ -146,6 +238,15 @@ export class App {
       }
       case "period": {
         return data.periodMap;
+      }
+      case "signature": {
+        if (!this.signatureData) {
+          return null;
+        }
+        return this.signatureData.signature;
+      }
+      case "none": {
+        return null;
       }
     }
   }
@@ -158,25 +259,42 @@ export class App {
     const data = this.mapCanvasUI.getMapIndexAt(
       position,
       this.data,
-      this.getMapData(),
+      this.getMapData()!,
     );
     this.colorTable.renderColorTableHighlight(data ?? null, this.mapType);
   }
 
   updateMapType(mapType: MapType) {
-    if (mapType === "heat") {
+    if (mapType === "heat" || mapType === "none") {
       $colorSelectContainer.style.display = "none";
     } else {
       $colorSelectContainer.style.display = "";
     }
+    if (mapType === "signature" && this.signatureData == null) {
+      this.analyzeSignature();
+    }
     this.mapType = mapType;
-    this.setupColorMap();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+    this.setupColor();
+    this.render();
   }
 
   updateColor(color: ColorType) {
     this.colorType = color;
+    this.setupColor();
+    this.render();
+  }
+
+  valveEnable(enable: boolean) {
+    this.valve.disabled = !enable;
+  }
+
+  private setupColor() {
     this.setupColorMap();
-    this.colorTable.setup(this.getMapData(), this.colorMap, this.mapType);
+    this.colorTable.setup(
+      this.getMapData(),
+      this.colorMap,
+      this.mapType,
+      this.histories!.length,
+    );
   }
 }

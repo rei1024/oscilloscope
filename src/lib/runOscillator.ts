@@ -5,6 +5,7 @@ export type RunOscillatorConfig = {
   cells: { x: number; y: number }[];
   rule: OuterTotalisticRule | INTRule | MAPRule;
   maxGeneration: number;
+  maxSize?: number | undefined;
 };
 
 export type RunOscillatorResult = {
@@ -20,9 +21,9 @@ export class MaxGenerationError extends Error {
 export function runOscillator(
   config: RunOscillatorConfig,
 ): RunOscillatorResult {
-  const { cells, rule, maxGeneration } = config;
+  const { cells, rule, maxGeneration, maxSize } = config;
 
-  const world = new WorldWithHistory({ cells, rule });
+  const world = new WorldWithHistory({ cells, rule, maxSize });
   const result = world.run({
     forceStop: () => world.getGen() >= maxGeneration,
   });

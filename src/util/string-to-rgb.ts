@@ -26,6 +26,7 @@ export function stringToRGB(
   if (ctx == null) {
     throw Error("Context");
   }
+  ctx.imageSmoothingEnabled = false; // ぼやけを防止
 
   // LCH文字列をfillStyleに設定
   // ブラウザがこれをsRGB(またはdisplay-p3など)に変換します
@@ -40,5 +41,5 @@ export function stringToRGB(
 
   // RGB値を返す (透明度は除外)
   // 例: [113, 91, 255]
-  return [data[0], data[1], data[2]];
+  return [data[0]!, data[1]!, data[2]!];
 }

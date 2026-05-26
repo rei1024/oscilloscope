@@ -8,23 +8,30 @@ import {
   $exampleOscillators,
   $input,
   $mapTypeSelect,
-  $message,
-  $outputTable,
+  $showAnimationCheckbox,
+  $showGridCheckbox,
 } from "./bind";
-import { setDataTable } from "./ui/dataTable";
 
 import { App } from "./app";
 import { getMousePositionInElement } from "./ui/getMousePositionInElement";
 import type { ColorType, MapType } from "./ui/core";
 import { setupShowAnimationCheckbox } from "./ui/show-animation-checkbox";
-
-setupShowAnimationCheckbox();
+import { setupDarkModeCheckbox } from "./ui/dark-mode-checkbox";
 
 const worker = new MyWorker();
 
 const app = new App($canvas);
 
-function post(req: WorkerRequestMessage) {
+setupShowAnimationCheckbox(() => {
+  app.valveEnable($showAnimationCheckbox.checked);
+  app.render();
+});
+
+setupDarkModeCheckbox(() => {
+  app.render();
+});
+
+export function post(req: WorkerRequestMessage) {
   worker.postMessage(req);
 }
 
@@ -32,24 +39,30 @@ let analyzingDelayTimeoutId: number | null = null;
 
 worker.addEventListener("message", (e) => {
   const message = e.data as WorkerResponseMessage;
-  $message.textContent = "";
-  $message.style.display = "none";
-  $outputTable.style.display = "none";
 
   $analyzeButton.disabled = false;
   if (analyzingDelayTimeoutId) {
     clearTimeout(analyzingDelayTimeoutId);
   }
+
   $analyzeButton.textContent = "Analyze";
-  if (message.kind === "response-error") {
-    $message.style.display = "block";
-    $message.textContent = "Error: " + message.message;
-    $message.style.backgroundColor = "#fecaca";
-  } else {
-    $outputTable.style.display = "block";
-    const data = message.data;
-    setDataTable($outputTable, data);
-    app.setup(data);
+  switch (message.kind) {
+    case "response-error": {
+      app.onError(message);
+      break;
+    }
+    case "response-analyzed": {
+      const data = message.data;
+      app.setup(data);
+      break;
+    }
+    case "response-signature": {
+      app.onSignatureMap(message);
+      break;
+    }
+    default: {
+      throw new Error("Internal");
+    }
   }
 });
 
@@ -61,11 +74,16 @@ $analyzeButton.addEventListener("click", () => {
   analyzingDelayTimeoutId = setTimeout(() => {
     $analyzeButton.textContent = "Analyzing";
   }, 200);
-  post({ kind: "request-analyze", rle: $input.value });
+  post({
+    kind: "request-analyze",
+    rle: $input.value,
+    analyzeConfig: {},
+  });
 });
 
 $animFrequency.addEventListener("input", () => {
   app.updateFrequency();
+  app.render();
 });
 
 $canvas.addEventListener("mousemove", (e) => {
@@ -148,4 +166,8 @@ $exampleOscillators.addEventListener("change", async () => {
 
 $input.addEventListener("input", () => {
   $exampleOscillators.value = "";
+});
+
+$showGridCheckbox.addEventListener("change", () => {
+  app.render();
 });
