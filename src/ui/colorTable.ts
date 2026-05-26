@@ -32,6 +32,7 @@ function createColorTable<T>(
 
     const thColorText = document.createElement("th");
     thColorText.textContent = "Hex";
+    thColorText.style.paddingInline = "40px";
 
     trHead.append(thColor, thType, thCount, thColorText);
     $colorTable.append(trHead);
@@ -88,6 +89,7 @@ function createColorTable<T>(
     $count.style.textAlign = "right";
 
     const $colorText = document.createElement("td");
+    $colorText.style.textAlign = "center";
     const [r, g, b] = stringToRGB(color);
     $colorText.textContent =
       "#" +
