@@ -153,7 +153,7 @@ export type AnalyzeResult = {
 export function bitGridToData(bitGrid: BitGrid): BitGridData {
   return {
     uint32: bitGrid.asInternalUint32Array(),
-    width32: bitGrid.getWidth32(),
+    width32: bitGrid.getInternalUint32ArrayWidth(),
     height: bitGrid.getHeight(),
   };
 }

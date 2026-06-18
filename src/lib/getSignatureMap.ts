@@ -35,7 +35,7 @@ export function getSignatureMap({
   const orUint32Array = or.asInternalUint32Array();
 
   {
-    const width = firstBitGrid.getWidth32();
+    const width = firstBitGrid.getInternalUint32ArrayWidth();
     const height = firstBitGrid.getHeight();
 
     const lenHistories = histories.length;

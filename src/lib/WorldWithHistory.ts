@@ -55,7 +55,7 @@ export class WorldWithHistory {
     });
     if (rule.type === "outer-totalistic") {
       if (rule.neighborhood == null) {
-        this.bitWorld.setRule(rule.transition);
+        this.bitWorld.setOuterTotalisticRule(rule.transition);
       } else if (rule.neighborhood === "von-neumann") {
         this.bitWorld.setVonNeumannOTRule(rule.transition);
       } else {
