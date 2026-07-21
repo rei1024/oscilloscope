@@ -3,6 +3,44 @@ import type { BitGrid } from "@ca-ts/algo/bit";
 export type Position = { x: number; y: number };
 
 /**
+ * Pre-extracted alive cell data of a BitGrid to avoid re-extracting coordinates
+ * across multiple symmetry checks.
+ */
+export type PreparedGrid = {
+  _isPrepared: true;
+  grid: BitGrid;
+  population: number;
+  xs: Int32Array;
+  ys: Int32Array;
+  x0: number;
+  y0: number;
+};
+
+/**
+ * Prepares a BitGrid by extracting its population and alive cell coordinates once.
+ */
+export function prepareGrid(grid: BitGrid): PreparedGrid {
+  const population = grid.getPopulation();
+  const xs = new Int32Array(population);
+  const ys = new Int32Array(population);
+  let idx = 0;
+  grid.forEachAlive((x, y) => {
+    xs[idx] = x;
+    ys[idx] = y;
+    idx++;
+  });
+  return {
+    _isPrepared: true,
+    grid,
+    population,
+    xs,
+    ys,
+    x0: xs[0] ?? 0,
+    y0: ys[0] ?? 0,
+  };
+}
+
+/**
  * Transforms a 2D coordinate according to one of the 8 grid symmetries (Dihedral Group D4).
  *
  * 0: Identity (0°)
@@ -41,12 +79,17 @@ export function transformCoord(x: number, y: number, sym: number): Position {
  * Checks whether `other` is identical to `self` under any of the 8 grid symmetries
  * (rotation/reflection) modulo translation.
  *
- * Optimized to eliminate JS object allocations during iteration, maintain 32-bit integer (Smi)
- * type stability in V8 JIT, and use fast paths.
+ * Accepts either a raw `BitGrid` or a pre-extracted `PreparedGrid`.
  */
-export function isSameWithSymm(self: BitGrid, other: BitGrid): boolean {
-  const aPopulation = self.getPopulation();
+export function isSameWithSymm(
+  self: BitGrid | PreparedGrid,
+  other: BitGrid,
+): boolean {
+  const isPrep = "_isPrepared" in self;
+  const selfGrid = isPrep ? self.grid : self;
+  const aPopulation = isPrep ? self.population : self.getPopulation();
   const bPopulation = other.getPopulation();
+
   if (aPopulation !== bPopulation) {
     return false;
   }
@@ -55,7 +98,7 @@ export function isSameWithSymm(self: BitGrid, other: BitGrid): boolean {
   }
 
   // Fast path: Check Identity symmetry first (0° rotation)
-  if (self.isSamePatternIgnoreTranslation(other)) {
+  if (selfGrid.isSamePatternIgnoreTranslation(other)) {
     return true;
   }
 
@@ -64,23 +107,13 @@ export function isSameWithSymm(self: BitGrid, other: BitGrid): boolean {
     return false;
   }
 
-  // Extract alive cell coordinates into flat arrays ONCE
-  const xs = new Int32Array(aPopulation);
-  const ys = new Int32Array(aPopulation);
-  let idx = 0;
-  self.forEachAlive((x, y) => {
-    xs[idx] = x;
-    ys[idx] = y;
-    idx++;
-  });
-
-  const x0 = xs[0]!;
-  const y0 = ys[0]!;
+  // Reuse prepared grid or prepare ONCE if BitGrid was passed
+  const prep: PreparedGrid = isPrep ? self : prepareGrid(self);
+  const { xs, ys, x0, y0 } = prep;
 
   // Check remaining 7 symmetries (indices 1 to 7)
   for (let sym = 1; sym < 8; sym++) {
     // Initialize minTx and minTy with the transformed coordinates of cell i = 0.
-    // This keeps minTx and minTy strictly as 32-bit Smi integers in V8 JIT without doubles or sentinels.
     let minTx = 0;
     let minTy = 0;
 
@@ -219,6 +252,8 @@ export function isSameWithSymm(self: BitGrid, other: BitGrid): boolean {
  * Calculates the mod of an oscillator or spaceship given its phase histories.
  * The mod is the smallest number of generations (1 <= mod <= period) after which
  * the pattern reappears in its original form up to rotation or reflection.
+ *
+ * Pre-extracts the first frame ONCE across all candidate phase checks.
  */
 export function detectMod(histories: BitGrid[]): number {
   if (histories.length <= 1) {
@@ -230,8 +265,11 @@ export function detectMod(histories: BitGrid[]): number {
     return period;
   }
 
+  // Extract initial frame coordinates ONCE for all candidate checks
+  const preparedFirst = prepareGrid(first);
+
   for (let i = 1; i < period; i++) {
-    if (period % i === 0 && isSameWithSymm(first, histories[i]!)) {
+    if (period % i === 0 && isSameWithSymm(preparedFirst, histories[i]!)) {
       return i;
     }
   }
