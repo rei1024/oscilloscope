@@ -61,6 +61,10 @@ function getDataTableRowsForOscillator(data: AnalyzeResult): DataTableRow[] {
       content: data.period.toString(),
     },
     {
+      header: "Mod",
+      content: data.mod.toString(),
+    },
+    {
       header: "Heat",
       content:
         data.heat.toFixed(2) + `, min = ${data.heatMin}, max = ${data.heatMax}`,
@@ -174,6 +178,10 @@ function getDataTableRowsForSpaceship(data: AnalyzeResult): DataTableRow[] {
     {
       header: "Period",
       content: data.period.toString(),
+    },
+    {
+      header: "Mod",
+      content: data.mod.toString(),
     },
     {
       header: "Population",
