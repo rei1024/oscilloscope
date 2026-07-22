@@ -4,6 +4,7 @@ import { BitGrid } from "@ca-ts/algo/bit";
 import { runOscillator, type RunOscillatorConfig } from "./runOscillator";
 import { getMap, type MapData } from "./getMap";
 import { throwError } from "./error";
+import { detectMod } from "./mod-detection";
 
 function getOrAndGrid(histories: BitGrid[]) {
   if (histories.length === 0) {
@@ -55,6 +56,10 @@ export type AnalyzeResult = {
    * Period
    */
   period: number;
+  /**
+   * Mod
+   */
+  mod: number;
   population: {
     /** Maximum population */
     max: number;
@@ -198,6 +203,7 @@ export function analyzeOscillator(
 
   const period = world.getGen();
   const historiesBitGrid = world.histories.map((h) => h.bitGrid);
+  const mod = detectMod(historiesBitGrid);
 
   const populations = historiesBitGrid.map((bitGrid) =>
     bitGrid.getPopulation(),
@@ -277,6 +283,7 @@ export function analyzeOscillator(
     isSpaceship,
     speed,
     period,
+    mod,
     population,
     boundingBox: rectToSize(boundingBox),
     boundingBoxMovingEncloses: {
